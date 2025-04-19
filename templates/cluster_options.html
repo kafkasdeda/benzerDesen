@@ -1,0 +1,117 @@
+<!-- cluster_options.html -->
+<!-- 
+Oluşturulma: 2025-04-19
+Hazırlayan: Kafkas ❤️ Luna
+Açıklama:
+Bu sayfa, Power User'ların otomatik clusterlama işlemi öncesinde hangi algoritmayı ve parametrelerini seçeceği arayüzdür.
+Desteklenen algoritmalar: K-Means, DBSCAN, Hierarchical
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Clusterlama Ayarları</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 40px;
+    }
+    label, select, input {
+      display: block;
+      margin-top: 10px;
+      font-size: 14px;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #3366cc;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    #status-box {
+      margin-top: 30px;
+      padding: 12px;
+      background: #f2f2f2;
+      border: 1px solid #aaa;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h2>✨ Otomatik Clusterlama Seçenekleri</h2>
+
+  <form id="cluster-form" onsubmit="startClustering(event)">
+    <label>Model Türü:</label>
+    <select name="model_type">
+      <option value="pattern">Desen</option>
+      <option value="color">Renk</option>
+      <option value="texture">Doku</option>
+    </select>
+
+    <label>Algoritma:</label>
+    <select name="algorithm" id="algo-selector" onchange="showParams()">
+      <option value="kmeans">K-Means</option>
+      <option value="dbscan">DBSCAN</option>
+      <option value="hierarchical">Hierarchical</option>
+    </select>
+
+    <div id="kmeans-params">
+      <label>K (küme sayısı):</label>
+      <input type="number" name="k" value="5" />
+    </div>
+
+    <div id="dbscan-params" style="display:none">
+      <label>eps:</label>
+      <input type="number" step="0.1" name="eps" value="0.5" />
+
+      <label>minPts:</label>
+      <input type="number" name="min_samples" value="5" />
+    </div>
+
+    <div id="hierarchical-params" style="display:none">
+      <label>Bağlantı yöntemi:</label>
+      <select name="linkage">
+        <option value="ward">Ward</option>
+        <option value="complete">Complete</option>
+        <option value="average">Average</option>
+        <option value="single">Single</option>
+      </select>
+    </div>
+
+    <button type="submit">🔁 Clusterla</button>
+  </form>
+
+  <div id="status-box">Hazır...</div>
+
+  <script>
+    function showParams() {
+      const algo = document.getElementById("algo-selector").value;
+      document.getElementById("kmeans-params").style.display = algo === "kmeans" ? "block" : "none";
+      document.getElementById("dbscan-params").style.display = algo === "dbscan" ? "block" : "none";
+      document.getElementById("hierarchical-params").style.display = algo === "hierarchical" ? "block" : "none";
+    }
+
+    function startClustering(event) {
+      event.preventDefault();
+      const formData = new FormData(document.getElementById("cluster-form"));
+      const payload = Object.fromEntries(formData);
+
+      fetch("/auto-cluster", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      })
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById("status-box").textContent = data.status;
+      })
+      .catch(err => {
+        document.getElementById("status-box").textContent = "❌ Hata: " + err;
+      });
+    }
+  </script>
+</body>
+</html>

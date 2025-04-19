@@ -1,0 +1,5732 @@
+[
+  {
+    "ID": 267294,
+    "BlendID": 1,
+    "HTYPE": "WV",
+    "PERCENTAGE": 10
+  },
+  {
+    "ID": 267295,
+    "BlendID": 1,
+    "HTYPE": "LI",
+    "PERCENTAGE": 49
+  },
+  {
+    "ID": 267296,
+    "BlendID": 1,
+    "HTYPE": "PES",
+    "PERCENTAGE": 40
+  },
+  {
+    "ID": 267297,
+    "BlendID": 1,
+    "HTYPE": "EA",
+    "PERCENTAGE": 1
+  },
+  {
+    "ID": 267298,
+    "BlendID": 2,
+    "HTYPE": "WV",
+    "PERCENTAGE": 10
+  },
+  {
+    "ID": 267299,
+    "BlendID": 2,
+    "HTYPE": "PES",
+    "PERCENTAGE": 63
+  },
+  {
+    "ID": 267300,
+    "BlendID": 2,
+    "HTYPE": "CV",
+    "PERCENTAGE": 27
+  },
+  {
+    "ID": 267301,
+    "BlendID": 3,
+    "HTYPE": "CO",
+    "PERCENTAGE": 100
+  },
+  {
+    "ID": 267302,
+    "BlendID": 4,
+    "HTYPE": "LI",
+    "PERCENTAGE": 100
+  },
+  {
+    "ID": 267303,
+    "BlendID": 5,
+    "HTYPE": "PA",
+    "PERCENTAGE": 100
+  },
+  {
+    "ID": 267304,
+    "BlendID": 6,
+    "HTYPE": "WOOL(RWS)",
+    "PERCENTAGE": 100
+  },
+  {
+    "ID": 267305,
+    "BlendID": 7,
+    "HTYPE": "WV",
+    "PERCENTAGE": 100
+  },
+  {
+    "ID": 267306,
+    "BlendID": 8,
+    "HTYPE": "WV",
+    "PERCENTAGE": 11
+  },
+  {
+    "ID": 267307,
+    "BlendID": 8,
+    "HTYPE": "PES",
+    "PERCENTAGE": 60
+  },
+  {
+    "ID": 267308,
+    "BlendID": 8,
+    "HTYPE": "CV",
+    "PERCENTAGE": 24
+  },
+  {
+    "ID": 267309,
+    "BlendID": 8,
+    "HTYPE": "EA",
+    "PERCENTAGE": 5
+  },
+  {
+    "ID": 267310,
+    "BlendID": 9,
+    "HTYPE": "WV",
+    "PERCENTAGE": 12
+  },
+  {
+    "ID": 267311,
+    "BlendID": 9,
+    "HTYPE": "CO",
+    "PERCENTAGE": 40
+  },
+  {
+    "ID": 267312,
+    "BlendID": 9,
+    "HTYPE": "PES",
+    "PERCENTAGE": 36
+  },
+  {
+    "ID": 267313,
+    "BlendID": 9,
+    "HTYPE": "LI",
+    "PERCENTAGE": 10
+  },
+  {
+    "ID": 267314,
+    "BlendID": 9,
+    "HTYPE": "EA",
+    "PERCENTAGE": 2
+  },
+  {
+    "ID": 267315,
+    "BlendID": 10,
+    "HTYPE": "WV",
+    "PERCENTAGE": 12
+  },
+  {
+    "ID": 267316,
+    "BlendID": 10,
+    "HTYPE": "CO",
+    "PERCENTAGE": 41
+  },
+  {
+    "ID": 267317,
+    "BlendID": 10,
+    "HTYPE": "PES",
+    "PERCENTAGE": 36
+  },
+  {
+    "ID": 267318,
+    "BlendID": 10,
+    "HTYPE": "LI",
+    "PERCENTAGE": 10
+  },
+  {
+    "ID": 267319,
+    "BlendID": 10,
+    "HTYPE": "EA",
+    "PERCENTAGE": 1
+  },
+  {
+    "ID": 267320,
+    "BlendID": 11,
+    "HTYPE": "WV",
+    "PERCENTAGE": 12
+  },
+  {
+    "ID": 267321,
+    "BlendID": 11,
+    "HTYPE": "CO",
+    "PERCENTAGE": 58
+  },
+  {
+    "ID": 267322,
+    "BlendID": 11,
+    "HTYPE": "PC",
+    "PERCENTAGE": 25
+  },
+  {
+    "ID": 267323,
+    "BlendID": 11,
+    "HTYPE": "PES",
+    "PERCENTAGE": 5
+  },
+  {
+    "ID": 267324,
+    "BlendID": 12,
+    "HTYPE": "WV",
+    "PERCENTAGE": 12
+  },
+  {
+    "ID": 267325,
+    "BlendID": 12,
+    "HTYPE": "PES",
+    "PERCENTAGE": 60
+  },
+  {
+    "ID": 267326,
+    "BlendID": 12,
+    "HTYPE": "CV",
+    "PERCENTAGE": 24
+  },
+  {
+    "ID": 267327,
+    "BlendID": 12,
+    "HTYPE": "EA",
+    "PERCENTAGE": 4
+  },
+  {
+    "ID": 267328,
+    "BlendID": 13,
+    "HTYPE": "WV",
+    "PERCENTAGE": 12
+  },
+  {
+    "ID": 267329,
+    "BlendID": 13,
+    "HTYPE": "PES",
+    "PERCENTAGE": 61
+  },
+  {
+    "ID": 267330,
+    "BlendID": 13,
+    "HTYPE": "CV",
+    "PERCENTAGE": 23
+  },
+  {
+    "ID": 267331,
+    "BlendID": 13,
+    "HTYPE": "EA",
+    "PERCENTAGE": 4
+  },
+  {
+    "ID": 267332,
+    "BlendID": 14,
+    "HTYPE": "WV",
+    "PERCENTAGE": 12
+  },
+  {
+    "ID": 267333,
+    "BlendID": 14,
+    "HTYPE": "CO",
+    "PERCENTAGE": 82
+  },
+  {
+    "ID": 267334,
+    "BlendID": 14,
+    "HTYPE": "SE",
+    "PERCENTAGE": 5
+  },
+  {
+    "ID": 267335,
+    "BlendID": 14,
+    "HTYPE": "EA",
+    "PERCENTAGE": 1
+  },
+  {
+    "ID": 267336,
+    "BlendID": 15,
+    "HTYPE": "WV",
+    "PERCENTAGE": 13
+  },
+  {
+    "ID": 267337,
+    "BlendID": 15,
+    "HTYPE": "PES",
+    "PERCENTAGE": 60
+  },
+  {
+    "ID": 267338,
+    "BlendID": 15,
+    "HTYPE": "CV",
+    "PERCENTAGE": 23
+  },
+  {
+    "ID": 267339,
+    "BlendID": 15,
+    "HTYPE": "EA",
+    "PERCENTAGE": 4
+  },
+  {
+    "ID": 267340,
+    "BlendID": 16,
+    "HTYPE": "WV",
+    "PERCENTAGE": 14
+  },
+  {
+    "ID": 267341,
+    "BlendID": 16,
+    "HTYPE": "PES",
+    "PERCENTAGE": 82
+  },
+  {
+    "ID": 267342,
+    "BlendID": 16,
+    "HTYPE": "EA",
+    "PERCENTAGE": 4
+  },
+  {
+    "ID": 267343,
+    "BlendID": 17,
+    "HTYPE": "WV",
+    "PERCENTAGE": 14
+  },
+  {
+    "ID": 267344,
+    "BlendID": 17,
+    "HTYPE": "PES",
+    "PERCENTAGE": 83
+  },
+  {
+    "ID": 267345,
+    "BlendID": 17,
+    "HTYPE": "EA",
+    "PERCENTAGE": 3
+  },
+  {
+    "ID": 267346,
+    "BlendID": 18,
+    "HTYPE": "WV",
+    "PERCENTAGE": 14
+  },
+  {
+    "ID": 267347,
+    "BlendID": 18,
+    "HTYPE": "PES",
+    "PERCENTAGE": 84
+  },
+  {
+    "ID": 267348,
+    "BlendID": 18,
+    "HTYPE": "EA",
+    "PERCENTAGE": 2
+  },
+  {
+    "ID": 267349,
+    "BlendID": 19,
+    "HTYPE": "WV",
+    "PERCENTAGE": 15
+  },
+  {
+    "ID": 267350,
+    "BlendID": 19,
+    "HTYPE": "PES",
+    "PERCENTAGE": 60
+  },
+  {
+    "ID": 267351,
+    "BlendID": 19,
+    "HTYPE": "CV",
+    "PERCENTAGE": 22
+  },
+  {
+    "ID": 267352,
+    "BlendID": 19,
+    "HTYPE": "EA",
+    "PERCENTAGE": 3
+  },
+  {
+    "ID": 267353,
+    "BlendID": 20,
+    "HTYPE": "WV",
+    "PERCENTAGE": 15
+  },
+  {
+    "ID": 267354,
+    "BlendID": 20,
+    "HTYPE": "PES",
+    "PERCENTAGE": 60
+  },
+  {
+    "ID": 267355,
+    "BlendID": 20,
+    "HTYPE": "CV",
+    "PERCENTAGE": 23
+  },
+  {
+    "ID": 267356,
+    "BlendID": 20,
+    "HTYPE": "EA",
+    "PERCENTAGE": 2
+  },
+  {
+    "ID": 267357,
+    "BlendID": 21,
+    "HTYPE": "WV",
+    "PERCENTAGE": 15
+  },
+  {
+    "ID": 267358,
+    "BlendID": 21,
+    "HTYPE": "PES",
+    "PERCENTAGE": 76
+  },
+  {
+    "ID": 267359,
+    "BlendID": 21,
+    "HTYPE": "CV",
+    "PERCENTAGE": 7
+  },
+  {
+    "ID": 267360,
+    "BlendID": 21,
+    "HTYPE": "LUREX",
+    "PERCENTAGE": 1
+  },
+  {
+    "ID": 267361,
+    "BlendID": 21,
+    "HTYPE": "EA",
+    "PERCENTAGE": 1
+  },
+  {
+    "ID": 267362,
+    "BlendID": 22,
+    "HTYPE": "WV",
+    "PERCENTAGE": 15
+  },
+  {
+    "ID": 267363,
+    "BlendID": 22,
+    "HTYPE": "PES",
+    "PERCENTAGE": 84
+  },
+  {
+    "ID": 267364,
+    "BlendID": 22,
+    "HTYPE": "EA",
+    "PERCENTAGE": 1
+  },
+  {
+    "ID": 267365,
+    "BlendID": 23,
+    "HTYPE": "WV",
+    "PERCENTAGE": 16
+  },
+  {
+    "ID": 267366,
+    "BlendID": 23,
+    "HTYPE": "PES",
+    "PERCENTAGE": 19
+  },
+  {
+    "ID": 267367,
+    "BlendID": 23,
+    "HTYPE": "LI",
+    "PERCENTAGE": 63
+  },
+  {
+    "ID": 267368,
+    "BlendID": 23,
+    "HTYPE": "EA",
+    "PERCENTAGE": 2
+  },
+  {
+    "ID": 267369,
+    "BlendID": 24,
+    "HTYPE": "WV",
+    "PERCENTAGE": 16
+  },
+  {
+    "ID": 267370,
+    "BlendID": 24,
+    "HTYPE": "PES",
+    "PERCENTAGE": 50
+  },
+  {
+    "ID": 267371,
+    "BlendID": 24,
+    "HTYPE": "CO",
+    "PERCENTAGE": 25
+  },
+  {
+    "ID": 267372,
+    "BlendID": 24,
+    "HTYPE": "LI",
+    "PERCENTAGE": 6
+  },
+  {
+    "ID": 267373,
+    "BlendID": 24,
+    "HTYPE": "EA",
+    "PERCENTAGE": 3
+  },
+  {
+    "ID": 267374,
+    "BlendID": 25,
+    "HTYPE": "WV",
+    "PERCENTAGE": 16
+  },
+  {
+    "ID": 267375,
+    "BlendID": 25,
+    "HTYPE": "PES",
+    "PERCENTAGE": 59
+  },
+  {
+    "ID": 267376,
+    "BlendID": 25,
+    "HTYPE": "CV",
+    "PERCENTAGE": 21
+  },
+  {
+    "ID": 267377,
+    "BlendID": 25,
+    "HTYPE": "EA",
+    "PERCENTAGE": 4
+  },
+  {
+    "ID": 267378,
+    "BlendID": 26,
+    "HTYPE": "WV",
+    "PERCENTAGE": 17
+  },
+  {
+    "ID": 267379,
+    "BlendID": 26,
+    "HTYPE": "PES",
+    "PERCENTAGE": 58
+  },
+  {
+    "ID": 267380,
+    "BlendID": 26,
+    "HTYPE": "PES(R-PET)",
+    "PERCENTAGE": 19
+  },
+  {
+    "ID": 267381,
+    "BlendID": 26,
+    "HTYPE": "EA",
+    "PERCENTAGE": 6
+  },
+  {
+    "ID": 267382,
+    "BlendID": 27,
+    "HTYPE": "WV",
+    "PERCENTAGE": 18
+  },
+  {
+    "ID": 267383,
+    "BlendID": 27,
+    "HTYPE": "PES",
+    "PERCENTAGE": 22
+  },
+  {
+    "ID": 267384,
+    "BlendID": 27,
+    "HTYPE": "LI",
+    "PERCENTAGE": 60
+  },
+  {
+    "ID": 267385,
+    "BlendID": 28,
+    "HTYPE": "WV",
+    "PERCENTAGE": 18
+  },
+  {
+    "ID": 267386,
+    "BlendID": 28,
+    "HTYPE": "CO",
+    "PERCENTAGE": 32
+  },
+  {
+    "ID": 267387,
+    "BlendID": 28,
+    "HTYPE": "LI",
+    "PERCENTAGE": 28
+  },
+  {
+    "ID": 267388,
+    "BlendID": 28,
+    "HTYPE": "PES",
+    "PERCENTAGE": 22
+  },
+  {
+    "ID": 267389,
+    "BlendID": 29,
+    "HTYPE": "WV",
+    "PERCENTAGE": 18
+  },
+  {
+    "ID": 267390,
+    "BlendID": 29,
+    "HTYPE": "LI",
+    "PERCENTAGE": 60
+  },
+  {
+    "ID": 267391,
+    "BlendID": 29,
+    "HTYPE": "PES",
+    "PERCENTAGE": 22
+  },
+  {
+    "ID": 267392,
+    "BlendID": 30,
+    "HTYPE": "WV",
+    "PERCENTAGE": 18
+  },
+  {
+    "ID": 267393,
+    "BlendID": 30,
+    "HTYPE": "PES",
+    "PERCENTAGE": 8
+  },
+  {
+    "ID": 267394,
+    "BlendID": 30,
+    "HTYPE": "LI",
+    "PERCENTAGE": 23
+  },
+  {
+    "ID": 267395,
+    "BlendID": 30,
+    "HTYPE": "SE",
+    "PERCENTAGE": 6
+  },
+  {
+    "ID": 267396,
+    "BlendID": 30,
+    "HTYPE": "CO",
+    "PERCENTAGE": 37
+  },
+  {
+    "ID": 267397,
+    "BlendID": 30,
+    "HTYPE": "CV",
+    "PERCENTAGE": 8
+  },
+  {
+    "ID": 267398,
+    "BlendID": 31,
+    "HTYPE": "WV",
+    "PERCENTAGE": 19
+  },
+  {
+    "ID": 267399,
+    "BlendID": 31,
+    "HTYPE": "PES",
+    "PERCENTAGE": 23
+  },
+  {
+    "ID": 267400,
+    "BlendID": 31,
+    "HTYPE": "LI",
+    "PERCENTAGE": 58
+  },
+  {
+    "ID": 267401,
+    "BlendID": 32,
+    "HTYPE": "WS",
+    "PERCENTAGE": 2
+  },
+  {
+    "ID": 267402,
+    "BlendID": 32,
+    "HTYPE": "WV",
+    "PERCENTAGE": 44
+  },
+  {
+    "ID": 267403,
+    "BlendID": 32,
+    "HTYPE": "CO",
+    "PERCENTAGE": 52
+  },
+  {
+    "ID": 267404,
+    "BlendID": 32,
+    "HTYPE": "EA",
+    "PERCENTAGE": 2
+  },
+  {
+    "ID": 267405,
+    "BlendID": 33,
+    "HTYPE": "WV",
+    "PERCENTAGE": 20
+  },
+  {
+    "ID": 267406,
+    "BlendID": 33,
+    "HTYPE": "CV",
+    "PERCENTAGE": 39
+  },
+  {
+    "ID": 267407,
+    "BlendID": 33,
+    "HTYPE": "PES",
+    "PERCENTAGE": 39
+  },
+  {
+    "ID": 267408,
+    "BlendID": 33,
+    "HTYPE": "EA",
+    "PERCENTAGE": 2
+  },
+  {
+    "ID": 267409,
+    "BlendID": 34,
+    "HTYPE": "WV",
+    "PERCENTAGE": 20
+  },
+  {
+    "ID": 267410,
+    "BlendID": 34,
+    "HTYPE": "CV",
+    "PERCENTAGE": 53
+  },
+  {
+    "ID": 267411,
+    "BlendID": 34,
+    "HTYPE": "PES",
+    "PERCENTAGE": 25
+  },
+  {
+    "ID": 267412,
+    "BlendID": 34,
+    "HTYPE": "EA",
+    "PERCENTAGE": 2
+  },
+  {
+    "ID": 267413,
+    "BlendID": 35,
+    "HTYPE": "WV",
+    "PERCENTAGE": 20
+  },
+  {
+    "ID": 267414,
+    "BlendID": 35,
+    "HTYPE": "ECOVERO",
+    "PERCENTAGE": 53
+  },
+  {
+    "ID": 267415,
+    "BlendID": 35,
+    "HTYPE": "PES",
+    "PERCENTAGE": 25
+  },
+  {
+    "ID": 267416,
+    "BlendID": 35,
+    "HTYPE": "EA",
+    "PERCENTAGE": 2
+  },
+  {
+    "ID": 267417,
+    "BlendID": 36,
+    "HTYPE": "WV",
+    "PERCENTAGE": 20
+  },
+  {
+    "ID": 267418,
+    "BlendID": 36,
+    "HTYPE": "LI",
+    "PERCENTAGE": 55
+  },
+  {
+    "ID": 267419,
+    "BlendID": 36,
+    "HTYPE": "PES",
+    "PERCENTAGE": 24
+  },
+  {
+    "ID": 267420,
+    "BlendID": 36,
+    "HTYPE": "EA",
+    "PERCENTAGE": 1
+  },
+  {
+    "ID": 267421,
+    "BlendID": 37,
+    "HTYPE": "WV",
+    "PERCENTAGE": 20
+  },
+  {
+    "ID": 267422,
+    "BlendID": 37,
+    "HTYPE": "PES",
+    "PERCENTAGE": 63
+  },
+  {
+    "ID": 267423,
+    "BlendID": 37,
+    "HTYPE": "LI",
+    "PERCENTAGE": 16
+  },
+  {
+    "ID": 267424,
+    "BlendID": 37,
+    "HTYPE": "EA",
+    "PERCENTAGE": 1
+  },
+  {
+    "ID": 267425,
+    "BlendID": 38,
+    "HTYPE": "WV",
+    "PERCENTAGE": 21
+  },
+  {
+    "ID": 267426,
+    "BlendID": 38,
+    "HTYPE": "LI",
+    "PERCENTAGE": 51
+  },
+  {
+    "ID": 267427,
+    "BlendID": 38,
+    "HTYPE": "PES",
+    "PERCENTAGE": 26
+  },
+  {
+    "ID": 267428,
+    "BlendID": 38,
+    "HTYPE": "EA",
+    "PERCENTAGE": 2
+  },
+  {
+    "ID": 267429,
+    "BlendID": 39,
+    "HTYPE": "WV",
+    "PERCENTAGE": 21
+  },
+  {
+    "ID": 267430,
+    "BlendID": 39,
+    "HTYPE": "LI",
+    "PERCENTAGE": 52
+  },
+  {
+    "ID": 267431,
+    "BlendID": 39,
+    "HTYPE": "PES",
+    "PERCENTAGE": 25
+  },
+  {
+    "ID": 267432,
+    "BlendID": 39,
+    "HTYPE": "EA",
+    "PERCENTAGE": 2
+  },
+  {
+    "ID": 267433,
+    "BlendID": 40,
+    "HTYPE": "WV",
+    "PERCENTAGE": 21
+  },
+  {
+    "ID": 267434,
+    "BlendID": 40,
+    "HTYPE": "PES",
+    "PERCENTAGE": 52
+  },
+  {
+    "ID": 267435,
+    "BlendID": 40,
+    "HTYPE": "CV",
+    "PERCENTAGE": 21
+  },
+  {
+    "ID": 267436,
+    "BlendID": 40,
+    "HTYPE": "EA",
+    "PERCENTAGE": 6
+  },
+  {
+    "ID": 267437,
+    "BlendID": 41,
+    "HTYPE": "WV",
+    "PERCENTAGE": 21
+  },
+  {
+    "ID": 267438,
+    "BlendID": 41,
+    "HTYPE": "PES",
+    "PERCENTAGE": 52
+  },
+  {
+    "ID": 267439,
+    "BlendID": 41,
+    "HTYPE": "CV",
+    "PERCENTAGE": 22
+  },
+  {
+    "ID": 267440,
+    "BlendID": 41,
+    "HTYPE": "EA",
+    "PERCENTAGE": 5
+  },
+  {
+    "ID": 267441,
+    "BlendID": 42,
+    "HTYPE": "WV",
+    "PERCENTAGE": 21
+  },
+  {
+    "ID": 267442,
+    "BlendID": 42,
+    "HTYPE": "PES(R-PET)",
+    "PERCENTAGE": 52
+  },
+  {
+    "ID": 267443,
+    "BlendID": 42,
+    "HTYPE": "CV",
+    "PERCENTAGE": 21
+  },
+  {
+    "ID": 267444,
+    "BlendID": 42,
+    "HTYPE": "EA",
+    "PERCENTAGE": 6
+  },
+  {
+    "ID": 267445,
+    "BlendID": 43,
+    "HTYPE": "WV",
+    "PERCENTAGE": 21
+  },
+  {
+    "ID": 267446,
+    "BlendID": 43,
+    "HTYPE": "PES(R-PET)",
+    "PERCENTAGE": 52
+  },
+  {
+    "ID": 267447,
+    "BlendID": 43,
+    "HTYPE": "CV",
+    "PERCENTAGE": 22
+  },
+  {
+    "ID": 267448,
+    "BlendID": 43,
+    "HTYPE": "EA",
+    "PERCENTAGE": 5
+  },
+  {
+    "ID": 267449,
+    "BlendID": 44,
+    "HTYPE": "WV",
+    "PERCENTAGE": 21
+  },
+  {
+    "ID": 267450,
+    "BlendID": 44,
+    "HTYPE": "LI",
+    "PERCENTAGE": 70
+  },
+  {
+    "ID": 267451,
+    "BlendID": 44,
+    "HTYPE": "SE",
+    "PERCENTAGE": 9
+  },
+  {
+    "ID": 267452,
+    "BlendID": 45,
+    "HTYPE": "WV",
+    "PERCENTAGE": 21
+  },
+  {
+    "ID": 267453,
+    "BlendID": 45,
+    "HTYPE": "CV",
+    "PERCENTAGE": 79
+  },
+  {
+    "ID": 267454,
+    "BlendID": 46,
+    "HTYPE": "WV",
+    "PERCENTAGE": 22
+  },
+  {
+    "ID": 267455,
+    "BlendID": 46,
+    "HTYPE": "PES",
+    "PERCENTAGE": 70
+  },
+  {
+    "ID": 267456,
+    "BlendID": 46,
+    "HTYPE": "EA",
+    "PERCENTAGE": 8
+  },
+  {
+    "ID": 267457,
+    "BlendID": 47,
+    "HTYPE": "WV",
+    "PERCENTAGE": 22
+  },
+  {
+    "ID": 267458,
+    "BlendID": 47,
+    "HTYPE": "PES",
+    "PERCENTAGE": 77
+  },
+  {
+    "ID": 267459,
+    "BlendID": 47,
+    "HTYPE": "EA",
+    "PERCENTAGE": 1
+  },
+  {
+    "ID": 267460,
+    "BlendID": 48,
+    "HTYPE": "WV",
+    "PERCENTAGE": 23
+  },
+  {
+    "ID": 267461,
+    "BlendID": 48,
+    "HTYPE": "PES",
+    "PERCENTAGE": 28
+  },
+  {
+    "ID": 267462,
+    "BlendID": 48,
+    "HTYPE": "LI",
+    "PERCENTAGE": 33
+  },
+  {
+    "ID": 267463,
+    "BlendID": 48,
+    "HTYPE": "CO",
+    "PERCENTAGE": 16
+  },
+  {
+    "ID": 267464,
+    "BlendID": 49,
+    "HTYPE": "WV",
+    "PERCENTAGE": 23
+  },
+  {
+    "ID": 267465,
+    "BlendID": 49,
+    "HTYPE": "PES",
+    "PERCENTAGE": 46
+  },
+  {
+    "ID": 267466,
+    "BlendID": 49,
+    "HTYPE": "PES(R-PET)",
+    "PERCENTAGE": 28
+  },
+  {
+    "ID": 267467,
+    "BlendID": 49,
+    "HTYPE": "EA",
+    "PERCENTAGE": 3
+  },
+  {
+    "ID": 267468,
+    "BlendID": 50,
+    "HTYPE": "WV",
+    "PERCENTAGE": 23
+  },
+  {
+    "ID": 267469,
+    "BlendID": 50,
+    "HTYPE": "PES",
+    "PERCENTAGE": 62
+  },
+  {
+    "ID": 267470,
+    "BlendID": 50,
+    "HTYPE": "LI",
+    "PERCENTAGE": 14
+  },
+  {
+    "ID": 267471,
+    "BlendID": 50,
+    "HTYPE": "EA",
+    "PERCENTAGE": 1
+  },
+  {
+    "ID": 267472,
+    "BlendID": 51,
+    "HTYPE": "WV",
+    "PERCENTAGE": 23
+  },
+  {
+    "ID": 267473,
+    "BlendID": 51,
+    "HTYPE": "PES",
+    "PERCENTAGE": 75
+  },
+  {
+    "ID": 267474,
+    "BlendID": 51,
+    "HTYPE": "LUREX",
+    "PERCENTAGE": 1
+  },
+  {
+    "ID": 267475,
+    "BlendID": 51,
+    "HTYPE": "EA",
+    "PERCENTAGE": 1
+  },
+  {
+    "ID": 267476,
+    "BlendID": 52,
+    "HTYPE": "WV",
+    "PERCENTAGE": 23
+  },
+  {
+    "ID": 267477,
+    "BlendID": 52,
+    "HTYPE": "PES",
+    "PERCENTAGE": 76
+  },
+  {
+    "ID": 267478,
+    "BlendID": 52,
+    "HTYPE": "EA",
+    "PERCENTAGE": 1
+  },
+  {
+    "ID": 267479,
+    "BlendID": 53,
+    "HTYPE": "WV",
+    "PERCENTAGE": 24
+  },
+  {
+    "ID": 267480,
+    "BlendID": 53,
+    "HTYPE": "PES",
+    "PERCENTAGE": 29
+  },
+  {
+    "ID": 267481,
+    "BlendID": 53,
+    "HTYPE": "CO",
+    "PERCENTAGE": 44
+  },
+  {
+    "ID": 267482,
+    "BlendID": 53,
+    "HTYPE": "EA",
+    "PERCENTAGE": 3
+  },
+  {
+    "ID": 267483,
+    "BlendID": 54,
+    "HTYPE": "WV",
+    "PERCENTAGE": 24
+  },
+  {
+    "ID": 267484,
+    "BlendID": 54,
+    "HTYPE": "PES",
+    "PERCENTAGE": 41
+  },
+  {
+    "ID": 267485,
+    "BlendID": 54,
+    "HTYPE": "CV",
+    "PERCENTAGE": 27
+  },
+  {
+    "ID": 267486,
+    "BlendID": 54,
+    "HTYPE": "SE",
+    "PERCENTAGE": 8
+  },
+  {
+    "ID": 267487,
+    "BlendID": 55,
+    "HTYPE": "WV",
+    "PERCENTAGE": 24
+  },
+  {
+    "ID": 267488,
+    "BlendID": 55,
+    "HTYPE": "CO",
+    "PERCENTAGE": 43
+  },
+  {
+    "ID": 267489,
+    "BlendID": 55,
+    "HTYPE": "PES",
+    "PERCENTAGE": 30
+  },
+  {
+    "ID": 267490,
+    "BlendID": 55,
+    "HTYPE": "EA",
+    "PERCENTAGE": 3
+  },
+  {
+    "ID": 267491,
+    "BlendID": 56,
+    "HTYPE": "WV",
+    "PERCENTAGE": 24
+  },
+  {
+    "ID": 267492,
+    "BlendID": 56,
+    "HTYPE": "PES",
+    "PERCENTAGE": 43
+  },
+  {
+    "ID": 267493,
+    "BlendID": 56,
+    "HTYPE": "PES(R-PET)",
+    "PERCENTAGE": 28
+  },
+  {
+    "ID": 267494,
+    "BlendID": 56,
+    "HTYPE": "EA",
+    "PERCENTAGE": 5
+  },
+  {
+    "ID": 267495,
+    "BlendID": 57,
+    "HTYPE": "WV",
+    "PERCENTAGE": 24
+  },
+  {
+    "ID": 267496,
+    "BlendID": 57,
+    "HTYPE": "PES",
+    "PERCENTAGE": 72
+  },
+  {
+    "ID": 267497,
+    "BlendID": 57,
+    "HTYPE": "EA",
+    "PERCENTAGE": 4
+  },
+  {
+    "ID": 267498,
+    "BlendID": 58,
+    "HTYPE": "WV",
+    "PERCENTAGE": 24
+  },
+  {
+    "ID": 267499,
+    "BlendID": 58,
+    "HTYPE": "PES",
+    "PERCENTAGE": 75
+  },
+  {
+    "ID": 267500,
+    "BlendID": 58,
+    "HTYPE": "EA",
+    "PERCENTAGE": 1
+  },
+  {
+    "ID": 267501,
+    "BlendID": 59,
+    "HTYPE": "WV",
+    "PERCENTAGE": 25
+  },
+  {
+    "ID": 267502,
+    "BlendID": 59,
+    "HTYPE": "PES",
+    "PERCENTAGE": 35
+  },
+  {
+    "ID": 267503,
+    "BlendID": 59,
+    "HTYPE": "PC",
+    "PERCENTAGE": 40
+  },
+  {
+    "ID": 267504,
+    "BlendID": 60,
+    "HTYPE": "WV",
+    "PERCENTAGE": 25
+  },
+  {
+    "ID": 267505,
+    "BlendID": 60,
+    "HTYPE": "PES",
+    "PERCENTAGE": 39
+  },
+  {
+    "ID": 267506,
+    "BlendID": 60,
+    "HTYPE": "CV",
+    "PERCENTAGE": 26
+  },
+  {
+    "ID": 267507,
+    "BlendID": 60,
+    "HTYPE": "SE",
+    "PERCENTAGE": 8
+  },
+  {
+    "ID": 267508,
+    "BlendID": 60,
+    "HTYPE": "EA",
+    "PERCENTAGE": 2
+  },
+  {
+    "ID": 267509,
+    "BlendID": 61,
+    "HTYPE": "LI",
+    "PERCENTAGE": 26
+  },
+  {
+    "ID": 267510,
+    "BlendID": 61,
+    "HTYPE": "CO",
+    "PERCENTAGE": 72
+  },
+  {
+    "ID": 267511,
+    "BlendID": 61,
+    "HTYPE": "EA",
+    "PERCENTAGE": 2
+  },
+  {
+    "ID": 267512,
+    "BlendID": 62,
+    "HTYPE": "WV",
+    "PERCENTAGE": 27
+  },
+  {
+    "ID": 267513,
+    "BlendID": 62,
+    "HTYPE": "PES",
+    "PERCENTAGE": 33
+  },
+  {
+    "ID": 267514,
+    "BlendID": 62,
+    "HTYPE": "PA",
+    "PERCENTAGE": 31
+  },
+  {
+    "ID": 267515,
+    "BlendID": 62,
+    "HTYPE": "EA",
+    "PERCENTAGE": 9
+  },
+  {
+    "ID": 267516,
+    "BlendID": 63,
+    "HTYPE": "WV",
+    "PERCENTAGE": 27
+  },
+  {
+    "ID": 267517,
+    "BlendID": 63,
+    "HTYPE": "CO",
+    "PERCENTAGE": 38
+  },
+  {
+    "ID": 267518,
+    "BlendID": 63,
+    "HTYPE": "PES",
+    "PERCENTAGE": 33
+  },
+  {
+    "ID": 267519,
+    "BlendID": 63,
+    "HTYPE": "EA",
+    "PERCENTAGE": 2
+  },
+  {
+    "ID": 267520,
+    "BlendID": 64,
+    "HTYPE": "WV",
+    "PERCENTAGE": 27
+  },
+  {
+    "ID": 267521,
+    "BlendID": 64,
+    "HTYPE": "PES",
+    "PERCENTAGE": 52
+  },
+  {
+    "ID": 267522,
+    "BlendID": 64,
+    "HTYPE": "CV",
+    "PERCENTAGE": 18
+  },
+  {
+    "ID": 267523,
+    "BlendID": 64,
+    "HTYPE": "EA",
+    "PERCENTAGE": 3
+  },
+  {
+    "ID": 267524,
+    "BlendID": 65,
+    "HTYPE": "WV",
+    "PERCENTAGE": 27
+  },
+  {
+    "ID": 267525,
+    "BlendID": 65,
+    "HTYPE": "PES",
+    "PERCENTAGE": 52
+  },
+  {
+    "ID": 267526,
+    "BlendID": 65,
+    "HTYPE": "VIS",
+    "PERCENTAGE": 19
+  },
+  {
+    "ID": 267527,
+    "BlendID": 65,
+    "HTYPE": "EA",
+    "PERCENTAGE": 2
+  },
+  {
+    "ID": 267528,
+    "BlendID": 66,
+    "HTYPE": "LI",
+    "PERCENTAGE": 28
+  },
+  {
+    "ID": 267529,
+    "BlendID": 66,
+    "HTYPE": "CV",
+    "PERCENTAGE": 35
+  },
+  {
+    "ID": 267530,
+    "BlendID": 66,
+    "HTYPE": "PES",
+    "PERCENTAGE": 11
+  },
+  {
+    "ID": 267531,
+    "BlendID": 66,
+    "HTYPE": "CO",
+    "PERCENTAGE": 26
+  },
+  {
+    "ID": 267532,
+    "BlendID": 67,
+    "HTYPE": "PES",
+    "PERCENTAGE": 28
+  },
+  {
+    "ID": 267533,
+    "BlendID": 67,
+    "HTYPE": "LI",
+    "PERCENTAGE": 56
+  },
+  {
+    "ID": 267534,
+    "BlendID": 67,
+    "HTYPE": "CV",
+    "PERCENTAGE": 15
+  },
+  {
+    "ID": 267535,
+    "BlendID": 67,
+    "HTYPE": "EA",
+    "PERCENTAGE": 1
+  },
+  {
+    "ID": 267536,
+    "BlendID": 68,
+    "HTYPE": "WV",
+    "PERCENTAGE": 28
+  },
+  {
+    "ID": 267537,
+    "BlendID": 68,
+    "HTYPE": "PA",
+    "PERCENTAGE": 37
+  },
+  {
+    "ID": 267538,
+    "BlendID": 68,
+    "HTYPE": "PES",
+    "PERCENTAGE": 35
+  },
+  {
+    "ID": 267539,
+    "BlendID": 69,
+    "HTYPE": "WV",
+    "PERCENTAGE": 28
+  },
+  {
+    "ID": 267540,
+    "BlendID": 69,
+    "HTYPE": "PA",
+    "PERCENTAGE": 38
+  },
+  {
+    "ID": 267541,
+    "BlendID": 69,
+    "HTYPE": "PES",
+    "PERCENTAGE": 34
+  },
+  {
+    "ID": 267542,
+    "BlendID": 70,
+    "HTYPE": "WV",
+    "PERCENTAGE": 29
+  },
+  {
+    "ID": 267543,
+    "BlendID": 70,
+    "HTYPE": "PES",
+    "PERCENTAGE": 36
+  },
+  {
+    "ID": 267544,
+    "BlendID": 70,
+    "HTYPE": "RPET",
+    "PERCENTAGE": 35
+  },
+  {
+    "ID": 267545,
+    "BlendID": 71,
+    "HTYPE": "WV",
+    "PERCENTAGE": 30
+  },
+  {
+    "ID": 267546,
+    "BlendID": 71,
+    "HTYPE": "PES",
+    "PERCENTAGE": 33
+  },
+  {
+    "ID": 267547,
+    "BlendID": 71,
+    "HTYPE": "CV",
+    "PERCENTAGE": 18
+  },
+  {
+    "ID": 267548,
+    "BlendID": 71,
+    "HTYPE": "PA",
+    "PERCENTAGE": 13
+  },
+  {
+    "ID": 267549,
+    "BlendID": 71,
+    "HTYPE": "LUREX",
+    "PERCENTAGE": 6
+  },
+  {
+    "ID": 267550,
+    "BlendID": 72,
+    "HTYPE": "WV",
+    "PERCENTAGE": 30
+  },
+  {
+    "ID": 267551,
+    "BlendID": 72,
+    "HTYPE": "PES",
+    "PERCENTAGE": 55
+  },
+  {
+    "ID": 267552,
+    "BlendID": 72,
+    "HTYPE": "CV",
+    "PERCENTAGE": 10
+  },
+  {
+    "ID": 267553,
+    "BlendID": 72,
+    "HTYPE": "LUREX",
+    "PERCENTAGE": 3
+  },
+  {
+    "ID": 267554,
+    "BlendID": 72,
+    "HTYPE": "EA",
+    "PERCENTAGE": 2
+  },
+  {
+    "ID": 267555,
+    "BlendID": 73,
+    "HTYPE": "WV",
+    "PERCENTAGE": 31
+  },
+  {
+    "ID": 267556,
+    "BlendID": 73,
+    "HTYPE": "PES(R-PET)",
+    "PERCENTAGE": 32
+  },
+  {
+    "ID": 267557,
+    "BlendID": 73,
+    "HTYPE": "CV",
+    "PERCENTAGE": 21
+  },
+  {
+    "ID": 267558,
+    "BlendID": 73,
+    "HTYPE": "PES",
+    "PERCENTAGE": 14
+  },
+  {
+    "ID": 267559,
+    "BlendID": 73,
+    "HTYPE": "EA",
+    "PERCENTAGE": 2
+  },
+  {
+    "ID": 267560,
+    "BlendID": 74,
+    "HTYPE": "WV",
+    "PERCENTAGE": 31
+  },
+  {
+    "ID": 267561,
+    "BlendID": 74,
+    "HTYPE": "PES",
+    "PERCENTAGE": 49
+  },
+  {
+    "ID": 267562,
+    "BlendID": 74,
+    "HTYPE": "CV",
+    "PERCENTAGE": 19
+  },
+  {
+    "ID": 267563,
+    "BlendID": 74,
+    "HTYPE": "EA",
+    "PERCENTAGE": 1
+  },
+  {
+    "ID": 267564,
+    "BlendID": 75,
+    "HTYPE": "WV",
+    "PERCENTAGE": 32
+  },
+  {
+    "ID": 267565,
+    "BlendID": 75,
+    "HTYPE": "CO",
+    "PERCENTAGE": 45
+  },
+  {
+    "ID": 267566,
+    "BlendID": 75,
+    "HTYPE": "PES",
+    "PERCENTAGE": 21
+  },
+  {
+    "ID": 267567,
+    "BlendID": 75,
+    "HTYPE": "EA",
+    "PERCENTAGE": 2
+  },
+  {
+    "ID": 267568,
+    "BlendID": 76,
+    "HTYPE": "WV",
+    "PERCENTAGE": 32
+  },
+  {
+    "ID": 267569,
+    "BlendID": 76,
+    "HTYPE": "PES",
+    "PERCENTAGE": 52
+  },
+  {
+    "ID": 267570,
+    "BlendID": 76,
+    "HTYPE": "CV",
+    "PERCENTAGE": 16
+  },
+  {
+    "ID": 267571,
+    "BlendID": 77,
+    "HTYPE": "WV",
+    "PERCENTAGE": 32
+  },
+  {
+    "ID": 267572,
+    "BlendID": 77,
+    "HTYPE": "CO",
+    "PERCENTAGE": 55
+  },
+  {
+    "ID": 267573,
+    "BlendID": 77,
+    "HTYPE": "PA",
+    "PERCENTAGE": 13
+  },
+  {
+    "ID": 267574,
+    "BlendID": 78,
+    "HTYPE": "WV",
+    "PERCENTAGE": 32
+  },
+  {
+    "ID": 267575,
+    "BlendID": 78,
+    "HTYPE": "PES",
+    "PERCENTAGE": 65
+  },
+  {
+    "ID": 267576,
+    "BlendID": 78,
+    "HTYPE": "EA",
+    "PERCENTAGE": 3
+  },
+  {
+    "ID": 267577,
+    "BlendID": 79,
+    "HTYPE": "WV",
+    "PERCENTAGE": 33
+  },
+  {
+    "ID": 267578,
+    "BlendID": 79,
+    "HTYPE": "PES",
+    "PERCENTAGE": 22
+  },
+  {
+    "ID": 267579,
+    "BlendID": 79,
+    "HTYPE": "CO",
+    "PERCENTAGE": 43
+  },
+  {
+    "ID": 267580,
+    "BlendID": 79,
+    "HTYPE": "EA",
+    "PERCENTAGE": 2
+  },
+  {
+    "ID": 267581,
+    "BlendID": 80,
+    "HTYPE": "WV",
+    "PERCENTAGE": 33
+  },
+  {
+    "ID": 267582,
+    "BlendID": 80,
+    "HTYPE": "CO",
+    "PERCENTAGE": 43
+  },
+  {
+    "ID": 267583,
+    "BlendID": 80,
+    "HTYPE": "PES",
+    "PERCENTAGE": 22
+  },
+  {
+    "ID": 267584,
+    "BlendID": 80,
+    "HTYPE": "EA",
+    "PERCENTAGE": 2
+  },
+  {
+    "ID": 267585,
+    "BlendID": 81,
+    "HTYPE": "WV",
+    "PERCENTAGE": 35
+  },
+  {
+    "ID": 267586,
+    "BlendID": 81,
+    "HTYPE": "PC",
+    "PERCENTAGE": 35
+  },
+  {
+    "ID": 267587,
+    "BlendID": 81,
+    "HTYPE": "PES",
+    "PERCENTAGE": 30
+  },
+  {
+    "ID": 267588,
+    "BlendID": 82,
+    "HTYPE": "WV",
+    "PERCENTAGE": 35
+  },
+  {
+    "ID": 267589,
+    "BlendID": 82,
+    "HTYPE": "PES",
+    "PERCENTAGE": 47
+  },
+  {
+    "ID": 267590,
+    "BlendID": 82,
+    "HTYPE": "CO",
+    "PERCENTAGE": 17
+  },
+  {
+    "ID": 267591,
+    "BlendID": 82,
+    "HTYPE": "EA",
+    "PERCENTAGE": 1
+  },
+  {
+    "ID": 267592,
+    "BlendID": 83,
+    "HTYPE": "LI",
+    "PERCENTAGE": 36
+  },
+  {
+    "ID": 267593,
+    "BlendID": 83,
+    "HTYPE": "CO",
+    "PERCENTAGE": 61
+  },
+  {
+    "ID": 267594,
+    "BlendID": 83,
+    "HTYPE": "EA",
+    "PERCENTAGE": 3
+  },
+  {
+    "ID": 267595,
+    "BlendID": 84,
+    "HTYPE": "WV",
+    "PERCENTAGE": 36
+  },
+  {
+    "ID": 267596,
+    "BlendID": 84,
+    "HTYPE": "PC",
+    "PERCENTAGE": 43
+  },
+  {
+    "ID": 267597,
+    "BlendID": 84,
+    "HTYPE": "PES",
+    "PERCENTAGE": 21
+  },
+  {
+    "ID": 267598,
+    "BlendID": 85,
+    "HTYPE": "WV",
+    "PERCENTAGE": 36
+  },
+  {
+    "ID": 267599,
+    "BlendID": 85,
+    "HTYPE": "PES",
+    "PERCENTAGE": 43
+  },
+  {
+    "ID": 267600,
+    "BlendID": 85,
+    "HTYPE": "PA",
+    "PERCENTAGE": 21
+  },
+  {
+    "ID": 267601,
+    "BlendID": 86,
+    "HTYPE": "WV",
+    "PERCENTAGE": 36
+  },
+  {
+    "ID": 267602,
+    "BlendID": 86,
+    "HTYPE": "PES",
+    "PERCENTAGE": 59
+  },
+  {
+    "ID": 267603,
+    "BlendID": 86,
+    "HTYPE": "EA",
+    "PERCENTAGE": 5
+  },
+  {
+    "ID": 267604,
+    "BlendID": 87,
+    "HTYPE": "WV",
+    "PERCENTAGE": 36
+  },
+  {
+    "ID": 267605,
+    "BlendID": 87,
+    "HTYPE": "PES",
+    "PERCENTAGE": 63
+  },
+  {
+    "ID": 267606,
+    "BlendID": 87,
+    "HTYPE": "EA",
+    "PERCENTAGE": 1
+  },
+  {
+    "ID": 267607,
+    "BlendID": 88,
+    "HTYPE": "WV",
+    "PERCENTAGE": 37
+  },
+  {
+    "ID": 267608,
+    "BlendID": 88,
+    "HTYPE": "PES",
+    "PERCENTAGE": 31
+  },
+  {
+    "ID": 267609,
+    "BlendID": 88,
+    "HTYPE": "CV",
+    "PERCENTAGE": 17
+  },
+  {
+    "ID": 267610,
+    "BlendID": 88,
+    "HTYPE": "PA",
+    "PERCENTAGE": 15
+  },
+  {
+    "ID": 267611,
+    "BlendID": 89,
+    "HTYPE": "WV",
+    "PERCENTAGE": 37
+  },
+  {
+    "ID": 267612,
+    "BlendID": 89,
+    "HTYPE": "PES",
+    "PERCENTAGE": 59
+  },
+  {
+    "ID": 267613,
+    "BlendID": 89,
+    "HTYPE": "EA",
+    "PERCENTAGE": 4
+  },
+  {
+    "ID": 267614,
+    "BlendID": 90,
+    "HTYPE": "WV",
+    "PERCENTAGE": 37
+  },
+  {
+    "ID": 267615,
+    "BlendID": 90,
+    "HTYPE": "PES",
+    "PERCENTAGE": 61
+  },
+  {
+    "ID": 267616,
+    "BlendID": 90,
+    "HTYPE": "EA",
+    "PERCENTAGE": 2
+  },
+  {
+    "ID": 267617,
+    "BlendID": 91,
+    "HTYPE": "WV",
+    "PERCENTAGE": 38
+  },
+  {
+    "ID": 267618,
+    "BlendID": 91,
+    "HTYPE": "PES",
+    "PERCENTAGE": 39
+  },
+  {
+    "ID": 267619,
+    "BlendID": 91,
+    "HTYPE": "PA",
+    "PERCENTAGE": 16
+  },
+  {
+    "ID": 267620,
+    "BlendID": 91,
+    "HTYPE": "LUREX",
+    "PERCENTAGE": 7
+  },
+  {
+    "ID": 267621,
+    "BlendID": 92,
+    "HTYPE": "WV",
+    "PERCENTAGE": 39
+  },
+  {
+    "ID": 267622,
+    "BlendID": 92,
+    "HTYPE": "LI",
+    "PERCENTAGE": 40
+  },
+  {
+    "ID": 267623,
+    "BlendID": 92,
+    "HTYPE": "CO",
+    "PERCENTAGE": 21
+  },
+  {
+    "ID": 267624,
+    "BlendID": 93,
+    "HTYPE": "WV",
+    "PERCENTAGE": 4
+  },
+  {
+    "ID": 267625,
+    "BlendID": 93,
+    "HTYPE": "CO",
+    "PERCENTAGE": 77
+  },
+  {
+    "ID": 267626,
+    "BlendID": 93,
+    "HTYPE": "PES",
+    "PERCENTAGE": 11
+  },
+  {
+    "ID": 267627,
+    "BlendID": 93,
+    "HTYPE": "PC",
+    "PERCENTAGE": 8
+  },
+  {
+    "ID": 267628,
+    "BlendID": 94,
+    "HTYPE": "WV",
+    "PERCENTAGE": 40
+  },
+  {
+    "ID": 267629,
+    "BlendID": 94,
+    "HTYPE": "LI",
+    "PERCENTAGE": 39
+  },
+  {
+    "ID": 267630,
+    "BlendID": 94,
+    "HTYPE": "CO",
+    "PERCENTAGE": 21
+  },
+  {
+    "ID": 267631,
+    "BlendID": 95,
+    "HTYPE": "WV",
+    "PERCENTAGE": 40
+  },
+  {
+    "ID": 267632,
+    "BlendID": 95,
+    "HTYPE": "PES",
+    "PERCENTAGE": 52
+  },
+  {
+    "ID": 267633,
+    "BlendID": 95,
+    "HTYPE": "CO",
+    "PERCENTAGE": 8
+  },
+  {
+    "ID": 267634,
+    "BlendID": 96,
+    "HTYPE": "WV",
+    "PERCENTAGE": 41
+  },
+  {
+    "ID": 267635,
+    "BlendID": 96,
+    "HTYPE": "PES",
+    "PERCENTAGE": 58
+  },
+  {
+    "ID": 267636,
+    "BlendID": 96,
+    "HTYPE": "EA",
+    "PERCENTAGE": 1
+  },
+  {
+    "ID": 267637,
+    "BlendID": 97,
+    "HTYPE": "WV",
+    "PERCENTAGE": 41
+  },
+  {
+    "ID": 267638,
+    "BlendID": 97,
+    "HTYPE": "LI",
+    "PERCENTAGE": 59
+  },
+  {
+    "ID": 267639,
+    "BlendID": 98,
+    "HTYPE": "CO",
+    "PERCENTAGE": 42
+  },
+  {
+    "ID": 267640,
+    "BlendID": 98,
+    "HTYPE": "PES",
+    "PERCENTAGE": 36
+  },
+  {
+    "ID": 267641,
+    "BlendID": 98,
+    "HTYPE": "CV",
+    "PERCENTAGE": 20
+  },
+  {
+    "ID": 267642,
+    "BlendID": 98,
+    "HTYPE": "EA",
+    "PERCENTAGE": 2
+  },
+  {
+    "ID": 267643,
+    "BlendID": 99,
+    "HTYPE": "PC",
+    "PERCENTAGE": 42
+  },
+  {
+    "ID": 267644,
+    "BlendID": 99,
+    "HTYPE": "LI",
+    "PERCENTAGE": 24
+  },
+  {
+    "ID": 267645,
+    "BlendID": 99,
+    "HTYPE": "PES",
+    "PERCENTAGE": 20
+  },
+  {
+    "ID": 267646,
+    "BlendID": 99,
+    "HTYPE": "CO",
+    "PERCENTAGE": 14
+  },
+  {
+    "ID": 267647,
+    "BlendID": 100,
+    "HTYPE": "PES",
+    "PERCENTAGE": 42
+  },
+  {
+    "ID": 267648,
+    "BlendID": 100,
+    "HTYPE": "CV",
+    "PERCENTAGE": 23
+  },
+  {
+    "ID": 267649,
+    "BlendID": 100,
+    "HTYPE": "PES(R-PES)",
+    "PERCENTAGE": 18
+  },
+  {
+    "ID": 267650,
+    "BlendID": 100,
+    "HTYPE": "R-CO",
+    "PERCENTAGE": 17
+  },
+  {
+    "ID": 267651,
+    "BlendID": 101,
+    "HTYPE": "WOOL(RWS)",
+    "PERCENTAGE": 42
+  },
+  {
+    "ID": 267652,
+    "BlendID": 101,
+    "HTYPE": "PES(R-PET)",
+    "PERCENTAGE": 52
+  },
+  {
+    "ID": 267653,
+    "BlendID": 101,
+    "HTYPE": "EA",
+    "PERCENTAGE": 6
+  },
+  {
+    "ID": 267654,
+    "BlendID": 102,
+    "HTYPE": "WV",
+    "PERCENTAGE": 42
+  },
+  {
+    "ID": 267655,
+    "BlendID": 102,
+    "HTYPE": "PES",
+    "PERCENTAGE": 51
+  },
+  {
+    "ID": 267656,
+    "BlendID": 102,
+    "HTYPE": "CV",
+    "PERCENTAGE": 5
+  },
+  {
+    "ID": 267657,
+    "BlendID": 102,
+    "HTYPE": "PA",
+    "PERCENTAGE": 1
+  },
+  {
+    "ID": 267658,
+    "BlendID": 102,
+    "HTYPE": "LUREX",
+    "PERCENTAGE": 1
+  },
+  {
+    "ID": 267659,
+    "BlendID": 103,
+    "HTYPE": "WV",
+    "PERCENTAGE": 42
+  },
+  {
+    "ID": 267660,
+    "BlendID": 103,
+    "HTYPE": "PES",
+    "PERCENTAGE": 52
+  },
+  {
+    "ID": 267661,
+    "BlendID": 103,
+    "HTYPE": "EA",
+    "PERCENTAGE": 6
+  },
+  {
+    "ID": 267662,
+    "BlendID": 104,
+    "HTYPE": "WV",
+    "PERCENTAGE": 42
+  },
+  {
+    "ID": 267663,
+    "BlendID": 104,
+    "HTYPE": "PES(R-PET)",
+    "PERCENTAGE": 52
+  },
+  {
+    "ID": 267664,
+    "BlendID": 104,
+    "HTYPE": "EA",
+    "PERCENTAGE": 6
+  },
+  {
+    "ID": 267665,
+    "BlendID": 105,
+    "HTYPE": "WV",
+    "PERCENTAGE": 42
+  },
+  {
+    "ID": 267666,
+    "BlendID": 105,
+    "HTYPE": "PES",
+    "PERCENTAGE": 56
+  },
+  {
+    "ID": 267667,
+    "BlendID": 105,
+    "HTYPE": "EA",
+    "PERCENTAGE": 2
+  },
+  {
+    "ID": 267668,
+    "BlendID": 106,
+    "HTYPE": "WV",
+    "PERCENTAGE": 43
+  },
+  {
+    "ID": 267669,
+    "BlendID": 106,
+    "HTYPE": "PES",
+    "PERCENTAGE": 23
+  },
+  {
+    "ID": 267670,
+    "BlendID": 106,
+    "HTYPE": "PA",
+    "PERCENTAGE": 18
+  },
+  {
+    "ID": 267671,
+    "BlendID": 106,
+    "HTYPE": "CV",
+    "PERCENTAGE": 12
+  },
+  {
+    "ID": 267672,
+    "BlendID": 106,
+    "HTYPE": "LUREX",
+    "PERCENTAGE": 4
+  },
+  {
+    "ID": 267673,
+    "BlendID": 107,
+    "HTYPE": "WV",
+    "PERCENTAGE": 43
+  },
+  {
+    "ID": 267674,
+    "BlendID": 107,
+    "HTYPE": "PES",
+    "PERCENTAGE": 26
+  },
+  {
+    "ID": 267675,
+    "BlendID": 107,
+    "HTYPE": "PA",
+    "PERCENTAGE": 17
+  },
+  {
+    "ID": 267676,
+    "BlendID": 107,
+    "HTYPE": "CV",
+    "PERCENTAGE": 14
+  },
+  {
+    "ID": 267677,
+    "BlendID": 108,
+    "HTYPE": "WV",
+    "PERCENTAGE": 43
+  },
+  {
+    "ID": 267678,
+    "BlendID": 108,
+    "HTYPE": "PC",
+    "PERCENTAGE": 36
+  },
+  {
+    "ID": 267679,
+    "BlendID": 108,
+    "HTYPE": "PES",
+    "PERCENTAGE": 13
+  },
+  {
+    "ID": 267680,
+    "BlendID": 108,
+    "HTYPE": "PA",
+    "PERCENTAGE": 8
+  },
+  {
+    "ID": 267681,
+    "BlendID": 109,
+    "HTYPE": "WV",
+    "PERCENTAGE": 43
+  },
+  {
+    "ID": 267682,
+    "BlendID": 109,
+    "HTYPE": "PES",
+    "PERCENTAGE": 52
+  },
+  {
+    "ID": 267683,
+    "BlendID": 109,
+    "HTYPE": "EA",
+    "PERCENTAGE": 5
+  },
+  {
+    "ID": 267684,
+    "BlendID": 110,
+    "HTYPE": "WV",
+    "PERCENTAGE": 43
+  },
+  {
+    "ID": 267685,
+    "BlendID": 110,
+    "HTYPE": "PES",
+    "PERCENTAGE": 52
+  },
+  {
+    "ID": 267686,
+    "BlendID": 110,
+    "HTYPE": "LYC",
+    "PERCENTAGE": 5
+  },
+  {
+    "ID": 267687,
+    "BlendID": 111,
+    "HTYPE": "WV",
+    "PERCENTAGE": 43
+  },
+  {
+    "ID": 267688,
+    "BlendID": 111,
+    "HTYPE": "PES",
+    "PERCENTAGE": 53
+  },
+  {
+    "ID": 267689,
+    "BlendID": 111,
+    "HTYPE": "EA",
+    "PERCENTAGE": 4
+  },
+  {
+    "ID": 267690,
+    "BlendID": 112,
+    "HTYPE": "WV",
+    "PERCENTAGE": 43
+  },
+  {
+    "ID": 267691,
+    "BlendID": 112,
+    "HTYPE": "PES",
+    "PERCENTAGE": 53
+  },
+  {
+    "ID": 267692,
+    "BlendID": 112,
+    "HTYPE": "ELASTAN",
+    "PERCENTAGE": 4
+  },
+  {
+    "ID": 267693,
+    "BlendID": 113,
+    "HTYPE": "WV",
+    "PERCENTAGE": 43
+  },
+  {
+    "ID": 267694,
+    "BlendID": 113,
+    "HTYPE": "PES",
+    "PERCENTAGE": 53
+  },
+  {
+    "ID": 267695,
+    "BlendID": 113,
+    "HTYPE": "LYC",
+    "PERCENTAGE": 4
+  },
+  {
+    "ID": 267696,
+    "BlendID": 114,
+    "HTYPE": "WV",
+    "PERCENTAGE": 43
+  },
+  {
+    "ID": 267697,
+    "BlendID": 114,
+    "HTYPE": "PES",
+    "PERCENTAGE": 55
+  },
+  {
+    "ID": 267698,
+    "BlendID": 114,
+    "HTYPE": "EA",
+    "PERCENTAGE": 2
+  },
+  {
+    "ID": 267699,
+    "BlendID": 115,
+    "HTYPE": "PES",
+    "PERCENTAGE": 52
+  },
+  {
+    "ID": 267700,
+    "BlendID": 116,
+    "HTYPE": "CO",
+    "PERCENTAGE": 44
+  },
+  {
+    "ID": 267701,
+    "BlendID": 116,
+    "HTYPE": "PES",
+    "PERCENTAGE": 35
+  },
+  {
+    "ID": 267702,
+    "BlendID": 116,
+    "HTYPE": "CV",
+    "PERCENTAGE": 19
+  },
+  {
+    "ID": 267703,
+    "BlendID": 116,
+    "HTYPE": "EA",
+    "PERCENTAGE": 2
+  },
+  {
+    "ID": 267704,
+    "BlendID": 117,
+    "HTYPE": "CO",
+    "PERCENTAGE": 44
+  },
+  {
+    "ID": 267705,
+    "BlendID": 117,
+    "HTYPE": "PES",
+    "PERCENTAGE": 35
+  },
+  {
+    "ID": 267706,
+    "BlendID": 117,
+    "HTYPE": "VIS",
+    "PERCENTAGE": 19
+  },
+  {
+    "ID": 267707,
+    "BlendID": 117,
+    "HTYPE": "EA",
+    "PERCENTAGE": 2
+  },
+  {
+    "ID": 267708,
+    "BlendID": 118,
+    "HTYPE": "PES",
+    "PERCENTAGE": 44
+  },
+  {
+    "ID": 267709,
+    "BlendID": 118,
+    "HTYPE": "LI",
+    "PERCENTAGE": 30
+  },
+  {
+    "ID": 267710,
+    "BlendID": 118,
+    "HTYPE": "CV",
+    "PERCENTAGE": 23
+  },
+  {
+    "ID": 267711,
+    "BlendID": 118,
+    "HTYPE": "EA",
+    "PERCENTAGE": 3
+  },
+  {
+    "ID": 267712,
+    "BlendID": 119,
+    "HTYPE": "WV",
+    "PERCENTAGE": 44
+  },
+  {
+    "ID": 267713,
+    "BlendID": 119,
+    "HTYPE": "PA",
+    "PERCENTAGE": 19
+  },
+  {
+    "ID": 267714,
+    "BlendID": 119,
+    "HTYPE": "CO",
+    "PERCENTAGE": 37
+  },
+  {
+    "ID": 267715,
+    "BlendID": 120,
+    "HTYPE": "WV",
+    "PERCENTAGE": 44
+  },
+  {
+    "ID": 267716,
+    "BlendID": 120,
+    "HTYPE": "PES",
+    "PERCENTAGE": 34
+  },
+  {
+    "ID": 267717,
+    "BlendID": 120,
+    "HTYPE": "CV",
+    "PERCENTAGE": 11
+  },
+  {
+    "ID": 267718,
+    "BlendID": 120,
+    "HTYPE": "SE",
+    "PERCENTAGE": 9
+  },
+  {
+    "ID": 267719,
+    "BlendID": 120,
+    "HTYPE": "EA",
+    "PERCENTAGE": 2
+  },
+  {
+    "ID": 267720,
+    "BlendID": 121,
+    "HTYPE": "WV",
+    "PERCENTAGE": 44
+  },
+  {
+    "ID": 267721,
+    "BlendID": 121,
+    "HTYPE": "CO",
+    "PERCENTAGE": 38
+  },
+  {
+    "ID": 267722,
+    "BlendID": 121,
+    "HTYPE": "PA",
+    "PERCENTAGE": 18
+  },
+  {
+    "ID": 267723,
+    "BlendID": 122,
+    "HTYPE": "WV",
+    "PERCENTAGE": 44
+  },
+  {
+    "ID": 267724,
+    "BlendID": 122,
+    "HTYPE": "PES",
+    "PERCENTAGE": 53
+  },
+  {
+    "ID": 267725,
+    "BlendID": 122,
+    "HTYPE": "EA",
+    "PERCENTAGE": 3
+  },
+  {
+    "ID": 267726,
+    "BlendID": 123,
+    "HTYPE": "WV",
+    "PERCENTAGE": 44
+  },
+  {
+    "ID": 267727,
+    "BlendID": 123,
+    "HTYPE": "PES",
+    "PERCENTAGE": 53
+  },
+  {
+    "ID": 267728,
+    "BlendID": 123,
+    "HTYPE": "LYC",
+    "PERCENTAGE": 3
+  },
+  {
+    "ID": 267729,
+    "BlendID": 124,
+    "HTYPE": "WV",
+    "PERCENTAGE": 44
+  },
+  {
+    "ID": 267730,
+    "BlendID": 124,
+    "HTYPE": "PES",
+    "PERCENTAGE": 54
+  },
+  {
+    "ID": 267731,
+    "BlendID": 124,
+    "HTYPE": "EA",
+    "PERCENTAGE": 2
+  },
+  {
+    "ID": 267732,
+    "BlendID": 125,
+    "HTYPE": "WV",
+    "PERCENTAGE": 44
+  },
+  {
+    "ID": 267733,
+    "BlendID": 125,
+    "HTYPE": "PES",
+    "PERCENTAGE": 54
+  },
+  {
+    "ID": 267734,
+    "BlendID": 125,
+    "HTYPE": "LYC",
+    "PERCENTAGE": 2
+  },
+  {
+    "ID": 267735,
+    "BlendID": 126,
+    "HTYPE": "WV",
+    "PERCENTAGE": 44
+  },
+  {
+    "ID": 267736,
+    "BlendID": 126,
+    "HTYPE": "PES(R-PET)",
+    "PERCENTAGE": 54
+  },
+  {
+    "ID": 267737,
+    "BlendID": 126,
+    "HTYPE": "EA",
+    "PERCENTAGE": 2
+  },
+  {
+    "ID": 267738,
+    "BlendID": 127,
+    "HTYPE": "WV",
+    "PERCENTAGE": 44
+  },
+  {
+    "ID": 267739,
+    "BlendID": 127,
+    "HTYPE": "CV",
+    "PERCENTAGE": 56
+  },
+  {
+    "ID": 267740,
+    "BlendID": 128,
+    "HTYPE": "PES",
+    "PERCENTAGE": 45
+  },
+  {
+    "ID": 267741,
+    "BlendID": 128,
+    "HTYPE": "LI",
+    "PERCENTAGE": 29
+  },
+  {
+    "ID": 267742,
+    "BlendID": 128,
+    "HTYPE": "CV",
+    "PERCENTAGE": 23
+  },
+  {
+    "ID": 267743,
+    "BlendID": 128,
+    "HTYPE": "EA",
+    "PERCENTAGE": 3
+  },
+  {
+    "ID": 267744,
+    "BlendID": 129,
+    "HTYPE": "WV",
+    "PERCENTAGE": 45
+  },
+  {
+    "ID": 267745,
+    "BlendID": 129,
+    "HTYPE": "LI",
+    "PERCENTAGE": 55
+  },
+  {
+    "ID": 267746,
+    "BlendID": 130,
+    "HTYPE": "WV",
+    "PERCENTAGE": 45
+  },
+  {
+    "ID": 267747,
+    "BlendID": 130,
+    "HTYPE": "PES",
+    "PERCENTAGE": 55
+  },
+  {
+    "ID": 267748,
+    "BlendID": 131,
+    "HTYPE": "WV",
+    "PERCENTAGE": 45
+  },
+  {
+    "ID": 267749,
+    "BlendID": 131,
+    "HTYPE": "PES(R-PET)",
+    "PERCENTAGE": 55
+  },
+  {
+    "ID": 267750,
+    "BlendID": 132,
+    "HTYPE": "WV",
+    "PERCENTAGE": 46
+  },
+  {
+    "ID": 267751,
+    "BlendID": 132,
+    "HTYPE": "CO",
+    "PERCENTAGE": 43
+  },
+  {
+    "ID": 267752,
+    "BlendID": 132,
+    "HTYPE": "PA",
+    "PERCENTAGE": 8
+  },
+  {
+    "ID": 267753,
+    "BlendID": 132,
+    "HTYPE": "EA",
+    "PERCENTAGE": 3
+  },
+  {
+    "ID": 267754,
+    "BlendID": 133,
+    "HTYPE": "WV",
+    "PERCENTAGE": 46
+  },
+  {
+    "ID": 267755,
+    "BlendID": 133,
+    "HTYPE": "CV",
+    "PERCENTAGE": 52
+  },
+  {
+    "ID": 267756,
+    "BlendID": 133,
+    "HTYPE": "EA",
+    "PERCENTAGE": 2
+  },
+  {
+    "ID": 267757,
+    "BlendID": 134,
+    "HTYPE": "WV",
+    "PERCENTAGE": 46
+  },
+  {
+    "ID": 267758,
+    "BlendID": 134,
+    "HTYPE": "PES",
+    "PERCENTAGE": 52
+  },
+  {
+    "ID": 267759,
+    "BlendID": 134,
+    "HTYPE": "EA",
+    "PERCENTAGE": 2
+  },
+  {
+    "ID": 267760,
+    "BlendID": 135,
+    "HTYPE": "WV",
+    "PERCENTAGE": 46
+  },
+  {
+    "ID": 267761,
+    "BlendID": 135,
+    "HTYPE": "CV",
+    "PERCENTAGE": 53
+  },
+  {
+    "ID": 267762,
+    "BlendID": 135,
+    "HTYPE": "EA",
+    "PERCENTAGE": 1
+  },
+  {
+    "ID": 267763,
+    "BlendID": 136,
+    "HTYPE": "CV",
+    "PERCENTAGE": 47
+  },
+  {
+    "ID": 267764,
+    "BlendID": 136,
+    "HTYPE": "PES(R-PES)",
+    "PERCENTAGE": 26
+  },
+  {
+    "ID": 267765,
+    "BlendID": 136,
+    "HTYPE": "R-CO",
+    "PERCENTAGE": 27
+  },
+  {
+    "ID": 267766,
+    "BlendID": 137,
+    "HTYPE": "CV",
+    "PERCENTAGE": 47
+  },
+  {
+    "ID": 267767,
+    "BlendID": 137,
+    "HTYPE": "R-CO",
+    "PERCENTAGE": 27
+  },
+  {
+    "ID": 267768,
+    "BlendID": 137,
+    "HTYPE": "PES(R-PES)",
+    "PERCENTAGE": 26
+  },
+  {
+    "ID": 267769,
+    "BlendID": 138,
+    "HTYPE": "PA",
+    "PERCENTAGE": 47
+  },
+  {
+    "ID": 267770,
+    "BlendID": 138,
+    "HTYPE": "RPET",
+    "PERCENTAGE": 53
+  },
+  {
+    "ID": 267771,
+    "BlendID": 139,
+    "HTYPE": "PES",
+    "PERCENTAGE": 47
+  },
+  {
+    "ID": 267772,
+    "BlendID": 139,
+    "HTYPE": "LI",
+    "PERCENTAGE": 26
+  },
+  {
+    "ID": 267773,
+    "BlendID": 139,
+    "HTYPE": "CV",
+    "PERCENTAGE": 24
+  },
+  {
+    "ID": 267774,
+    "BlendID": 139,
+    "HTYPE": "EA",
+    "PERCENTAGE": 3
+  },
+  {
+    "ID": 267775,
+    "BlendID": 140,
+    "HTYPE": "WV",
+    "PERCENTAGE": 47
+  },
+  {
+    "ID": 267776,
+    "BlendID": 140,
+    "HTYPE": "PA",
+    "PERCENTAGE": 20
+  },
+  {
+    "ID": 267777,
+    "BlendID": 140,
+    "HTYPE": "PES",
+    "PERCENTAGE": 19
+  },
+  {
+    "ID": 267778,
+    "BlendID": 140,
+    "HTYPE": "CV",
+    "PERCENTAGE": 10
+  },
+  {
+    "ID": 267779,
+    "BlendID": 140,
+    "HTYPE": "LUREX",
+    "PERCENTAGE": 4
+  },
+  {
+    "ID": 267780,
+    "BlendID": 141,
+    "HTYPE": "WV",
+    "PERCENTAGE": 47
+  },
+  {
+    "ID": 267781,
+    "BlendID": 141,
+    "HTYPE": "CO",
+    "PERCENTAGE": 44
+  },
+  {
+    "ID": 267782,
+    "BlendID": 141,
+    "HTYPE": "PA",
+    "PERCENTAGE": 9
+  },
+  {
+    "ID": 267783,
+    "BlendID": 142,
+    "HTYPE": "WV",
+    "PERCENTAGE": 47
+  },
+  {
+    "ID": 267784,
+    "BlendID": 142,
+    "HTYPE": "CV",
+    "PERCENTAGE": 51
+  },
+  {
+    "ID": 267785,
+    "BlendID": 142,
+    "HTYPE": "EA",
+    "PERCENTAGE": 2
+  },
+  {
+    "ID": 267786,
+    "BlendID": 143,
+    "HTYPE": "WV",
+    "PERCENTAGE": 47
+  },
+  {
+    "ID": 267787,
+    "BlendID": 143,
+    "HTYPE": "LI",
+    "PERCENTAGE": 51
+  },
+  {
+    "ID": 267788,
+    "BlendID": 143,
+    "HTYPE": "EA",
+    "PERCENTAGE": 2
+  },
+  {
+    "ID": 267789,
+    "BlendID": 144,
+    "HTYPE": "WV",
+    "PERCENTAGE": 47
+  },
+  {
+    "ID": 267790,
+    "BlendID": 144,
+    "HTYPE": "PES",
+    "PERCENTAGE": 51
+  },
+  {
+    "ID": 267791,
+    "BlendID": 144,
+    "HTYPE": "EA",
+    "PERCENTAGE": 2
+  },
+  {
+    "ID": 267792,
+    "BlendID": 145,
+    "HTYPE": "WV",
+    "PERCENTAGE": 47
+  },
+  {
+    "ID": 267793,
+    "BlendID": 145,
+    "HTYPE": "VIS",
+    "PERCENTAGE": 51
+  },
+  {
+    "ID": 267794,
+    "BlendID": 145,
+    "HTYPE": "LYC",
+    "PERCENTAGE": 2
+  },
+  {
+    "ID": 267795,
+    "BlendID": 146,
+    "HTYPE": "WV",
+    "PERCENTAGE": 47
+  },
+  {
+    "ID": 267796,
+    "BlendID": 146,
+    "HTYPE": "LI",
+    "PERCENTAGE": 53
+  },
+  {
+    "ID": 267797,
+    "BlendID": 147,
+    "HTYPE": "BAMBU",
+    "PERCENTAGE": 48
+  },
+  {
+    "ID": 267798,
+    "BlendID": 147,
+    "HTYPE": "WV",
+    "PERCENTAGE": 31
+  },
+  {
+    "ID": 267799,
+    "BlendID": 147,
+    "HTYPE": "PES",
+    "PERCENTAGE": 21
+  },
+  {
+    "ID": 267800,
+    "BlendID": 148,
+    "HTYPE": "CO",
+    "PERCENTAGE": 48
+  },
+  {
+    "ID": 267801,
+    "BlendID": 148,
+    "HTYPE": "PES",
+    "PERCENTAGE": 32
+  },
+  {
+    "ID": 267802,
+    "BlendID": 148,
+    "HTYPE": "CV",
+    "PERCENTAGE": 17
+  },
+  {
+    "ID": 267803,
+    "BlendID": 148,
+    "HTYPE": "EA",
+    "PERCENTAGE": 3
+  },
+  {
+    "ID": 267804,
+    "BlendID": 149,
+    "HTYPE": "WV",
+    "PERCENTAGE": 48
+  },
+  {
+    "ID": 267805,
+    "BlendID": 149,
+    "HTYPE": "PES",
+    "PERCENTAGE": 50
+  },
+  {
+    "ID": 267806,
+    "BlendID": 149,
+    "HTYPE": "EA",
+    "PERCENTAGE": 2
+  },
+  {
+    "ID": 267807,
+    "BlendID": 150,
+    "HTYPE": "WV",
+    "PERCENTAGE": 48
+  },
+  {
+    "ID": 267808,
+    "BlendID": 150,
+    "HTYPE": "PES",
+    "PERCENTAGE": 52
+  },
+  {
+    "ID": 267809,
+    "BlendID": 151,
+    "HTYPE": "LI",
+    "PERCENTAGE": 49
+  },
+  {
+    "ID": 267810,
+    "BlendID": 151,
+    "HTYPE": "CO",
+    "PERCENTAGE": 43
+  },
+  {
+    "ID": 267811,
+    "BlendID": 151,
+    "HTYPE": "PES",
+    "PERCENTAGE": 8
+  },
+  {
+    "ID": 267812,
+    "BlendID": 152,
+    "HTYPE": "LI",
+    "PERCENTAGE": 49
+  },
+  {
+    "ID": 267813,
+    "BlendID": 152,
+    "HTYPE": "CO",
+    "PERCENTAGE": 51
+  },
+  {
+    "ID": 267814,
+    "BlendID": 153,
+    "HTYPE": "WV",
+    "PERCENTAGE": 49
+  },
+  {
+    "ID": 267815,
+    "BlendID": 153,
+    "HTYPE": "PA",
+    "PERCENTAGE": 21
+  },
+  {
+    "ID": 267816,
+    "BlendID": 153,
+    "HTYPE": "PES",
+    "PERCENTAGE": 18
+  },
+  {
+    "ID": 267817,
+    "BlendID": 153,
+    "HTYPE": "CV",
+    "PERCENTAGE": 9
+  },
+  {
+    "ID": 267818,
+    "BlendID": 153,
+    "HTYPE": "LUREX",
+    "PERCENTAGE": 3
+  },
+  {
+    "ID": 267819,
+    "BlendID": 154,
+    "HTYPE": "WV",
+    "PERCENTAGE": 49
+  },
+  {
+    "ID": 267820,
+    "BlendID": 154,
+    "HTYPE": "LI",
+    "PERCENTAGE": 51
+  },
+  {
+    "ID": 267821,
+    "BlendID": 155,
+    "HTYPE": "WV",
+    "PERCENTAGE": 5
+  },
+  {
+    "ID": 267822,
+    "BlendID": 155,
+    "HTYPE": "LI",
+    "PERCENTAGE": 88
+  },
+  {
+    "ID": 267823,
+    "BlendID": 155,
+    "HTYPE": "PES",
+    "PERCENTAGE": 7
+  },
+  {
+    "ID": 267824,
+    "BlendID": 156,
+    "HTYPE": "CO",
+    "PERCENTAGE": 50
+  },
+  {
+    "ID": 267825,
+    "BlendID": 156,
+    "HTYPE": "CV",
+    "PERCENTAGE": 46
+  },
+  {
+    "ID": 267826,
+    "BlendID": 156,
+    "HTYPE": "EA",
+    "PERCENTAGE": 4
+  },
+  {
+    "ID": 267827,
+    "BlendID": 157,
+    "HTYPE": "LI",
+    "PERCENTAGE": 50
+  },
+  {
+    "ID": 267828,
+    "BlendID": 157,
+    "HTYPE": "CO",
+    "PERCENTAGE": 47
+  },
+  {
+    "ID": 267829,
+    "BlendID": 157,
+    "HTYPE": "EA",
+    "PERCENTAGE": 3
+  },
+  {
+    "ID": 267830,
+    "BlendID": 158,
+    "HTYPE": "TENCEL",
+    "PERCENTAGE": 50
+  },
+  {
+    "ID": 267831,
+    "BlendID": 158,
+    "HTYPE": "CO",
+    "PERCENTAGE": 47
+  },
+  {
+    "ID": 267832,
+    "BlendID": 158,
+    "HTYPE": "EA",
+    "PERCENTAGE": 3
+  },
+  {
+    "ID": 267833,
+    "BlendID": 159,
+    "HTYPE": "WV",
+    "PERCENTAGE": 50
+  },
+  {
+    "ID": 267834,
+    "BlendID": 159,
+    "HTYPE": "CO",
+    "PERCENTAGE": 50
+  },
+  {
+    "ID": 267835,
+    "BlendID": 160,
+    "HTYPE": "WV",
+    "PERCENTAGE": 50
+  },
+  {
+    "ID": 267836,
+    "BlendID": 160,
+    "HTYPE": "LI",
+    "PERCENTAGE": 50
+  },
+  {
+    "ID": 267837,
+    "BlendID": 161,
+    "HTYPE": "WV",
+    "PERCENTAGE": 50
+  },
+  {
+    "ID": 267838,
+    "BlendID": 161,
+    "HTYPE": "PES",
+    "PERCENTAGE": 50
+  },
+  {
+    "ID": 267839,
+    "BlendID": 162,
+    "HTYPE": "CO",
+    "PERCENTAGE": 51
+  },
+  {
+    "ID": 267840,
+    "BlendID": 162,
+    "HTYPE": "LI",
+    "PERCENTAGE": 49
+  },
+  {
+    "ID": 267841,
+    "BlendID": 163,
+    "HTYPE": "LI",
+    "PERCENTAGE": 51
+  },
+  {
+    "ID": 267842,
+    "BlendID": 163,
+    "HTYPE": "CO",
+    "PERCENTAGE": 40
+  },
+  {
+    "ID": 267843,
+    "BlendID": 163,
+    "HTYPE": "PA",
+    "PERCENTAGE": 9
+  },
+  {
+    "ID": 267844,
+    "BlendID": 164,
+    "HTYPE": "LI",
+    "PERCENTAGE": 51
+  },
+  {
+    "ID": 267845,
+    "BlendID": 164,
+    "HTYPE": "CV",
+    "PERCENTAGE": 49
+  },
+  {
+    "ID": 267846,
+    "BlendID": 165,
+    "HTYPE": "PES",
+    "PERCENTAGE": 51
+  },
+  {
+    "ID": 267847,
+    "BlendID": 165,
+    "HTYPE": "CV",
+    "PERCENTAGE": 27
+  },
+  {
+    "ID": 267848,
+    "BlendID": 165,
+    "HTYPE": "LI",
+    "PERCENTAGE": 20
+  },
+  {
+    "ID": 267849,
+    "BlendID": 165,
+    "HTYPE": "EA",
+    "PERCENTAGE": 2
+  },
+  {
+    "ID": 267850,
+    "BlendID": 166,
+    "HTYPE": "WV",
+    "PERCENTAGE": 51
+  },
+  {
+    "ID": 267851,
+    "BlendID": 166,
+    "HTYPE": "PES",
+    "PERCENTAGE": 43
+  },
+  {
+    "ID": 267852,
+    "BlendID": 166,
+    "HTYPE": "EA",
+    "PERCENTAGE": 6
+  },
+  {
+    "ID": 267853,
+    "BlendID": 167,
+    "HTYPE": "WV",
+    "PERCENTAGE": 51
+  },
+  {
+    "ID": 267854,
+    "BlendID": 167,
+    "HTYPE": "PES",
+    "PERCENTAGE": 47
+  },
+  {
+    "ID": 267855,
+    "BlendID": 167,
+    "HTYPE": "EA",
+    "PERCENTAGE": 2
+  },
+  {
+    "ID": 267856,
+    "BlendID": 168,
+    "HTYPE": "WV",
+    "PERCENTAGE": 51
+  },
+  {
+    "ID": 267857,
+    "BlendID": 168,
+    "HTYPE": "CO",
+    "PERCENTAGE": 49
+  },
+  {
+    "ID": 267858,
+    "BlendID": 169,
+    "HTYPE": "CO",
+    "PERCENTAGE": 52
+  },
+  {
+    "ID": 267859,
+    "BlendID": 169,
+    "HTYPE": "LI",
+    "PERCENTAGE": 44
+  },
+  {
+    "ID": 267860,
+    "BlendID": 169,
+    "HTYPE": "PA",
+    "PERCENTAGE": 2
+  },
+  {
+    "ID": 267861,
+    "BlendID": 169,
+    "HTYPE": "PC",
+    "PERCENTAGE": 2
+  },
+  {
+    "ID": 267862,
+    "BlendID": 170,
+    "HTYPE": "CO",
+    "PERCENTAGE": 52
+  },
+  {
+    "ID": 267863,
+    "BlendID": 170,
+    "HTYPE": "LI",
+    "PERCENTAGE": 46
+  },
+  {
+    "ID": 267864,
+    "BlendID": 170,
+    "HTYPE": "EA",
+    "PERCENTAGE": 2
+  },
+  {
+    "ID": 267865,
+    "BlendID": 171,
+    "HTYPE": "WOOL(RWS)",
+    "PERCENTAGE": 52
+  },
+  {
+    "ID": 267866,
+    "BlendID": 171,
+    "HTYPE": "WV",
+    "PERCENTAGE": 19
+  },
+  {
+    "ID": 267867,
+    "BlendID": 171,
+    "HTYPE": "PES(R-PET)",
+    "PERCENTAGE": 24
+  },
+  {
+    "ID": 267868,
+    "BlendID": 171,
+    "HTYPE": "EA",
+    "PERCENTAGE": 5
+  },
+  {
+    "ID": 267869,
+    "BlendID": 172,
+    "HTYPE": "WV",
+    "PERCENTAGE": 52
+  },
+  {
+    "ID": 267870,
+    "BlendID": 172,
+    "HTYPE": "PES(R-PET)",
+    "PERCENTAGE": 24
+  },
+  {
+    "ID": 267871,
+    "BlendID": 172,
+    "HTYPE": "PES",
+    "PERCENTAGE": 22
+  },
+  {
+    "ID": 267872,
+    "BlendID": 172,
+    "HTYPE": "EA",
+    "PERCENTAGE": 2
+  },
+  {
+    "ID": 267873,
+    "BlendID": 173,
+    "HTYPE": "WV",
+    "PERCENTAGE": 52
+  },
+  {
+    "ID": 267874,
+    "BlendID": 173,
+    "HTYPE": "PES",
+    "PERCENTAGE": 46
+  },
+  {
+    "ID": 267875,
+    "BlendID": 173,
+    "HTYPE": "EA",
+    "PERCENTAGE": 2
+  },
+  {
+    "ID": 267876,
+    "BlendID": 174,
+    "HTYPE": "CV",
+    "PERCENTAGE": 53
+  },
+  {
+    "ID": 267877,
+    "BlendID": 174,
+    "HTYPE": "LI",
+    "PERCENTAGE": 47
+  },
+  {
+    "ID": 267878,
+    "BlendID": 175,
+    "HTYPE": "LI",
+    "PERCENTAGE": 53
+  },
+  {
+    "ID": 267879,
+    "BlendID": 175,
+    "HTYPE": "CO",
+    "PERCENTAGE": 44
+  },
+  {
+    "ID": 267880,
+    "BlendID": 175,
+    "HTYPE": "EA",
+    "PERCENTAGE": 3
+  },
+  {
+    "ID": 267881,
+    "BlendID": 176,
+    "HTYPE": "LI",
+    "PERCENTAGE": 53
+  },
+  {
+    "ID": 267882,
+    "BlendID": 176,
+    "HTYPE": "CO",
+    "PERCENTAGE": 47
+  },
+  {
+    "ID": 267883,
+    "BlendID": 177,
+    "HTYPE": "LINEN",
+    "PERCENTAGE": 53
+  },
+  {
+    "ID": 267884,
+    "BlendID": 177,
+    "HTYPE": "CO",
+    "PERCENTAGE": 44
+  },
+  {
+    "ID": 267885,
+    "BlendID": 177,
+    "HTYPE": "EA",
+    "PERCENTAGE": 3
+  },
+  {
+    "ID": 267886,
+    "BlendID": 178,
+    "HTYPE": "WV",
+    "PERCENTAGE": 53
+  },
+  {
+    "ID": 267887,
+    "BlendID": 178,
+    "HTYPE": "PES",
+    "PERCENTAGE": 30
+  },
+  {
+    "ID": 267888,
+    "BlendID": 178,
+    "HTYPE": "CV",
+    "PERCENTAGE": 10
+  },
+  {
+    "ID": 267889,
+    "BlendID": 178,
+    "HTYPE": "SE",
+    "PERCENTAGE": 7
+  },
+  {
+    "ID": 267890,
+    "BlendID": 179,
+    "HTYPE": "WV",
+    "PERCENTAGE": 54
+  },
+  {
+    "ID": 267891,
+    "BlendID": 179,
+    "HTYPE": "PES",
+    "PERCENTAGE": 20
+  },
+  {
+    "ID": 267892,
+    "BlendID": 179,
+    "HTYPE": "CV",
+    "PERCENTAGE": 17
+  },
+  {
+    "ID": 267893,
+    "BlendID": 179,
+    "HTYPE": "SE",
+    "PERCENTAGE": 8
+  },
+  {
+    "ID": 267894,
+    "BlendID": 179,
+    "HTYPE": "EA",
+    "PERCENTAGE": 1
+  },
+  {
+    "ID": 267895,
+    "BlendID": 180,
+    "HTYPE": "WV",
+    "PERCENTAGE": 54
+  },
+  {
+    "ID": 267896,
+    "BlendID": 180,
+    "HTYPE": "PES",
+    "PERCENTAGE": 45
+  },
+  {
+    "ID": 267897,
+    "BlendID": 180,
+    "HTYPE": "EA",
+    "PERCENTAGE": 1
+  },
+  {
+    "ID": 267898,
+    "BlendID": 181,
+    "HTYPE": "WV",
+    "PERCENTAGE": 54
+  },
+  {
+    "ID": 267899,
+    "BlendID": 181,
+    "HTYPE": "PES",
+    "PERCENTAGE": 46
+  },
+  {
+    "ID": 267900,
+    "BlendID": 182,
+    "HTYPE": "CO",
+    "PERCENTAGE": 55
+  },
+  {
+    "ID": 267901,
+    "BlendID": 182,
+    "HTYPE": "WV",
+    "PERCENTAGE": 32
+  },
+  {
+    "ID": 267902,
+    "BlendID": 182,
+    "HTYPE": "PA",
+    "PERCENTAGE": 13
+  },
+  {
+    "ID": 267903,
+    "BlendID": 183,
+    "HTYPE": "CO",
+    "PERCENTAGE": 55
+  },
+  {
+    "ID": 267904,
+    "BlendID": 183,
+    "HTYPE": "CV",
+    "PERCENTAGE": 41
+  },
+  {
+    "ID": 267905,
+    "BlendID": 183,
+    "HTYPE": "LI",
+    "PERCENTAGE": 3
+  },
+  {
+    "ID": 267906,
+    "BlendID": 183,
+    "HTYPE": "EA",
+    "PERCENTAGE": 1
+  },
+  {
+    "ID": 267907,
+    "BlendID": 184,
+    "HTYPE": "WV",
+    "PERCENTAGE": 55
+  },
+  {
+    "ID": 267908,
+    "BlendID": 184,
+    "HTYPE": "PC",
+    "PERCENTAGE": 26
+  },
+  {
+    "ID": 267909,
+    "BlendID": 184,
+    "HTYPE": "PA",
+    "PERCENTAGE": 14
+  },
+  {
+    "ID": 267910,
+    "BlendID": 184,
+    "HTYPE": "PES",
+    "PERCENTAGE": 5
+  },
+  {
+    "ID": 267911,
+    "BlendID": 185,
+    "HTYPE": "WV",
+    "PERCENTAGE": 55
+  },
+  {
+    "ID": 267912,
+    "BlendID": 185,
+    "HTYPE": "PES",
+    "PERCENTAGE": 45
+  },
+  {
+    "ID": 267913,
+    "BlendID": 186,
+    "HTYPE": "LI",
+    "PERCENTAGE": 56
+  },
+  {
+    "ID": 267914,
+    "BlendID": 186,
+    "HTYPE": "PES",
+    "PERCENTAGE": 28
+  },
+  {
+    "ID": 267915,
+    "BlendID": 186,
+    "HTYPE": "CV",
+    "PERCENTAGE": 15
+  },
+  {
+    "ID": 267916,
+    "BlendID": 186,
+    "HTYPE": "EA",
+    "PERCENTAGE": 1
+  },
+  {
+    "ID": 267917,
+    "BlendID": 187,
+    "HTYPE": "WV",
+    "PERCENTAGE": 56
+  },
+  {
+    "ID": 267918,
+    "BlendID": 187,
+    "HTYPE": "PES",
+    "PERCENTAGE": 36
+  },
+  {
+    "ID": 267919,
+    "BlendID": 187,
+    "HTYPE": "SE",
+    "PERCENTAGE": 3
+  },
+  {
+    "ID": 267920,
+    "BlendID": 187,
+    "HTYPE": "CV",
+    "PERCENTAGE": 5
+  },
+  {
+    "ID": 267921,
+    "BlendID": 188,
+    "HTYPE": "WV",
+    "PERCENTAGE": 56
+  },
+  {
+    "ID": 267922,
+    "BlendID": 188,
+    "HTYPE": "CO",
+    "PERCENTAGE": 44
+  },
+  {
+    "ID": 267923,
+    "BlendID": 189,
+    "HTYPE": "WV",
+    "PERCENTAGE": 57
+  },
+  {
+    "ID": 267924,
+    "BlendID": 189,
+    "HTYPE": "PES",
+    "PERCENTAGE": 38
+  },
+  {
+    "ID": 267925,
+    "BlendID": 189,
+    "HTYPE": "PC",
+    "PERCENTAGE": 2
+  },
+  {
+    "ID": 267926,
+    "BlendID": 189,
+    "HTYPE": "CO",
+    "PERCENTAGE": 2
+  },
+  {
+    "ID": 267927,
+    "BlendID": 189,
+    "HTYPE": "PA",
+    "PERCENTAGE": 1
+  },
+  {
+    "ID": 267928,
+    "BlendID": 190,
+    "HTYPE": "WV",
+    "PERCENTAGE": 57
+  },
+  {
+    "ID": 267929,
+    "BlendID": 190,
+    "HTYPE": "PES",
+    "PERCENTAGE": 42
+  },
+  {
+    "ID": 267930,
+    "BlendID": 190,
+    "HTYPE": "EA",
+    "PERCENTAGE": 1
+  },
+  {
+    "ID": 267931,
+    "BlendID": 191,
+    "HTYPE": "WV",
+    "PERCENTAGE": 57
+  },
+  {
+    "ID": 267932,
+    "BlendID": 191,
+    "HTYPE": "CO",
+    "PERCENTAGE": 43
+  },
+  {
+    "ID": 267933,
+    "BlendID": 192,
+    "HTYPE": "WV",
+    "PERCENTAGE": 57
+  },
+  {
+    "ID": 267934,
+    "BlendID": 192,
+    "HTYPE": "LI",
+    "PERCENTAGE": 43
+  },
+  {
+    "ID": 267935,
+    "BlendID": 193,
+    "HTYPE": "WV",
+    "PERCENTAGE": 58
+  },
+  {
+    "ID": 267936,
+    "BlendID": 193,
+    "HTYPE": "PA",
+    "PERCENTAGE": 15
+  },
+  {
+    "ID": 267937,
+    "BlendID": 193,
+    "HTYPE": "PES",
+    "PERCENTAGE": 10
+  },
+  {
+    "ID": 267938,
+    "BlendID": 193,
+    "HTYPE": "CV",
+    "PERCENTAGE": 10
+  },
+  {
+    "ID": 267939,
+    "BlendID": 193,
+    "HTYPE": "SE",
+    "PERCENTAGE": 7
+  },
+  {
+    "ID": 267940,
+    "BlendID": 194,
+    "HTYPE": "WV",
+    "PERCENTAGE": 58
+  },
+  {
+    "ID": 267941,
+    "BlendID": 194,
+    "HTYPE": "PES",
+    "PERCENTAGE": 23
+  },
+  {
+    "ID": 267942,
+    "BlendID": 194,
+    "HTYPE": "PA",
+    "PERCENTAGE": 17
+  },
+  {
+    "ID": 267943,
+    "BlendID": 194,
+    "HTYPE": "EA",
+    "PERCENTAGE": 2
+  },
+  {
+    "ID": 267944,
+    "BlendID": 195,
+    "HTYPE": "WV",
+    "PERCENTAGE": 58
+  },
+  {
+    "ID": 267945,
+    "BlendID": 195,
+    "HTYPE": "PA",
+    "PERCENTAGE": 25
+  },
+  {
+    "ID": 267946,
+    "BlendID": 195,
+    "HTYPE": "PES",
+    "PERCENTAGE": 10
+  },
+  {
+    "ID": 267947,
+    "BlendID": 195,
+    "HTYPE": "CV",
+    "PERCENTAGE": 5
+  },
+  {
+    "ID": 267948,
+    "BlendID": 195,
+    "HTYPE": "LUREX",
+    "PERCENTAGE": 2
+  },
+  {
+    "ID": 267949,
+    "BlendID": 196,
+    "HTYPE": "WV",
+    "PERCENTAGE": 58
+  },
+  {
+    "ID": 267950,
+    "BlendID": 196,
+    "HTYPE": "CO",
+    "PERCENTAGE": 39
+  },
+  {
+    "ID": 267951,
+    "BlendID": 196,
+    "HTYPE": "EA",
+    "PERCENTAGE": 3
+  },
+  {
+    "ID": 267952,
+    "BlendID": 197,
+    "HTYPE": "WV",
+    "PERCENTAGE": 58
+  },
+  {
+    "ID": 267953,
+    "BlendID": 197,
+    "HTYPE": "LI",
+    "PERCENTAGE": 42
+  },
+  {
+    "ID": 267954,
+    "BlendID": 198,
+    "HTYPE": "WV",
+    "PERCENTAGE": 58
+  },
+  {
+    "ID": 267955,
+    "BlendID": 198,
+    "HTYPE": "TENSEL",
+    "PERCENTAGE": 42
+  },
+  {
+    "ID": 267956,
+    "BlendID": 199,
+    "HTYPE": "CV",
+    "PERCENTAGE": 59
+  },
+  {
+    "ID": 267957,
+    "BlendID": 199,
+    "HTYPE": "LI",
+    "PERCENTAGE": 41
+  },
+  {
+    "ID": 267958,
+    "BlendID": 200,
+    "HTYPE": "LI",
+    "PERCENTAGE": 59
+  },
+  {
+    "ID": 267959,
+    "BlendID": 200,
+    "HTYPE": "CO",
+    "PERCENTAGE": 41
+  },
+  {
+    "ID": 267960,
+    "BlendID": 201,
+    "HTYPE": "WV",
+    "PERCENTAGE": 59
+  },
+  {
+    "ID": 267961,
+    "BlendID": 201,
+    "HTYPE": "PES",
+    "PERCENTAGE": 13
+  },
+  {
+    "ID": 267962,
+    "BlendID": 201,
+    "HTYPE": "PA",
+    "PERCENTAGE": 17
+  },
+  {
+    "ID": 267963,
+    "BlendID": 201,
+    "HTYPE": "CV",
+    "PERCENTAGE": 6
+  },
+  {
+    "ID": 267964,
+    "BlendID": 201,
+    "HTYPE": "SE",
+    "PERCENTAGE": 4
+  },
+  {
+    "ID": 267965,
+    "BlendID": 201,
+    "HTYPE": "EA",
+    "PERCENTAGE": 1
+  },
+  {
+    "ID": 267966,
+    "BlendID": 202,
+    "HTYPE": "WV",
+    "PERCENTAGE": 59
+  },
+  {
+    "ID": 267967,
+    "BlendID": 202,
+    "HTYPE": "PES",
+    "PERCENTAGE": 39
+  },
+  {
+    "ID": 267968,
+    "BlendID": 202,
+    "HTYPE": "EA",
+    "PERCENTAGE": 2
+  },
+  {
+    "ID": 267969,
+    "BlendID": 203,
+    "HTYPE": "CO",
+    "PERCENTAGE": 60
+  },
+  {
+    "ID": 267970,
+    "BlendID": 203,
+    "HTYPE": "TENCEL",
+    "PERCENTAGE": 37
+  },
+  {
+    "ID": 267971,
+    "BlendID": 203,
+    "HTYPE": "EA",
+    "PERCENTAGE": 3
+  },
+  {
+    "ID": 267972,
+    "BlendID": 204,
+    "HTYPE": "WV",
+    "PERCENTAGE": 60
+  },
+  {
+    "ID": 267973,
+    "BlendID": 204,
+    "HTYPE": "LI",
+    "PERCENTAGE": 35
+  },
+  {
+    "ID": 267974,
+    "BlendID": 204,
+    "HTYPE": "SE",
+    "PERCENTAGE": 5
+  },
+  {
+    "ID": 267975,
+    "BlendID": 205,
+    "HTYPE": "WV",
+    "PERCENTAGE": 60
+  },
+  {
+    "ID": 267976,
+    "BlendID": 205,
+    "HTYPE": "PES",
+    "PERCENTAGE": 39
+  },
+  {
+    "ID": 267977,
+    "BlendID": 205,
+    "HTYPE": "EA",
+    "PERCENTAGE": 1
+  },
+  {
+    "ID": 267978,
+    "BlendID": 206,
+    "HTYPE": "WV",
+    "PERCENTAGE": 60
+  },
+  {
+    "ID": 267979,
+    "BlendID": 206,
+    "HTYPE": "PES",
+    "PERCENTAGE": 40
+  },
+  {
+    "ID": 267980,
+    "BlendID": 207,
+    "HTYPE": "CV",
+    "PERCENTAGE": 61
+  },
+  {
+    "ID": 267981,
+    "BlendID": 207,
+    "HTYPE": "LI",
+    "PERCENTAGE": 37
+  },
+  {
+    "ID": 267982,
+    "BlendID": 207,
+    "HTYPE": "PES",
+    "PERCENTAGE": 2
+  },
+  {
+    "ID": 267983,
+    "BlendID": 208,
+    "HTYPE": "WV",
+    "PERCENTAGE": 61
+  },
+  {
+    "ID": 267984,
+    "BlendID": 208,
+    "HTYPE": "PES",
+    "PERCENTAGE": 25
+  },
+  {
+    "ID": 267985,
+    "BlendID": 208,
+    "HTYPE": "CV",
+    "PERCENTAGE": 13
+  },
+  {
+    "ID": 267986,
+    "BlendID": 208,
+    "HTYPE": "LI",
+    "PERCENTAGE": 1
+  },
+  {
+    "ID": 267987,
+    "BlendID": 209,
+    "HTYPE": "LI",
+    "PERCENTAGE": 62
+  },
+  {
+    "ID": 267988,
+    "BlendID": 209,
+    "HTYPE": "CO",
+    "PERCENTAGE": 36
+  },
+  {
+    "ID": 267989,
+    "BlendID": 209,
+    "HTYPE": "EA",
+    "PERCENTAGE": 2
+  },
+  {
+    "ID": 267990,
+    "BlendID": 210,
+    "HTYPE": "WV",
+    "PERCENTAGE": 62
+  },
+  {
+    "ID": 267991,
+    "BlendID": 210,
+    "HTYPE": "PES",
+    "PERCENTAGE": 33
+  },
+  {
+    "ID": 267992,
+    "BlendID": 210,
+    "HTYPE": "EA",
+    "PERCENTAGE": 5
+  },
+  {
+    "ID": 267993,
+    "BlendID": 211,
+    "HTYPE": "WV",
+    "PERCENTAGE": 62
+  },
+  {
+    "ID": 267994,
+    "BlendID": 211,
+    "HTYPE": "LI",
+    "PERCENTAGE": 34
+  },
+  {
+    "ID": 267995,
+    "BlendID": 211,
+    "HTYPE": "SE",
+    "PERCENTAGE": 4
+  },
+  {
+    "ID": 267996,
+    "BlendID": 212,
+    "HTYPE": "WV",
+    "PERCENTAGE": 62
+  },
+  {
+    "ID": 267997,
+    "BlendID": 212,
+    "HTYPE": "PES",
+    "PERCENTAGE": 34
+  },
+  {
+    "ID": 267998,
+    "BlendID": 212,
+    "HTYPE": "EA",
+    "PERCENTAGE": 4
+  },
+  {
+    "ID": 267999,
+    "BlendID": 213,
+    "HTYPE": "PES",
+    "PERCENTAGE": 63
+  },
+  {
+    "ID": 268000,
+    "BlendID": 213,
+    "HTYPE": "CV",
+    "PERCENTAGE": 33
+  },
+  {
+    "ID": 268001,
+    "BlendID": 213,
+    "HTYPE": "EA",
+    "PERCENTAGE": 4
+  },
+  {
+    "ID": 268002,
+    "BlendID": 214,
+    "HTYPE": "PES",
+    "PERCENTAGE": 63
+  },
+  {
+    "ID": 268003,
+    "BlendID": 214,
+    "HTYPE": "CV",
+    "PERCENTAGE": 34
+  },
+  {
+    "ID": 268004,
+    "BlendID": 214,
+    "HTYPE": "EA",
+    "PERCENTAGE": 3
+  },
+  {
+    "ID": 268005,
+    "BlendID": 215,
+    "HTYPE": "WV",
+    "PERCENTAGE": 63
+  },
+  {
+    "ID": 268006,
+    "BlendID": 215,
+    "HTYPE": "PES",
+    "PERCENTAGE": 26
+  },
+  {
+    "ID": 268007,
+    "BlendID": 215,
+    "HTYPE": "PA",
+    "PERCENTAGE": 7
+  },
+  {
+    "ID": 268008,
+    "BlendID": 215,
+    "HTYPE": "EA",
+    "PERCENTAGE": 4
+  },
+  {
+    "ID": 268009,
+    "BlendID": 216,
+    "HTYPE": "WV",
+    "PERCENTAGE": 63
+  },
+  {
+    "ID": 268010,
+    "BlendID": 216,
+    "HTYPE": "LINEN",
+    "PERCENTAGE": 33
+  },
+  {
+    "ID": 268011,
+    "BlendID": 216,
+    "HTYPE": "SE",
+    "PERCENTAGE": 4
+  },
+  {
+    "ID": 268012,
+    "BlendID": 217,
+    "HTYPE": "WV",
+    "PERCENTAGE": 63
+  },
+  {
+    "ID": 268013,
+    "BlendID": 217,
+    "HTYPE": "LI",
+    "PERCENTAGE": 37
+  },
+  {
+    "ID": 268014,
+    "BlendID": 218,
+    "HTYPE": "PES",
+    "PERCENTAGE": 64
+  },
+  {
+    "ID": 268015,
+    "BlendID": 218,
+    "HTYPE": "CV",
+    "PERCENTAGE": 34
+  },
+  {
+    "ID": 268016,
+    "BlendID": 218,
+    "HTYPE": "LI",
+    "PERCENTAGE": 1
+  },
+  {
+    "ID": 268017,
+    "BlendID": 218,
+    "HTYPE": "EA",
+    "PERCENTAGE": 1
+  },
+  {
+    "ID": 268018,
+    "BlendID": 219,
+    "HTYPE": "WV",
+    "PERCENTAGE": 64
+  },
+  {
+    "ID": 268019,
+    "BlendID": 219,
+    "HTYPE": "PES",
+    "PERCENTAGE": 35
+  },
+  {
+    "ID": 268020,
+    "BlendID": 219,
+    "HTYPE": "EA",
+    "PERCENTAGE": 1
+  },
+  {
+    "ID": 268021,
+    "BlendID": 220,
+    "HTYPE": "CO",
+    "PERCENTAGE": 65
+  },
+  {
+    "ID": 268022,
+    "BlendID": 220,
+    "HTYPE": "PES",
+    "PERCENTAGE": 32
+  },
+  {
+    "ID": 268023,
+    "BlendID": 220,
+    "HTYPE": "EA",
+    "PERCENTAGE": 3
+  },
+  {
+    "ID": 268024,
+    "BlendID": 221,
+    "HTYPE": "WV",
+    "PERCENTAGE": 65
+  },
+  {
+    "ID": 268025,
+    "BlendID": 221,
+    "HTYPE": "PES",
+    "PERCENTAGE": 24
+  },
+  {
+    "ID": 268026,
+    "BlendID": 221,
+    "HTYPE": "PA",
+    "PERCENTAGE": 8
+  },
+  {
+    "ID": 268027,
+    "BlendID": 221,
+    "HTYPE": "EA",
+    "PERCENTAGE": 3
+  },
+  {
+    "ID": 268028,
+    "BlendID": 222,
+    "HTYPE": "WV",
+    "PERCENTAGE": 65
+  },
+  {
+    "ID": 268029,
+    "BlendID": 222,
+    "HTYPE": "PES",
+    "PERCENTAGE": 32
+  },
+  {
+    "ID": 268030,
+    "BlendID": 222,
+    "HTYPE": "EA",
+    "PERCENTAGE": 3
+  },
+  {
+    "ID": 268031,
+    "BlendID": 223,
+    "HTYPE": "LI",
+    "PERCENTAGE": 66
+  },
+  {
+    "ID": 268032,
+    "BlendID": 223,
+    "HTYPE": "CO",
+    "PERCENTAGE": 34
+  },
+  {
+    "ID": 268033,
+    "BlendID": 224,
+    "HTYPE": "WV",
+    "PERCENTAGE": 66
+  },
+  {
+    "ID": 268034,
+    "BlendID": 224,
+    "HTYPE": "LI",
+    "PERCENTAGE": 28
+  },
+  {
+    "ID": 268035,
+    "BlendID": 224,
+    "HTYPE": "SE",
+    "PERCENTAGE": 6
+  },
+  {
+    "ID": 268036,
+    "BlendID": 225,
+    "HTYPE": "PES",
+    "PERCENTAGE": 67
+  },
+  {
+    "ID": 268037,
+    "BlendID": 225,
+    "HTYPE": "LI",
+    "PERCENTAGE": 17
+  },
+  {
+    "ID": 268038,
+    "BlendID": 225,
+    "HTYPE": "CV",
+    "PERCENTAGE": 14
+  },
+  {
+    "ID": 268039,
+    "BlendID": 225,
+    "HTYPE": "EA",
+    "PERCENTAGE": 2
+  },
+  {
+    "ID": 268040,
+    "BlendID": 226,
+    "HTYPE": "WV",
+    "PERCENTAGE": 67
+  },
+  {
+    "ID": 268041,
+    "BlendID": 226,
+    "HTYPE": "PA",
+    "PERCENTAGE": 28
+  },
+  {
+    "ID": 268042,
+    "BlendID": 226,
+    "HTYPE": "EA",
+    "PERCENTAGE": 5
+  },
+  {
+    "ID": 268043,
+    "BlendID": 227,
+    "HTYPE": "LI",
+    "PERCENTAGE": 68
+  },
+  {
+    "ID": 268044,
+    "BlendID": 227,
+    "HTYPE": "CV",
+    "PERCENTAGE": 31
+  },
+  {
+    "ID": 268045,
+    "BlendID": 227,
+    "HTYPE": "PES",
+    "PERCENTAGE": 1
+  },
+  {
+    "ID": 268046,
+    "BlendID": 228,
+    "HTYPE": "WV",
+    "PERCENTAGE": 68
+  },
+  {
+    "ID": 268047,
+    "BlendID": 228,
+    "HTYPE": "PES",
+    "PERCENTAGE": 30
+  },
+  {
+    "ID": 268048,
+    "BlendID": 228,
+    "HTYPE": "EA",
+    "PERCENTAGE": 2
+  },
+  {
+    "ID": 268049,
+    "BlendID": 229,
+    "HTYPE": "WV",
+    "PERCENTAGE": 69
+  },
+  {
+    "ID": 268050,
+    "BlendID": 229,
+    "HTYPE": "PA",
+    "PERCENTAGE": 26
+  },
+  {
+    "ID": 268051,
+    "BlendID": 229,
+    "HTYPE": "EA",
+    "PERCENTAGE": 5
+  },
+  {
+    "ID": 268052,
+    "BlendID": 230,
+    "HTYPE": "WV",
+    "PERCENTAGE": 69
+  },
+  {
+    "ID": 268053,
+    "BlendID": 230,
+    "HTYPE": "PA",
+    "PERCENTAGE": 29
+  },
+  {
+    "ID": 268054,
+    "BlendID": 230,
+    "HTYPE": "PES",
+    "PERCENTAGE": 1
+  },
+  {
+    "ID": 268055,
+    "BlendID": 230,
+    "HTYPE": "LUREX",
+    "PERCENTAGE": 1
+  },
+  {
+    "ID": 268056,
+    "BlendID": 231,
+    "HTYPE": "WV",
+    "PERCENTAGE": 69
+  },
+  {
+    "ID": 268057,
+    "BlendID": 231,
+    "HTYPE": "PA",
+    "PERCENTAGE": 30
+  },
+  {
+    "ID": 268058,
+    "BlendID": 231,
+    "HTYPE": "CO",
+    "PERCENTAGE": 1
+  },
+  {
+    "ID": 268059,
+    "BlendID": 232,
+    "HTYPE": "WV",
+    "PERCENTAGE": 7
+  },
+  {
+    "ID": 268060,
+    "BlendID": 232,
+    "HTYPE": "PC",
+    "PERCENTAGE": 72
+  },
+  {
+    "ID": 268061,
+    "BlendID": 232,
+    "HTYPE": "PES",
+    "PERCENTAGE": 20
+  },
+  {
+    "ID": 268062,
+    "BlendID": 232,
+    "HTYPE": "EA",
+    "PERCENTAGE": 1
+  },
+  {
+    "ID": 268063,
+    "BlendID": 233,
+    "HTYPE": "WV",
+    "PERCENTAGE": 70
+  },
+  {
+    "ID": 268064,
+    "BlendID": 233,
+    "HTYPE": "PA",
+    "PERCENTAGE": 26
+  },
+  {
+    "ID": 268065,
+    "BlendID": 233,
+    "HTYPE": "EA",
+    "PERCENTAGE": 4
+  },
+  {
+    "ID": 268066,
+    "BlendID": 234,
+    "HTYPE": "WV",
+    "PERCENTAGE": 70
+  },
+  {
+    "ID": 268067,
+    "BlendID": 234,
+    "HTYPE": "PA",
+    "PERCENTAGE": 30
+  },
+  {
+    "ID": 268068,
+    "BlendID": 235,
+    "HTYPE": "CO",
+    "PERCENTAGE": 71
+  },
+  {
+    "ID": 268069,
+    "BlendID": 235,
+    "HTYPE": "LI",
+    "PERCENTAGE": 28
+  },
+  {
+    "ID": 268070,
+    "BlendID": 235,
+    "HTYPE": "EA",
+    "PERCENTAGE": 1
+  },
+  {
+    "ID": 268071,
+    "BlendID": 236,
+    "HTYPE": "CV",
+    "PERCENTAGE": 71
+  },
+  {
+    "ID": 268072,
+    "BlendID": 236,
+    "HTYPE": "LI",
+    "PERCENTAGE": 29
+  },
+  {
+    "ID": 268073,
+    "BlendID": 237,
+    "HTYPE": "CO",
+    "PERCENTAGE": 72
+  },
+  {
+    "ID": 268074,
+    "BlendID": 237,
+    "HTYPE": "PES",
+    "PERCENTAGE": 27
+  },
+  {
+    "ID": 268075,
+    "BlendID": 237,
+    "HTYPE": "EA",
+    "PERCENTAGE": 1
+  },
+  {
+    "ID": 268076,
+    "BlendID": 238,
+    "HTYPE": "LI",
+    "PERCENTAGE": 72
+  },
+  {
+    "ID": 268077,
+    "BlendID": 238,
+    "HTYPE": "PES",
+    "PERCENTAGE": 25
+  },
+  {
+    "ID": 268078,
+    "BlendID": 238,
+    "HTYPE": "EA",
+    "PERCENTAGE": 3
+  },
+  {
+    "ID": 268079,
+    "BlendID": 239,
+    "HTYPE": "WV",
+    "PERCENTAGE": 72
+  },
+  {
+    "ID": 268080,
+    "BlendID": 239,
+    "HTYPE": "PES",
+    "PERCENTAGE": 25
+  },
+  {
+    "ID": 268081,
+    "BlendID": 239,
+    "HTYPE": "EA",
+    "PERCENTAGE": 3
+  },
+  {
+    "ID": 268082,
+    "BlendID": 240,
+    "HTYPE": "WV",
+    "PERCENTAGE": 72
+  },
+  {
+    "ID": 268083,
+    "BlendID": 240,
+    "HTYPE": "PES",
+    "PERCENTAGE": 26
+  },
+  {
+    "ID": 268084,
+    "BlendID": 240,
+    "HTYPE": "EA",
+    "PERCENTAGE": 2
+  },
+  {
+    "ID": 268085,
+    "BlendID": 241,
+    "HTYPE": "CV",
+    "PERCENTAGE": 73
+  },
+  {
+    "ID": 268086,
+    "BlendID": 241,
+    "HTYPE": "PES",
+    "PERCENTAGE": 27
+  },
+  {
+    "ID": 268087,
+    "BlendID": 242,
+    "HTYPE": "WV",
+    "PERCENTAGE": 73
+  },
+  {
+    "ID": 268088,
+    "BlendID": 242,
+    "HTYPE": "WP",
+    "PERCENTAGE": 14
+  },
+  {
+    "ID": 268089,
+    "BlendID": 242,
+    "HTYPE": "PA",
+    "PERCENTAGE": 13
+  },
+  {
+    "ID": 268090,
+    "BlendID": 243,
+    "HTYPE": "PES",
+    "PERCENTAGE": 74
+  },
+  {
+    "ID": 268091,
+    "BlendID": 243,
+    "HTYPE": "CV",
+    "PERCENTAGE": 25
+  },
+  {
+    "ID": 268092,
+    "BlendID": 243,
+    "HTYPE": "EA",
+    "PERCENTAGE": 1
+  },
+  {
+    "ID": 268093,
+    "BlendID": 244,
+    "HTYPE": "WV",
+    "PERCENTAGE": 74
+  },
+  {
+    "ID": 268094,
+    "BlendID": 244,
+    "HTYPE": "PES",
+    "PERCENTAGE": 17
+  },
+  {
+    "ID": 268095,
+    "BlendID": 244,
+    "HTYPE": "PA",
+    "PERCENTAGE": 9
+  },
+  {
+    "ID": 268096,
+    "BlendID": 245,
+    "HTYPE": "WV",
+    "PERCENTAGE": 74
+  },
+  {
+    "ID": 268097,
+    "BlendID": 245,
+    "HTYPE": "PES",
+    "PERCENTAGE": 18
+  },
+  {
+    "ID": 268098,
+    "BlendID": 245,
+    "HTYPE": "PA",
+    "PERCENTAGE": 8
+  },
+  {
+    "ID": 268099,
+    "BlendID": 246,
+    "HTYPE": "WV",
+    "PERCENTAGE": 74
+  },
+  {
+    "ID": 268100,
+    "BlendID": 246,
+    "HTYPE": "LI",
+    "PERCENTAGE": 23
+  },
+  {
+    "ID": 268101,
+    "BlendID": 246,
+    "HTYPE": "SE",
+    "PERCENTAGE": 3
+  },
+  {
+    "ID": 268102,
+    "BlendID": 247,
+    "HTYPE": "WV",
+    "PERCENTAGE": 74
+  },
+  {
+    "ID": 268103,
+    "BlendID": 247,
+    "HTYPE": "PES",
+    "PERCENTAGE": 24
+  },
+  {
+    "ID": 268104,
+    "BlendID": 247,
+    "HTYPE": "EA",
+    "PERCENTAGE": 2
+  },
+  {
+    "ID": 268105,
+    "BlendID": 248,
+    "HTYPE": "WV",
+    "PERCENTAGE": 74
+  },
+  {
+    "ID": 268106,
+    "BlendID": 248,
+    "HTYPE": "PES",
+    "PERCENTAGE": 26
+  },
+  {
+    "ID": 268107,
+    "BlendID": 249,
+    "HTYPE": "LI",
+    "PERCENTAGE": 75
+  },
+  {
+    "ID": 268108,
+    "BlendID": 249,
+    "HTYPE": "CO",
+    "PERCENTAGE": 20
+  },
+  {
+    "ID": 268109,
+    "BlendID": 249,
+    "HTYPE": "PES",
+    "PERCENTAGE": 3
+  },
+  {
+    "ID": 268110,
+    "BlendID": 249,
+    "HTYPE": "EA",
+    "PERCENTAGE": 2
+  },
+  {
+    "ID": 268111,
+    "BlendID": 250,
+    "HTYPE": "WV",
+    "PERCENTAGE": 75
+  },
+  {
+    "ID": 268112,
+    "BlendID": 250,
+    "HTYPE": "CV",
+    "PERCENTAGE": 16
+  },
+  {
+    "ID": 268113,
+    "BlendID": 250,
+    "HTYPE": "PA",
+    "PERCENTAGE": 4
+  },
+  {
+    "ID": 268114,
+    "BlendID": 250,
+    "HTYPE": "LUREX",
+    "PERCENTAGE": 5
+  },
+  {
+    "ID": 268115,
+    "BlendID": 251,
+    "HTYPE": "WV",
+    "PERCENTAGE": 75
+  },
+  {
+    "ID": 268116,
+    "BlendID": 251,
+    "HTYPE": "PA",
+    "PERCENTAGE": 21
+  },
+  {
+    "ID": 268117,
+    "BlendID": 251,
+    "HTYPE": "EA",
+    "PERCENTAGE": 4
+  },
+  {
+    "ID": 268118,
+    "BlendID": 252,
+    "HTYPE": "WV",
+    "PERCENTAGE": 76
+  },
+  {
+    "ID": 268119,
+    "BlendID": 252,
+    "HTYPE": "PA",
+    "PERCENTAGE": 22
+  },
+  {
+    "ID": 268120,
+    "BlendID": 252,
+    "HTYPE": "EA",
+    "PERCENTAGE": 2
+  },
+  {
+    "ID": 268121,
+    "BlendID": 253,
+    "HTYPE": "WV",
+    "PERCENTAGE": 76
+  },
+  {
+    "ID": 268122,
+    "BlendID": 253,
+    "HTYPE": "PES",
+    "PERCENTAGE": 23
+  },
+  {
+    "ID": 268123,
+    "BlendID": 253,
+    "HTYPE": "EA",
+    "PERCENTAGE": 1
+  },
+  {
+    "ID": 268124,
+    "BlendID": 254,
+    "HTYPE": "CO",
+    "PERCENTAGE": 77
+  },
+  {
+    "ID": 268125,
+    "BlendID": 254,
+    "HTYPE": "PES",
+    "PERCENTAGE": 22
+  },
+  {
+    "ID": 268126,
+    "BlendID": 254,
+    "HTYPE": "EA",
+    "PERCENTAGE": 1
+  },
+  {
+    "ID": 268127,
+    "BlendID": 255,
+    "HTYPE": "WV",
+    "PERCENTAGE": 78
+  },
+  {
+    "ID": 268128,
+    "BlendID": 255,
+    "HTYPE": "PES",
+    "PERCENTAGE": 20
+  },
+  {
+    "ID": 268129,
+    "BlendID": 255,
+    "HTYPE": "EA",
+    "PERCENTAGE": 2
+  },
+  {
+    "ID": 268130,
+    "BlendID": 256,
+    "HTYPE": "LI",
+    "PERCENTAGE": 79
+  },
+  {
+    "ID": 268131,
+    "BlendID": 256,
+    "HTYPE": "CO",
+    "PERCENTAGE": 21
+  },
+  {
+    "ID": 268132,
+    "BlendID": 257,
+    "HTYPE": "WV",
+    "PERCENTAGE": 8
+  },
+  {
+    "ID": 268133,
+    "BlendID": 257,
+    "HTYPE": "PES",
+    "PERCENTAGE": 61
+  },
+  {
+    "ID": 268134,
+    "BlendID": 257,
+    "HTYPE": "CV",
+    "PERCENTAGE": 28
+  },
+  {
+    "ID": 268135,
+    "BlendID": 257,
+    "HTYPE": "EA",
+    "PERCENTAGE": 3
+  },
+  {
+    "ID": 268136,
+    "BlendID": 258,
+    "HTYPE": "LI",
+    "PERCENTAGE": 80
+  },
+  {
+    "ID": 268137,
+    "BlendID": 258,
+    "HTYPE": "PES",
+    "PERCENTAGE": 20
+  },
+  {
+    "ID": 268138,
+    "BlendID": 259,
+    "HTYPE": "WV",
+    "PERCENTAGE": 80
+  },
+  {
+    "ID": 268139,
+    "BlendID": 259,
+    "HTYPE": "PA",
+    "PERCENTAGE": 20
+  },
+  {
+    "ID": 268140,
+    "BlendID": 260,
+    "HTYPE": "WV",
+    "PERCENTAGE": 80
+  },
+  {
+    "ID": 268141,
+    "BlendID": 260,
+    "HTYPE": "PES",
+    "PERCENTAGE": 20
+  },
+  {
+    "ID": 268142,
+    "BlendID": 261,
+    "HTYPE": "WV",
+    "PERCENTAGE": 81
+  },
+  {
+    "ID": 268143,
+    "BlendID": 261,
+    "HTYPE": "SE",
+    "PERCENTAGE": 13
+  },
+  {
+    "ID": 268144,
+    "BlendID": 261,
+    "HTYPE": "WS",
+    "PERCENTAGE": 6
+  },
+  {
+    "ID": 268145,
+    "BlendID": 262,
+    "HTYPE": "COTON",
+    "PERCENTAGE": 82
+  },
+  {
+    "ID": 268146,
+    "BlendID": 262,
+    "HTYPE": "VISKON",
+    "PERCENTAGE": 16
+  },
+  {
+    "ID": 268147,
+    "BlendID": 262,
+    "HTYPE": "ELASTAN",
+    "PERCENTAGE": 2
+  },
+  {
+    "ID": 268148,
+    "BlendID": 263,
+    "HTYPE": "LI",
+    "PERCENTAGE": 82
+  },
+  {
+    "ID": 268149,
+    "BlendID": 263,
+    "HTYPE": "PES",
+    "PERCENTAGE": 12
+  },
+  {
+    "ID": 268150,
+    "BlendID": 263,
+    "HTYPE": "CV",
+    "PERCENTAGE": 6
+  },
+  {
+    "ID": 268151,
+    "BlendID": 264,
+    "HTYPE": "WV",
+    "PERCENTAGE": 82
+  },
+  {
+    "ID": 268152,
+    "BlendID": 264,
+    "HTYPE": "PES",
+    "PERCENTAGE": 17
+  },
+  {
+    "ID": 268153,
+    "BlendID": 264,
+    "HTYPE": "EA",
+    "PERCENTAGE": 1
+  },
+  {
+    "ID": 268154,
+    "BlendID": 265,
+    "HTYPE": "WV",
+    "PERCENTAGE": 82
+  },
+  {
+    "ID": 268155,
+    "BlendID": 265,
+    "HTYPE": "PES",
+    "PERCENTAGE": 18
+  },
+  {
+    "ID": 268156,
+    "BlendID": 266,
+    "HTYPE": "WV",
+    "PERCENTAGE": 83
+  },
+  {
+    "ID": 268157,
+    "BlendID": 266,
+    "HTYPE": "TENSEL",
+    "PERCENTAGE": 16
+  },
+  {
+    "ID": 268158,
+    "BlendID": 266,
+    "HTYPE": "EA",
+    "PERCENTAGE": 1
+  },
+  {
+    "ID": 268159,
+    "BlendID": 267,
+    "HTYPE": "WV",
+    "PERCENTAGE": 83
+  },
+  {
+    "ID": 268160,
+    "BlendID": 267,
+    "HTYPE": "PES",
+    "PERCENTAGE": 17
+  },
+  {
+    "ID": 268161,
+    "BlendID": 268,
+    "HTYPE": "CO",
+    "PERCENTAGE": 84
+  },
+  {
+    "ID": 268162,
+    "BlendID": 268,
+    "HTYPE": "LI",
+    "PERCENTAGE": 14
+  },
+  {
+    "ID": 268163,
+    "BlendID": 268,
+    "HTYPE": "EA",
+    "PERCENTAGE": 2
+  },
+  {
+    "ID": 268164,
+    "BlendID": 269,
+    "HTYPE": "PES",
+    "PERCENTAGE": 84
+  },
+  {
+    "ID": 268165,
+    "BlendID": 269,
+    "HTYPE": "CV",
+    "PERCENTAGE": 16
+  },
+  {
+    "ID": 268166,
+    "BlendID": 270,
+    "HTYPE": "WV",
+    "PERCENTAGE": 84
+  },
+  {
+    "ID": 268167,
+    "BlendID": 270,
+    "HTYPE": "PES",
+    "PERCENTAGE": 16
+  },
+  {
+    "ID": 268168,
+    "BlendID": 271,
+    "HTYPE": "LI",
+    "PERCENTAGE": 85
+  },
+  {
+    "ID": 268169,
+    "BlendID": 271,
+    "HTYPE": "CV",
+    "PERCENTAGE": 15
+  },
+  {
+    "ID": 268170,
+    "BlendID": 272,
+    "HTYPE": "WOOL",
+    "PERCENTAGE": 85
+  },
+  {
+    "ID": 268171,
+    "BlendID": 272,
+    "HTYPE": "NYL",
+    "PERCENTAGE": 4
+  },
+  {
+    "ID": 268172,
+    "BlendID": 273,
+    "HTYPE": "WV",
+    "PERCENTAGE": 85
+  },
+  {
+    "ID": 268173,
+    "BlendID": 273,
+    "HTYPE": "PA",
+    "PERCENTAGE": 15
+  },
+  {
+    "ID": 268174,
+    "BlendID": 274,
+    "HTYPE": "WV",
+    "PERCENTAGE": 86
+  },
+  {
+    "ID": 268175,
+    "BlendID": 274,
+    "HTYPE": "PA",
+    "PERCENTAGE": 10
+  },
+  {
+    "ID": 268176,
+    "BlendID": 274,
+    "HTYPE": "EA",
+    "PERCENTAGE": 4
+  },
+  {
+    "ID": 268177,
+    "BlendID": 275,
+    "HTYPE": "WV",
+    "PERCENTAGE": 86
+  },
+  {
+    "ID": 268178,
+    "BlendID": 275,
+    "HTYPE": "PA",
+    "PERCENTAGE": 10
+  },
+  {
+    "ID": 268179,
+    "BlendID": 275,
+    "HTYPE": "LYC",
+    "PERCENTAGE": 4
+  },
+  {
+    "ID": 268180,
+    "BlendID": 276,
+    "HTYPE": "WV",
+    "PERCENTAGE": 88
+  },
+  {
+    "ID": 268181,
+    "BlendID": 276,
+    "HTYPE": "PA",
+    "PERCENTAGE": 10
+  },
+  {
+    "ID": 268182,
+    "BlendID": 276,
+    "HTYPE": "EA",
+    "PERCENTAGE": 1
+  },
+  {
+    "ID": 268183,
+    "BlendID": 276,
+    "HTYPE": "EA",
+    "PERCENTAGE": 1
+  },
+  {
+    "ID": 268184,
+    "BlendID": 277,
+    "HTYPE": "CO",
+    "PERCENTAGE": 90
+  },
+  {
+    "ID": 268185,
+    "BlendID": 277,
+    "HTYPE": "PES",
+    "PERCENTAGE": 8
+  },
+  {
+    "ID": 268186,
+    "BlendID": 277,
+    "HTYPE": "EA",
+    "PERCENTAGE": 2
+  },
+  {
+    "ID": 268187,
+    "BlendID": 278,
+    "HTYPE": "PES",
+    "PERCENTAGE": 90
+  },
+  {
+    "ID": 268188,
+    "BlendID": 278,
+    "HTYPE": "CV",
+    "PERCENTAGE": 10
+  },
+  {
+    "ID": 268189,
+    "BlendID": 279,
+    "HTYPE": "WV",
+    "PERCENTAGE": 91
+  },
+  {
+    "ID": 268190,
+    "BlendID": 279,
+    "HTYPE": "SE",
+    "PERCENTAGE": 6
+  },
+  {
+    "ID": 268191,
+    "BlendID": 279,
+    "HTYPE": "WS",
+    "PERCENTAGE": 3
+  },
+  {
+    "ID": 268192,
+    "BlendID": 280,
+    "HTYPE": "WV",
+    "PERCENTAGE": 92
+  },
+  {
+    "ID": 268193,
+    "BlendID": 280,
+    "HTYPE": "WS",
+    "PERCENTAGE": 2
+  },
+  {
+    "ID": 268194,
+    "BlendID": 280,
+    "HTYPE": "SE",
+    "PERCENTAGE": 6
+  },
+  {
+    "ID": 268195,
+    "BlendID": 281,
+    "HTYPE": "WV",
+    "PERCENTAGE": 92
+  },
+  {
+    "ID": 268196,
+    "BlendID": 281,
+    "HTYPE": "PA",
+    "PERCENTAGE": 6
+  },
+  {
+    "ID": 268197,
+    "BlendID": 281,
+    "HTYPE": "PES",
+    "PERCENTAGE": 1
+  },
+  {
+    "ID": 268198,
+    "BlendID": 281,
+    "HTYPE": "EA",
+    "PERCENTAGE": 1
+  },
+  {
+    "ID": 268199,
+    "BlendID": 282,
+    "HTYPE": "PES",
+    "PERCENTAGE": 93
+  },
+  {
+    "ID": 268200,
+    "BlendID": 282,
+    "HTYPE": "EA",
+    "PERCENTAGE": 7
+  },
+  {
+    "ID": 268201,
+    "BlendID": 283,
+    "HTYPE": "WV",
+    "PERCENTAGE": 93
+  },
+  {
+    "ID": 268202,
+    "BlendID": 283,
+    "HTYPE": "LI",
+    "PERCENTAGE": 4
+  },
+  {
+    "ID": 268203,
+    "BlendID": 283,
+    "HTYPE": "WS",
+    "PERCENTAGE": 3
+  },
+  {
+    "ID": 268204,
+    "BlendID": 284,
+    "HTYPE": "WV",
+    "PERCENTAGE": 93
+  },
+  {
+    "ID": 268205,
+    "BlendID": 284,
+    "HTYPE": "LI",
+    "PERCENTAGE": 5
+  },
+  {
+    "ID": 268206,
+    "BlendID": 284,
+    "HTYPE": "EA",
+    "PERCENTAGE": 2
+  },
+  {
+    "ID": 268207,
+    "BlendID": 285,
+    "HTYPE": "CV",
+    "PERCENTAGE": 94
+  },
+  {
+    "ID": 268208,
+    "BlendID": 285,
+    "HTYPE": "PES",
+    "PERCENTAGE": 5
+  },
+  {
+    "ID": 268209,
+    "BlendID": 285,
+    "HTYPE": "EA",
+    "PERCENTAGE": 1
+  },
+  {
+    "ID": 268210,
+    "BlendID": 286,
+    "HTYPE": "WV",
+    "PERCENTAGE": 94
+  },
+  {
+    "ID": 268211,
+    "BlendID": 286,
+    "HTYPE": "EA",
+    "PERCENTAGE": 6
+  },
+  {
+    "ID": 268212,
+    "BlendID": 287,
+    "HTYPE": "WV",
+    "PERCENTAGE": 94
+  },
+  {
+    "ID": 268213,
+    "BlendID": 287,
+    "HTYPE": "SE",
+    "PERCENTAGE": 6
+  },
+  {
+    "ID": 268214,
+    "BlendID": 288,
+    "HTYPE": "WV",
+    "PERCENTAGE": 95
+  },
+  {
+    "ID": 268215,
+    "BlendID": 288,
+    "HTYPE": "LI",
+    "PERCENTAGE": 5
+  },
+  {
+    "ID": 268216,
+    "BlendID": 289,
+    "HTYPE": "WV",
+    "PERCENTAGE": 95
+  },
+  {
+    "ID": 268217,
+    "BlendID": 289,
+    "HTYPE": "SE",
+    "PERCENTAGE": 5
+  },
+  {
+    "ID": 268218,
+    "BlendID": 290,
+    "HTYPE": "WV",
+    "PERCENTAGE": 95
+  },
+  {
+    "ID": 268219,
+    "BlendID": 290,
+    "HTYPE": "WM",
+    "PERCENTAGE": 5
+  },
+  {
+    "ID": 268220,
+    "BlendID": 291,
+    "HTYPE": "WV",
+    "PERCENTAGE": 95
+  },
+  {
+    "ID": 268221,
+    "BlendID": 291,
+    "HTYPE": "WS",
+    "PERCENTAGE": 5
+  },
+  {
+    "ID": 268222,
+    "BlendID": 292,
+    "HTYPE": "LI",
+    "PERCENTAGE": 96
+  },
+  {
+    "ID": 268223,
+    "BlendID": 292,
+    "HTYPE": "PES",
+    "PERCENTAGE": 4
+  },
+  {
+    "ID": 268224,
+    "BlendID": 293,
+    "HTYPE": "WV",
+    "PERCENTAGE": 96
+  },
+  {
+    "ID": 268225,
+    "BlendID": 293,
+    "HTYPE": "EA",
+    "PERCENTAGE": 4
+  },
+  {
+    "ID": 268226,
+    "BlendID": 294,
+    "HTYPE": "WV",
+    "PERCENTAGE": 96
+  },
+  {
+    "ID": 268227,
+    "BlendID": 294,
+    "HTYPE": "LYC",
+    "PERCENTAGE": 4
+  },
+  {
+    "ID": 268228,
+    "BlendID": 295,
+    "HTYPE": "WV",
+    "PERCENTAGE": 96
+  },
+  {
+    "ID": 268229,
+    "BlendID": 295,
+    "HTYPE": "SE",
+    "PERCENTAGE": 4
+  },
+  {
+    "ID": 268230,
+    "BlendID": 296,
+    "HTYPE": "LI",
+    "PERCENTAGE": 97
+  },
+  {
+    "ID": 268231,
+    "BlendID": 296,
+    "HTYPE": "PES",
+    "PERCENTAGE": 3
+  },
+  {
+    "ID": 268232,
+    "BlendID": 297,
+    "HTYPE": "WV",
+    "PERCENTAGE": 97
+  },
+  {
+    "ID": 268233,
+    "BlendID": 297,
+    "HTYPE": "EA",
+    "PERCENTAGE": 3
+  },
+  {
+    "ID": 268234,
+    "BlendID": 298,
+    "HTYPE": "WV",
+    "PERCENTAGE": 97
+  },
+  {
+    "ID": 268235,
+    "BlendID": 298,
+    "HTYPE": "SE",
+    "PERCENTAGE": 3
+  },
+  {
+    "ID": 268236,
+    "BlendID": 299,
+    "HTYPE": "CO",
+    "PERCENTAGE": 98
+  },
+  {
+    "ID": 268237,
+    "BlendID": 299,
+    "HTYPE": "EA",
+    "PERCENTAGE": 2
+  },
+  {
+    "ID": 268238,
+    "BlendID": 300,
+    "HTYPE": "LI",
+    "PERCENTAGE": 98
+  },
+  {
+    "ID": 268239,
+    "BlendID": 300,
+    "HTYPE": "WV",
+    "PERCENTAGE": 1
+  },
+  {
+    "ID": 268240,
+    "BlendID": 300,
+    "HTYPE": "PA",
+    "PERCENTAGE": 1
+  },
+  {
+    "ID": 268241,
+    "BlendID": 301,
+    "HTYPE": "WV",
+    "PERCENTAGE": 98
+  },
+  {
+    "ID": 268242,
+    "BlendID": 301,
+    "HTYPE": "EA",
+    "PERCENTAGE": 2
+  },
+  {
+    "ID": 268243,
+    "BlendID": 302,
+    "HTYPE": "WV",
+    "PERCENTAGE": 98
+  },
+  {
+    "ID": 268244,
+    "BlendID": 302,
+    "HTYPE": "LYC",
+    "PERCENTAGE": 2
+  },
+  {
+    "ID": 268245,
+    "BlendID": 303,
+    "HTYPE": "LI",
+    "PERCENTAGE": 99
+  },
+  {
+    "ID": 268246,
+    "BlendID": 303,
+    "HTYPE": "PES",
+    "PERCENTAGE": 1
+  },
+  {
+    "ID": 268247,
+    "BlendID": 304,
+    "HTYPE": "WV",
+    "PERCENTAGE": 99
+  },
+  {
+    "ID": 268248,
+    "BlendID": 304,
+    "HTYPE": "EA",
+    "PERCENTAGE": 1
+  }
+]

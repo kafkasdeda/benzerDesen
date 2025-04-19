@@ -1,0 +1,78 @@
+<!-- index.html -->
+<!-- PU arayüzü için ana sayfa -->
+<!--
+Oluşturulma: 2025-04-19
+Hazırlayan: Kafkas 
+Açıklama:
+Bu dosya, Power User (PU) arayüzünün ana ekranıdır.
+Sayfa, aşağıdaki tüm modülleri içerecek şekilde geliştirilecektir:
+
+✅ realImages klasöründeki görsellerin filtrelenebilir listesi (lazy-loaded)
+✅ Hover ile metadata ve cluster bilgisi gösterimi
+✅ Görsel benzerlik arama sonuçlarının gösterimi
+✅ Otomatik kümeleme ve manuel cluster yönetimi
+✅ Model seçimi (desen / renk / doku) ve eğitim parametreleri kontrolü
+✅ Cluster’a görsel ekleme / çıkarma, yeniden adlandırma
+✅ Eğitim başlatma (tüm veya alt küme)
+✅ Geri bildirimlerin puanlanması ve kullanımı
+✅ Versiyon kontrolü, metadata güncellemeleri ve kullanıcı aksiyonlarının izlenmesi
+
+Bu sayfa, hem kullanıcı arayüzünü hem de model eğitim süreçlerini entegre şekilde sunar.
+-->
+
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>PU Güncelleme Paneli</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px;
+    }
+    #status-box {
+      background-color: #f0f4ff;
+      border: 1px solid #bcd;
+      border-radius: 8px;
+      padding: 10px 15px;
+      margin: 15px 0;
+      font-family: monospace;
+      color: #333;
+      font-size: 15px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      border-radius: 6px;
+      border: none;
+      background-color: #3366cc;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #2a52a3;
+    }
+  </style>
+</head>
+<body>
+  <h2>🔍 Metadata Durumu</h2>
+
+  <div id="status-box">🚦 Bekleniyor...</div>
+
+  <button onclick="fetchUpdateStatus()">🌀 Güncellemeleri Kontrol Et</button>
+
+  <script>
+    function updateStatus(message) {
+      document.getElementById("status-box").textContent = message;
+    }
+
+    function fetchUpdateStatus() {
+      fetch("/check-updates")
+        .then(response => response.json())
+        .then(data => updateStatus(data.status))
+        .catch(error => updateStatus("❌ Bağlantı hatası: " + error));
+    }
+  </script>
+</body>
+</html>

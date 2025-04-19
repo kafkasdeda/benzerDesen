@@ -1,0 +1,108 @@
+<!-- train.html -->
+<!-- 
+Oluşturulma: 2025-04-19
+Hazırlayan: Kafkas 
+Açıklama:
+Bu sayfa, Power User (PU) ekranında model eğitimi için kullanılır.
+Kullanıcı burada model türünü (pattern / color / texture), versiyon, epoch, batch size ve öğrenme hızı gibi parametreleri girerek
+model eğitimini başlatabilir.
+Bu form, arka planda `train_config.json` dosyasını oluşturur ve `train_model.py` dosyasını tetikler.
+Gelecekte bu sayfa aşağıdakileri de içerecek:
+- augmentasyon seçenekleri
+- GPU/CPU seçimi
+- feedback ağırlığı ayarlama
+- cluster ön izleme ve check listelerle alt küme eğitimi
+-->
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Model Eğitimi - PU</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px;
+    }
+    label {
+      display: block;
+      margin: 10px 0 4px;
+    }
+    input, select {
+      padding: 6px;
+      font-size: 14px;
+      width: 250px;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #3366cc;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #2a52a3;
+    }
+    #status-box {
+      margin-top: 30px;
+      padding: 12px;
+      border-radius: 6px;
+      background: #eef4ff;
+      border: 1px solid #aac;
+      font-family: monospace;
+    }
+  </style>
+</head>
+<body>
+  <h2>🎓 Model Eğitim Paneli</h2>
+
+  <form id="train-form" onsubmit="startTraining(event)">
+    <label>Model Türü:</label>
+    <select name="model_type">
+      <option value="pattern">Desen</option>
+      <option value="color">Renk</option>
+      <option value="texture">Doku</option>
+    </select>
+
+    <label>Versiyon:</label>
+    <input type="text" name="version" value="v1" required />
+
+    <label>Epochs:</label>
+    <input type="number" name="epochs" value="10" required />
+
+    <label>Batch Size:</label>
+    <input type="number" name="batch_size" value="16" required />
+
+    <label>Learning Rate:</label>
+    <input type="number" step="0.0001" name="learning_rate" value="0.0001" required />
+
+    <button type="submit">🚀 Eğitimi Başlat</button>
+  </form>
+
+  <div id="status-box">💤 Beklemede...</div>
+
+  <script>
+    function updateStatus(message) {
+      document.getElementById("status-box").textContent = message;
+    }
+
+    function startTraining(event) {
+      event.preventDefault();
+      const formData = new FormData(document.getElementById("train-form"));
+      const payload = Object.fromEntries(formData);
+
+      fetch("/train-model", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      })
+      .then(res => res.json())
+      .then(data => updateStatus(data.status))
+      .catch(err => updateStatus("❌ Eğitim başlatılamadı: " + err));
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,107 @@
+<!-- pu.html -->
+<!-- Oluşturulma: 2025-04-19 -->
+<!-- Hazırlayan: Kafkas ❤️ Luna -->
+<!-- Açıklama:
+     PU ekranı 3 ana panelden oluşur:
+     - Sol panel: realImages klasöründeki tüm görselleri lazy loading ile listeler.
+     - Orta panel: Seçilen görsele göre benzer sonuçları getirir (model, metrik, topN'e göre).
+     - Sağ panel: Cluster temsilcilerini gösterir, detay sayfasına yönlendirme yapılabilir.
+     Hover'da metadata + büyük görsel görünür. Cluster’a ait görseller çerçeveyle belirginleşir.
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>PU Ekranı - Pattern Cluster Görünümü</title>
+  <style>
+    body {
+      display: flex;
+      font-family: Arial, sans-serif;
+      margin: 0;
+    }
+    .panel {
+      flex: 1;
+      height: 100vh;
+      overflow-y: auto;
+      padding: 10px;
+      border-right: 1px solid #ccc;
+    }
+    .panel h2 {
+      margin-top: 0;
+    }
+    .image-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .image-box {
+      width: 100px;
+      height: 100px;
+      position: relative;
+      border: 2px solid transparent;
+    }
+    .image-box.clustered {
+      border-color: #4caf50;
+    }
+    .image-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 4px;
+    }
+    .tooltip {
+      display: none;
+      position: absolute;
+      top: 110%;
+      left: 0;
+      background: #fff;
+      border: 1px solid #aaa;
+      padding: 8px;
+      z-index: 10;
+      width: 300px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    .tooltip img {
+      width: 100%;
+      height: auto;
+      margin-bottom: 5px;
+    }
+    .image-box:hover .tooltip {
+      display: block;
+    }
+        /* Center panel horizontal yayılma */
+        #center-panel {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      align-content: flex-start;
+    }
+    #center-panel .image-box {
+      width: 150px;
+      height: 150px;
+    }
+  </style>
+</head>
+<body>
+  <div class="panel" id="left-panel">
+    <h2>🖼️ Sol Panel - Tüm Görseller</h2>
+    <div class="image-grid" id="image-container">
+      <!-- Görseller buraya JS ile yüklenecek -->
+    </div>
+  </div>
+
+  <div id="center-panel" class="panel">
+    Benzer görseller burada gösterilecek.
+  </div>
+
+  <div class="panel" id="right-panel">
+    <h2>🧠 Sağ Panel - Cluster Temsilcileri</h2>
+  </div>
+
+  <!-- Script sırası önemlidir: önce center_panel.js, sonra left_panel.js -->
+  <script src="{{ url_for('static', filename='js/center_panel.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/left_panel.js') }}"></script>
+</body>
+</html>
