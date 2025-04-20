@@ -1,9 +1,6 @@
 # check_updates.py
 # Bu dosya, realImages klasöründeki görseller ve realImages_json içindeki JSON dosyalarında bir değişiklik olup olmadığını kontrol eder.
-# Yeni görseller veya güncellenmiş JSON tespit edilirse:
-# 1. merge_metadata.py tetiklenir
-# 2. generate_thumbnails.py tetiklenir (thumbnail güncellenir)
-# Cache dosyası güncellenir.
+# Yeni görseller veya güncellenmiş JSON tespit edilirse, merge_metadata.py, generate_thumbnails.py ve generate_representatives.py çalıştırılır.
 # Oluşturulma: 2025-04-19
 # Hazırlayan: Kafkas ❤️ Luna
 
@@ -54,13 +51,19 @@ def check_for_updates():
 
     if cached["images"] != current_images or cached["json_hashes"] != current_hashes:
         print("🔄 Değişiklik algılandı: metadata yeniden oluşturuluyor...")
-        import merge_metadata  # Metadata birleşimi
+        import merge_metadata  # yeniden çalıştır
 
+        # Thumbnail'ları da güncelle
         try:
             subprocess.run(["python", "generate_thumbnails.py"], check=True)
-            print("🖼️ Thumbnail'lar başarıyla oluşturuldu.")
         except Exception as e:
             print(f"❌ Thumbnail oluşturma sırasında hata: {e}")
+
+        # ✅ GÜNCELLEME: Cluster temsilcilerini de yeniden oluştur
+        try:
+            subprocess.run(["python", "generate_representatives.py"], check=True)
+        except Exception as e:
+            print(f"❌ Cluster temsilcileri güncellenemedi: {e}")
 
         save_current_cache(current_images, current_hashes)
         return True

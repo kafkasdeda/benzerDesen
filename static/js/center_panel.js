@@ -4,10 +4,11 @@
 // Açıklama:
 // Orta panelde, seçilen görsele göre benzer desenleri gösteren dinamik yapı.
 // Sunucudan gelen benzerlik sonuçlarını gösterir. Hover'da metadata + büyük görsel içerir.
+// Ek olarak, checkbox ile görsel seçimi yapılabilir (yeni cluster oluşturmak için kullanılacak).
 
 const centerContainer = document.getElementById("center-panel");
+window.selectedImages = []; // global seçim dizisi
 
-// Bu fonksiyon dışarıdan çağrılır
 function loadSimilarImages(selectedFilename, model = "pattern", topN = 10, metric = "cosine") {
   centerContainer.innerHTML = "🔄 Benzer görseller yükleniyor...";
 
@@ -42,12 +43,30 @@ function loadSimilarImages(selectedFilename, model = "pattern", topN = 10, metri
           Similarity: ${result.similarity?.toFixed(3) || '—'}
         `;
 
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.style.position = "absolute";
+        checkbox.style.top = "5px";
+        checkbox.style.right = "5px";
+        checkbox.checked = window.selectedImages.includes(result.filename);
+
+        checkbox.addEventListener("change", () => {
+          if (checkbox.checked) {
+            if (!window.selectedImages.includes(result.filename)) {
+              window.selectedImages.push(result.filename);
+            }
+          } else {
+            window.selectedImages = window.selectedImages.filter(f => f !== result.filename);
+          }
+        });
+
         box.appendChild(img);
         box.appendChild(tooltip);
+        box.appendChild(checkbox);
         centerContainer.appendChild(box);
       });
     })
     .catch(err => {
       centerContainer.innerText = `❌ Benzer görseller yüklenemedi: ${err}`;
     });
-}
+} 

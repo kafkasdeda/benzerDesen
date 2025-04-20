@@ -1,14 +1,111 @@
-[
+{
+  "version_comment": "test",
+  "clusters": [
     {
-      "cluster": "Pattern-01",
-      "filename": "KW42000-01.jpg"
+      "filename": "22 SS - OSCAR PRESTIGE - KM13195-01.jpg",
+      "cluster": "cluster_0",
+      "comment": ""
     },
     {
-      "cluster": "Pattern-02",
-      "filename": "KM99881-02.jpg"
+      "filename": "AW22 - Chopard Prestige - KP61515-1.jpg",
+      "cluster": "cluster_1",
+      "comment": ""
     },
     {
-      "cluster": "Pattern-03",
-      "filename": "SS26-MIRAGE-LM12345-10.jpg"
+      "filename": "22 SS - OSCAR PRESTIGE - KM13192-14.jpg",
+      "cluster": "cluster_10",
+      "comment": ""
+    },
+    {
+      "filename": "AW22 - HENSON  - KW41202-11.jpg",
+      "cluster": "cluster_11",
+      "comment": ""
+    },
+    {
+      "filename": "AW22 - HUBLOT - KP61630-4.jpg",
+      "cluster": "cluster_12",
+      "comment": ""
+    },
+    {
+      "filename": "AW22 - HOUSTON - KW41233-3.jpg",
+      "cluster": "cluster_13",
+      "comment": ""
+    },
+    {
+      "filename": "AW-22 - BLANCPAIN - KP61044-9.jpg",
+      "cluster": "cluster_14",
+      "comment": ""
+    },
+    {
+      "filename": "AW22 - JADORE - KM12834-6.jpg",
+      "cluster": "cluster_15",
+      "comment": ""
+    },
+    {
+      "filename": "AW24-FERRANO LUXURY-KW41719-10.jpg",
+      "cluster": "cluster_16",
+      "comment": ""
+    },
+    {
+      "filename": "22 SS - OSCAR PRESTIGE - KM13180-01.jpg",
+      "cluster": "cluster_17",
+      "comment": ""
+    },
+    {
+      "filename": "AW-22 - BLANCPAIN - KP61622-11.jpg",
+      "cluster": "cluster_18",
+      "comment": ""
+    },
+    {
+      "filename": "AW22 - BRUNELLA FLANNEL RCS - KW41206-1.jpg",
+      "cluster": "cluster_19",
+      "comment": ""
+    },
+    {
+      "filename": "AW22 - 120 S DRAGON FLANNEL - KW41300-18.jpg",
+      "cluster": "cluster_2",
+      "comment": ""
+    },
+    {
+      "filename": "AW-22 - BLANCPAIN - KP61044-1.jpg",
+      "cluster": "cluster_3",
+      "comment": ""
+    },
+    {
+      "filename": "AW22 - HEMLOCK LUXURY FLANNEL - KM12855-4.jpg",
+      "cluster": "cluster_4",
+      "comment": ""
+    },
+    {
+      "filename": "22 SS - OSCAR PRESTIGE - KM13178-07.jpg",
+      "cluster": "cluster_5",
+      "comment": ""
+    },
+    {
+      "filename": "AW22 - BETZDORF WOOL - KW41215-4.jpg",
+      "cluster": "cluster_6",
+      "comment": ""
+    },
+    {
+      "filename": "AW22 - KIND - KP61612-4.jpg",
+      "cluster": "cluster_7",
+      "comment": ""
+    },
+    {
+      "filename": "AW23-LEICESTER LUXURY-KW41614-9.jpg",
+      "cluster": "cluster_8",
+      "comment": ""
+    },
+    {
+      "filename": "AW-22 - BLANCPAIN - KP61625-2.jpg",
+      "cluster": "cluster_9",
+      "comment": ""
+    },
+    {
+      "cluster": "cluster-1",
+      "filename": "AW23-BREONNA WOOL RICH FLANNEL-KW41620-15.jpg",
+      "comment": ""
     }
-  ]
+  ],
+  "last_updated": "2025-04-20T12:32:51.991918"
+}

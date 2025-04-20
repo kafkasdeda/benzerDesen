@@ -11,6 +11,7 @@
 # - "/check-updates" → JSON & görsel güncellemelerini kontrol eder
 # - "/find-similar"  → Benzer desen görsellerini getirir
 # - "/realImages/<path:filename>" → Gerçek görselleri sunar
+# - "/create-cluster" → Seçilen görsellerle yeni cluster oluşturur
 
 from flask import Flask, render_template, request, jsonify, send_from_directory
 import json
@@ -19,12 +20,18 @@ import sys
 import os
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity, euclidean_distances
+import shutil
+from datetime import datetime
+import json
+import os
+import random
 
 app = Flask(__name__)
 
 @app.route("/")
 def home():
-    return "<h2>PU Ana Panel - Luna & Kafkas</h2><p>/train ile model eğit, /check-updates ile güncelle kontrol et.</p>"
+    return "<h2>PU Ana Panel </h2><p>/train ile model eğit, /check-updates ile güncelle kontrol et.</p>"
+
 
 @app.route("/train")
 def train():
@@ -96,7 +103,7 @@ def serve_representatives(model, version):
 def find_similar():
     filename = request.args.get("filename")
     model = request.args.get("model", "pattern")
-    topN = int(request.args.get("topN", 10))
+    topN = int(request.args.get("topN", 100))
     metric = request.args.get("metric", "cosine")
 
     # Feature dosyasını oku
@@ -144,6 +151,96 @@ def find_similar():
         })
 
     return jsonify(results)
+
+@app.route("/update-version-comment", methods=["POST"])
+def update_version_comment():
+    data = request.get_json()
+    model = data.get("model")
+    version = data.get("version")
+    comment = data.get("version_comment", "")
+
+    path = os.path.join("exported_clusters", model, version, "representatives.json")
+
+    if not os.path.exists(path):
+        return jsonify({"status": "error", "message": "Dosya bulunamadı."})
+
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            content = json.load(f)
+
+        content["version_comment"] = comment
+
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(content, f, indent=2, ensure_ascii=False)
+
+        return jsonify({"status": "ok"})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)})
+
+
+@app.route("/create-cluster", methods=["POST"])
+def create_cluster():
+    data = request.get_json()
+    model = data.get("model")
+    version = data.get("version")
+    filenames = data.get("filenames", [])
+
+    cluster_base = os.path.join("exported_clusters", model, version)
+    reps_path = os.path.join(cluster_base, "representatives.json")
+
+    if not os.path.exists(reps_path):
+        return jsonify({"status": "error", "message": "representatives.json bulunamadı."})
+
+    try:
+        with open(reps_path, "r", encoding="utf-8") as f:
+            rep_data = json.load(f)
+
+        clusters = rep_data.get("clusters", [])
+
+        # Eski cluster'lardan çıkar
+        clusters = [c for c in clusters if c["filename"] not in filenames]
+
+        # Yeni cluster adı
+        cluster_ids = [c["cluster"] for c in clusters]
+        next_id = max([int(c.split("-")[-1]) for c in cluster_ids if c.startswith("cluster-")]+[0]) + 1
+        new_cluster_name = f"cluster-{next_id}"
+
+        # Yeni klasör oluştur
+        new_folder = os.path.join(cluster_base, new_cluster_name)
+        os.makedirs(new_folder, exist_ok=True)
+
+        # Görselleri kopyala ve representative listesine ekle
+        for i, fname in enumerate(filenames):
+            src = os.path.join("realImages", fname)
+            dst = os.path.join(new_folder, fname)
+            if os.path.exists(src):
+                shutil.copy2(src, dst)
+            clusters.append({
+                "cluster": new_cluster_name,
+                "filename": fname,
+                "comment": ""
+            })
+
+        # ✅ Temsilci olarak ilk görseli representatives listesine ekle
+        rep_data.setdefault("representatives", [])
+        existing = [r["cluster"] for r in rep_data["representatives"]]
+        if new_cluster_name not in existing:
+            rep_data["representatives"].append({
+                "cluster": new_cluster_name,
+                "filename": filenames[0]
+            })
+
+        rep_data["clusters"] = clusters
+        rep_data.setdefault("version_comment", "")
+        rep_data["last_updated"] = datetime.now().isoformat()
+
+        with open(reps_path, "w", encoding="utf-8") as f:
+            json.dump(rep_data, f, indent=2, ensure_ascii=False)
+
+        return jsonify({"status": "ok", "new_cluster": new_cluster_name})
+
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)})
 
 if __name__ == "__main__":
     app.run(debug=True)
