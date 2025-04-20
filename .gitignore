@@ -30,3 +30,5 @@ train_config.json
 # 🌐 Tarayıcı veya sistem çöpleri
 .DS_Store
 Thumbs.db
+# 🚫 Otomatik cluster çıktıları (model bazlı)
+exported_clusters/
