@@ -103,5 +103,10 @@
   <!-- Script sırası önemlidir: önce center_panel.js, sonra left_panel.js -->
   <script src="{{ url_for('static', filename='js/center_panel.js') }}"></script>
   <script src="{{ url_for('static', filename='js/left_panel.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/right_panel.js') }}"></script>
+  <script>
+    // Örnek: desen modeli ve v1 versiyonu yüklensin
+    loadClusterRepresentatives("pattern", "v1");
+  </script>
 </body>
 </html>

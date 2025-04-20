@@ -83,6 +83,14 @@ def check_updates():
             return jsonify({"status": "✅ Değişiklik yok, metadata güncel."})
     except Exception as ex:
         return jsonify({"status": f"❌ Hata oluştu: {str(ex)}"})
+@app.route('/thumbnails/<path:filename>')
+def serve_thumbnail(filename):
+    return send_from_directory('thumbnails', filename)
+
+@app.route('/clusters/<model>/<version>/representatives.json')
+def serve_representatives(model, version):
+    folder = os.path.join("exported_clusters", model, version)
+    return send_from_directory(folder, "representatives.json")
 
 @app.route("/find-similar")
 def find_similar():

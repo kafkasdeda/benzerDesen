@@ -21,7 +21,7 @@ function loadSimilarImages(selectedFilename, model = "pattern", topN = 10, metri
         box.className = "image-box";
 
         const img = document.createElement("img");
-        img.src = `realImages/${result.filename}`;
+        img.src = `thumbnails/${result.filename}`;
         img.loading = "lazy";
         img.alt = result.filename;
 

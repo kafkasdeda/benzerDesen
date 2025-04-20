@@ -34,7 +34,7 @@ window.onload = function () {
   
           const img = document.createElement("img");
           img.loading = "lazy";
-          img.src = `realImages/${name}`;
+          img.src = `thumbnails/${name}`;
           img.alt = name;
   
           const tooltip = document.createElement("div");

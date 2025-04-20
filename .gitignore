@@ -1,10 +1,32 @@
+# 🔒 Ortam ve geçici klasörler
 luna_env/
+.vscode/
+.idea/
+__pycache__/
+*.pyc
+
+# 🖼️ Kullanıcı görselleri (dev dışı)
 realImages/
+thumbnails/
 new_inputs/
+
+# 🧠 Derin öğrenme artefaktları
 *.pkl
 *.pt
 *.index
-__pycache__/
-*.pyc
-.vscode/
-.idea/
+*.npy
+*.npz
+
+# 📁 Otomatik metadata dosyaları (opsiyonel dışarıda tutulabilir)
+image_metadata_map.json
+metadata_cache.json
+train_config.json
+
+# 🧪 Geçici test dosyaları
+*.log
+*.tmp
+*.bak
+
+# 🌐 Tarayıcı veya sistem çöpleri
+.DS_Store
+Thumbs.db
