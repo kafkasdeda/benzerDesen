@@ -248,11 +248,13 @@ window.loadSimilarImages = function loadSimilarImages(selectedFilename, model = 
 
   centerContainer.innerHTML = "🔁 Benzer görseller yükleniyor...";
   window.currentSelectedImage = selectedFilename;
-  const version = document.getElementById("version-selector")?.value || "v1";
+  const version = document.getElementById("version-combo")?.value || window.currentVersion || "v1";
   const preFilterEnabled = document.getElementById("center-pre-filter")?.checked;
   const filters = customFilters || (preFilterEnabled && typeof window.getFilterParams === "function" ? getFilterParams() : null);
+  
+  console.log(`🔍 Benzer görseller aranıyor: model=${model}, version=${version}, metric=${metric}`);
 
-  fetch(`/find-similar?filename=${encodeURIComponent(selectedFilename)}&model=${model}&topN=${topN}&metric=${metric}`, {
+  fetch(`/find-similar?filename=${encodeURIComponent(selectedFilename)}&model=${model}&version=${version}&topN=${topN}&metric=${metric}`, {
     method: filters ? "POST" : "GET",
     headers: filters ? { "Content-Type": "application/json" } : {},
     body: filters ? JSON.stringify(filters) : null
@@ -330,11 +332,13 @@ window.applyAllFilters = function () {
     return;
   }
 
-  const model = document.getElementById("model-selector")?.value || "pattern";
-  const version = document.getElementById("version-selector")?.value || "v1";
+  const model = window.currentModel || "pattern";
+  const version = window.currentVersion || "v1";
   const metric = document.getElementById("metric-selector")?.value || "cosine";
   const topN = parseInt(document.getElementById("topn-input")?.value || "10");
   const filters = typeof window.getFilterParams === "function" ? window.getFilterParams() : null;
+  
+  console.log(`🔄 Filtreler uygulanıyor: model=${model}, version=${version}`);
 
   window.loadSimilarImages(window.currentSelectedImage, model, topN, metric, filters);
 };

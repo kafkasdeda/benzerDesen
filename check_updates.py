@@ -43,13 +43,78 @@ def save_current_cache(image_list, json_hashes):
     with open(MERGE_CACHE_FILE, "w", encoding="utf-8") as f:
         json.dump({"images": image_list, "json_hashes": json_hashes}, f, indent=2)
 
+# Model dosyasını al
+def get_model_data(model_type):
+    model_path = os.path.join("exported_clusters", model_type, "versions.json")
+    if not os.path.exists(model_path):
+        return None
+        
+    try:
+        with open(model_path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except:
+        return None
+
+# Mevcut clusterları ve versiyonları kontrol et
+def check_cluster_integrity():
+    # Kullanılabilir modelleri kontrol et
+    models = ["pattern", "color", "texture"]
+    updated = False
+    
+    for model in models:
+        model_data = get_model_data(model)
+        if not model_data:
+            continue
+        
+        current_version = model_data.get("current_version")
+        if not current_version:
+            continue
+            
+        versions = model_data.get("versions", {})
+        if not versions:
+            continue
+            
+        # Metadata dosyasını yükle
+        metadata_path = "image_metadata_map.json"
+        if not os.path.exists(metadata_path):
+            continue
+            
+        with open(metadata_path, "r", encoding="utf-8") as f:
+            metadata = json.load(f)
+        
+        # Versiyon tutarlılığını kontrol et
+        for version_id, version_data in versions.items():
+            clusters = version_data.get("clusters", {})
+            for cluster_id, cluster_data in clusters.items():
+                # Bu cluster'daki tüm görsellerin metadata'daki cluster bilgisini güncelle
+                images = cluster_data.get("images", [])
+                
+                for image_name in images:
+                    if image_name in metadata:
+                        # Metadata bilgisini kontrol et ve güncelle
+                        if metadata[image_name].get("cluster") != cluster_id:
+                            metadata[image_name]["cluster"] = cluster_id
+                            updated = True
+                            print(f"🔄 Görsel {image_name} için cluster bilgisi güncellendi: {cluster_id}")
+        
+        # Değişiklik olduysa kaydet
+        if updated:
+            with open(metadata_path, "w", encoding="utf-8") as f:
+                json.dump(metadata, f, indent=2, ensure_ascii=False)
+            print(f"✅ Metadata tutarlılığı sağlandı.")
+    
+    return updated
+
 # Asıl kontrol fonksiyonu
 def check_for_updates():
     current_images = get_image_filenames()
     current_hashes = get_json_hashes()
     cached = load_previous_cache()
+    
+    # Önce cluster tutarlılığını kontrol et
+    cluster_updated = check_cluster_integrity()
 
-    if cached["images"] != current_images or cached["json_hashes"] != current_hashes:
+    if cached["images"] != current_images or cached["json_hashes"] != current_hashes or cluster_updated:
         print("🔄 Değişiklik algılandı: metadata yeniden oluşturuluyor...")
         import merge_metadata  # yeniden çalıştır
 
@@ -72,4 +137,5 @@ def check_for_updates():
         return False
 
 if __name__ == "__main__":
-    check_for_updates()
+    update_result = check_for_updates()
+    print(f"💼 Güncelleme durumu: {'Güncellendi' if update_result else 'Güncel'}")

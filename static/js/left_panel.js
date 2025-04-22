@@ -8,6 +8,39 @@
 
 window.onload = function () {
   console.log("✅ left_panel.js window.onload tetiklendi");
+  
+  // Model ve versiyon değişikliklerini dinle
+  function listenForModelChanges() {
+    const modelButtons = document.querySelectorAll(".model-button");
+    if (modelButtons.length > 0) {
+      console.log("Model butonları bulundu, dinleniyor...");
+      return true;
+    }
+    return false;
+  }
+  
+  function listenForVersionChanges() {
+    const versionCombo = document.getElementById("version-combo");
+    if (versionCombo) {
+      console.log("Versiyon combo bulundu, dinleniyor...");
+      versionCombo.addEventListener("change", () => {
+        window.applyFilters(); // Versiyon değiştiğinde filtreleri yeniden uygula
+      });
+      return true;
+    }
+    return false;
+  }
+  
+  // Element'ler yüklenene kadar bekle
+  let checkInterval = setInterval(() => {
+    const modelsReady = listenForModelChanges();
+    const versionsReady = listenForVersionChanges();
+    
+    if (modelsReady && versionsReady) {
+      clearInterval(checkInterval);
+      console.log("👍 Sağ panel elemanları başarıyla dinleniyor");
+    }
+  }, 500);
 
   fetch('image_metadata_map.json')
     .then(res => res.json())
@@ -49,13 +82,17 @@ window.onload = function () {
           console.log("🔁 Benzer görseller yükleniyor:", name);
 
           window.currentSelectedImage = name;
-          const model = document.getElementById("model-selector")?.value || "pattern";
+          const model = window.currentModel || "pattern";
+          const version = window.currentVersion || "v1";
           const topN = parseInt(document.getElementById("topn-input")?.value || "10");
           const metric = document.getElementById("metric-selector")?.value || "cosine";
 
+          // Eski elementler için geriye dönük uyumluluk kontrolleri
           if (document.getElementById("model-selector")) document.getElementById("model-selector").value = model;
           if (document.getElementById("topn-input")) document.getElementById("topn-input").value = topN;
           if (document.getElementById("metric-selector")) document.getElementById("metric-selector").value = metric;
+          
+          console.log(`🎨 Görsel seçildi: ${name}, model=${model}, version=${version}`);
 
           let filters = null;
           if (document.getElementById("center-pre-filter")?.checked && window.getFilterParams) {
@@ -321,6 +358,11 @@ window.populateMaterialDropdown();
         const featureValue = document.getElementById("feature-filter")?.value?.trim().toLowerCase();
         const clusterValue = document.getElementById("cluster-filter")?.value?.trim().toLowerCase();
         const mixFilters = getMixFilterValues();
+        
+        // Mevcut model ve versiyonu günlükçe olarak göster
+        const model = window.currentModel || "pattern";
+        const version = window.currentVersion || "v1";
+        console.log(`📊 Filtreler uygulanıyor - Model: ${model}, Versiyon: ${version}`);
 
         allBoxes.forEach(box => {
           const matchBlend = !blendValue || box.dataset.blend.toLowerCase().includes(blendValue);

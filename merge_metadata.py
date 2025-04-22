@@ -101,4 +101,88 @@ for item in main_data:
 with open("merged_metadata.json", "w", encoding="utf-8") as f:
     json.dump(merged_metadata, f, indent=2, ensure_ascii=False)
 
-print(f"✅ Toplam {len(merged_metadata)} görsel için metadata birleştirildi.")
+# image_metadata_map.json içine aktarma
+# Bu dosyada model-versiyon bilgilerini korumak önemli
+# Eğer dosya varsa, içeriğini yükle ve sadece temel özellikleri güncelle
+if os.path.exists("image_metadata_map.json"):
+    try:
+        with open("image_metadata_map.json", "r", encoding="utf-8") as f:
+            metadata_map = json.load(f)
+        
+        # Her yeni görsel için bilgileri güncelle
+        updated_count = 0
+        for entry in merged_metadata:
+            filename = entry["filename"]
+            
+            # Genel özellikler ve hamadde bilgileri güncelle
+            # Ama mevcut cluster bilgisini koru
+            if filename in metadata_map:
+                # Cluster bilgisini tut
+                cluster_info = metadata_map[filename].get("cluster", None)
+                # Diğer bilgileri güncelle
+                metadata_map[filename] = {
+                    "design": entry["design"],
+                    "variant": entry["variant"],
+                    "season": entry["season"],
+                    "quality": entry["quality"],
+                    # Blend'i features formatına çevir
+                    "features": [(item["htype"], item["percentage"]) for item in entry["blend"]],
+                }
+                
+                # Feature flag'lerini ayrı ekleriz
+                for flag, value in entry["features"].items():
+                    if value:
+                        metadata_map[filename][flag] = value
+                
+                # Cluster bilgisini koru
+                if cluster_info:
+                    metadata_map[filename]["cluster"] = cluster_info
+                    
+                updated_count += 1
+            else:
+                # Yeni görsel
+                metadata_map[filename] = {
+                    "design": entry["design"],
+                    "variant": entry["variant"],
+                    "season": entry["season"],
+                    "quality": entry["quality"],
+                    # Blend'i features formatına çevir
+                    "features": [(item["htype"], item["percentage"]) for item in entry["blend"]],
+                }
+                
+                # Feature flag'lerini ayrı ekleriz
+                for flag, value in entry["features"].items():
+                    if value:
+                        metadata_map[filename][flag] = value
+        
+        # Güncellenmiş metadata_map'i kaydet
+        with open("image_metadata_map.json", "w", encoding="utf-8") as f:
+            json.dump(metadata_map, f, indent=2, ensure_ascii=False)
+            
+        print(f"✅ Toplam {len(merged_metadata)} görselin {updated_count} tanesi güncellendi, gerisi yeni eklendi.")
+    except Exception as e:
+        print(f"❌ image_metadata_map.json güncellenirken hata: {e}")
+else:
+    # Dosya yoksa, yeni bir metadata_map oluştur
+    metadata_map = {}
+    for entry in merged_metadata:
+        filename = entry["filename"]
+        metadata_map[filename] = {
+            "design": entry["design"],
+            "variant": entry["variant"],
+            "season": entry["season"],
+            "quality": entry["quality"],
+            # Blend'i features formatına çevir
+            "features": [(item["htype"], item["percentage"]) for item in entry["blend"]],
+        }
+        
+        # Feature flag'lerini ayrı ekleriz
+        for flag, value in entry["features"].items():
+            if value:
+                metadata_map[filename][flag] = value
+    
+    # Yeni metadata_map'i kaydet
+    with open("image_metadata_map.json", "w", encoding="utf-8") as f:
+        json.dump(metadata_map, f, indent=2, ensure_ascii=False)
+    
+    print(f"✅ Toplam {len(merged_metadata)} görsel için yeni metadata_map oluşturuldu.")

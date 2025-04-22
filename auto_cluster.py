@@ -135,7 +135,22 @@ version_data = model_data["versions"][version]
 # Önceki cluster'ları temizle (eğer varsa)
 version_data["clusters"] = {}
 
+# Cluster sayısını ve image sayısını yaz
+log_path = os.path.join(output_dir, "cluster_log.txt")
+with open(log_path, "w", encoding="utf-8") as log_file:
+    log_file.write(f"Algoritma: {algorithm}\n")
+    log_file.write(f"Parametre: k={k} (KMeans), eps={eps} (DBSCAN), min_samples={min_samples} (DBSCAN), linkage={linkage} (Hierarchical)\n")
+    log_file.write(f"Toplam görsel sayısı: {len(image_paths)}\n")
+    if algorithm == "dbscan":
+        unique_labels = len(set(labels)) - (1 if -1 in labels else 0)
+        log_file.write(f"Oluşturulan küme sayısı: {unique_labels}\n")
+        outliers = list(labels).count(-1)
+        log_file.write(f"Outlier sayısı: {outliers}\n")
+    else:
+        log_file.write(f"Oluşturulan küme sayısı: {len(set(labels))}\n")
+
 # Görselleri işle ve cluster'lara ekle
+cluster_counts = {}
 for idx, label in enumerate(labels):
     if label == -1:
         continue  # DBSCAN outlier
@@ -146,6 +161,11 @@ for idx, label in enumerate(labels):
     # Kaynak dosya bilgileri
     source_path = image_paths[idx]  # Tam yol
     filename = os.path.basename(source_path)
+    
+    # Cluster için sayaç
+    if cluster_name not in cluster_counts:
+        cluster_counts[cluster_name] = 0
+    cluster_counts[cluster_name] += 1
     
     # Eğer cluster yoksa oluştur
     if cluster_name not in version_data["clusters"]:
@@ -167,6 +187,34 @@ for idx, label in enumerate(labels):
         shutil.copy2(src_thumb, dst_thumb)
     else:
         print(f"[UYARI] {filename} için thumbnail bulunamadı")
+
+# Debug için cluster içeriklerini de log'a ekle
+with open(log_path, "a", encoding="utf-8") as log_file:
+    log_file.write("\nCluster içerikleri:\n")
+    for cluster_name, count in cluster_counts.items():
+        log_file.write(f"{cluster_name}: {count} görsel\n")
+    log_file.write(f"\nToplam {len(version_data['clusters'])} cluster oluşturuldu.\n")
+
+# Metadata update
+import json
+if os.path.exists("image_metadata_map.json"):
+    try:
+        with open("image_metadata_map.json", "r", encoding="utf-8") as f:
+            metadata = json.load(f)
+        
+        # Her clusterdaki görsellerin metadata'sını güncelle
+        for cluster_name, cluster_data in version_data["clusters"].items():
+            for img in cluster_data["images"]:
+                if img in metadata:
+                    metadata[img]["cluster"] = cluster_name
+        
+        # Metadata'yı kaydet
+        with open("image_metadata_map.json", "w", encoding="utf-8") as f:
+            json.dump(metadata, f, indent=2, ensure_ascii=False)
+            
+        print(f"✅ Metadata başarıyla güncellendi.")
+    except Exception as e:
+        print(f"❌ Metadata güncellenirken hata: {e}")
 
 # Güncel versiyonu ayarla
 model_data["current_version"] = version

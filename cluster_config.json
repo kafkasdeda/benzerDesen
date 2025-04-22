@@ -1,7 +1,6 @@
 {
   "model_type": "pattern",
-  "version": "v1",
-  "algorithm": "dbscan",
-  "eps": 1,
-  "min_samples": 15
+  "version": "v7",
+  "algorithm": "kmeans",
+  "k": 19
 }

@@ -177,10 +177,29 @@ def serve_cluster_data(model, version):
     if version not in model_data.get("versions", {}):
         return jsonify({"error": "Versiyon bulunamadı"}), 404
     
+    # Versiyon içeriklerini kontrol et
+    version_data = model_data["versions"][version]
+    clusters = version_data.get("clusters", {})
+    cluster_count = len(clusters)
+    total_images = 0
+    
+    # Her cluster'daki görsel sayısını topla
+    for cluster_name, cluster_data in clusters.items():
+        total_images += len(cluster_data.get("images", []))
+    
+    print(f"\n[DEBUG] Model: {model}, Version: {version}")
+    print(f"[DEBUG] Cluster count: {cluster_count}")
+    print(f"[DEBUG] Total images: {total_images}")
+    print(f"[DEBUG] Clusters: {list(clusters.keys())}\n")
+    
     # Sadece istenen versiyonun verisini döndür
     return jsonify({
         "version": version,
-        "data": model_data["versions"][version]
+        "data": model_data["versions"][version],
+        "stats": {
+            "cluster_count": cluster_count,
+            "total_images": total_images
+        }
     })
 
 @app.route("/find-similar", methods=["GET", "POST"])
@@ -188,8 +207,11 @@ def find_similar():
     filters = request.get_json() if request.method == "POST" else None
     filename = request.args.get("filename")
     model = request.args.get("model", "pattern")
+    version = request.args.get("version", "v1")  # Versiyon parametresi eklendi
     topN = int(request.args.get("topN", 100))
     metric = request.args.get("metric", "cosine")
+    
+    print(f"📊 Benzer görsel arama: model={model}, version={version}, metric={metric}")
 
     feature_path = f"image_features/{model}_features.npy"
     index_path = f"image_features/{model}_filenames.json"
@@ -216,6 +238,9 @@ def find_similar():
         mix_filters = filters.get("mixFilters", [])
         feature_filters = filters.get("features", [])
         cluster_status = filters.get("cluster", "")
+        
+        # Model verilerini yükle (versiyon bilgisi için)
+        model_data = get_model_data(model)
 
         for i, fname in enumerate(filenames):
             meta = metadata.get(fname, {})
@@ -229,16 +254,50 @@ def find_similar():
 
             match_feature = all(f in feature_map for f in feature_filters)
 
+            # Versiyon bazlı cluster kontrolü
             match_cluster = True
             if cluster_status == "clustered" and not cluster:
                 match_cluster = False
             elif cluster_status == "unclustered" and cluster:
                 match_cluster = False
+                
+            # Versiyon kontrolü: Eğer metadata'da cluster bilgisi varsa
+            # ve bu cluster belirtilen model ve versiyonda yer alıyorsa, kullan
+            if version != "v1" and cluster:  # v1 tüm görseller için varsayılan
+                # Model verisinde bu cluster var mı kontrol et
+                model_data = get_model_data(model)
+                version_data = model_data.get("versions", {}).get(version, {})
+                version_clusters = version_data.get("clusters", {})
+                
+                cluster_exists = False
+                for cluster_name, cluster_data in version_clusters.items():
+                    if fname in cluster_data.get("images", []):
+                        cluster_exists = True
+                        break
+                
+                # Bu görsel belirtilen versiyonda değilse ve clustered filtresi varsa, filtreleme yap
+                if cluster_status == "clustered" and not cluster_exists:
+                    match_cluster = False
 
             if match_mix and match_feature and match_cluster:
                 allowed_indices.append(i)
     else:
-        allowed_indices = list(range(len(filenames)))
+        # Filtre yoksa ve versiyon v1 değilse, versiyon bazlı filtreleme yap
+        if version != "v1":
+            model_data = get_model_data(model)
+            version_data = model_data.get("versions", {}).get(version, {})
+            version_clusters = version_data.get("clusters", {})
+            
+            # Tüm clusterlar'daki görselleri topla
+            version_images = set()
+            for cluster_data in version_clusters.values():
+                version_images.update(cluster_data.get("images", []))
+            
+            # Sadece bu versiyondaki görselleri dahil et
+            allowed_indices = [i for i, fname in enumerate(filenames) if fname in version_images]
+            print(f"ℹ️ Versiyon filtreleme: {version} versiyonunda {len(allowed_indices)} görsel bulundu.")
+        else:
+            allowed_indices = list(range(len(filenames)))
 
     if not allowed_indices:
         return jsonify([])
@@ -259,13 +318,28 @@ def find_similar():
         global_idx = allowed_indices[local_idx]
         fname = filenames[global_idx]
         meta = metadata.get(fname, {})
+        
+        # Versiyon spesifik cluster bilgisi varsa ekle
+        cluster_info = meta.get("cluster", "")
+        if version != "v1" and cluster_info:
+            model_data = get_model_data(model)
+            version_data = model_data.get("versions", {}).get(version, {})
+            version_clusters = version_data.get("clusters", {})
+            
+            # Bu görselin bu versiyondaki cluster'ını bul
+            for cluster_name, cluster_data in version_clusters.items():
+                if fname in cluster_data.get("images", []):
+                    cluster_info = cluster_name
+                    break
+                    
         final_results.append({
             "filename": fname,
             "design": meta.get("design"),
             "season": meta.get("season"),
             "quality": meta.get("quality"),
             "features": meta.get("features", []),
-            "cluster": meta.get("cluster"),
+            "cluster": cluster_info,
+            "version": version,  # Versiyon bilgisini ekle
             "similarity": float(sims[local_idx])
         })
 
@@ -553,6 +627,9 @@ def create_new_version():
     with open("cluster_config.json", "w", encoding="utf-8") as f:
         json.dump(cluster_config, f, indent=2, ensure_ascii=False)
     
+    print(f"\n[DEBUG CREATE NEW VERSION] Başlıyor: model={model}, versiyon={new_version}, algoritma={algorithm}")
+    print(f"[DEBUG CREATE NEW VERSION] Parametreler: {parameters}")
+    
     try:
         # Versiyon klasörünü oluştur
         version_path = os.path.join("exported_clusters", model, new_version)
@@ -564,6 +641,8 @@ def create_new_version():
         env = os.environ.copy()
         env["PYTHONIOENCODING"] = "utf-8"
         
+        print(f"[DEBUG CREATE NEW VERSION] auto_cluster.py çalıştırılıyor: {python_exe} auto_cluster.py")
+        
         result = subprocess.run(
             [python_exe, "auto_cluster.py"], 
             capture_output=True, 
@@ -571,6 +650,14 @@ def create_new_version():
             check=True, 
             env=env
         )
+        
+        # Standart çıktı ve hata çıktısını göster
+        print("[DEBUG CREATE NEW VERSION] auto_cluster.py stdout:")
+        print(result.stdout)
+        
+        if result.stderr:
+            print("[DEBUG CREATE NEW VERSION] auto_cluster.py stderr:")
+            print(result.stderr)
         
         # Çıktıdan cluster bilgilerini al
         cluster_count = 0
@@ -582,33 +669,66 @@ def create_new_version():
                 except (ValueError, IndexError):
                     pass
         
-        # Auto cluster sonucunu versions.json'a aktar
-        # (auto_cluster.py'ye de değişiklikler gerekecek)
-        model_data["current_version"] = new_version
-        if new_version not in model_data["versions"]:
-            model_data["versions"][new_version] = {
-                "created_at": datetime.now().isoformat(),
-                "comment": comment,
-                "algorithm": algorithm,
-                "parameters": parameters,
-                "clusters": {}  # Bunu auto_cluster.py dolduracak
-            }
+        # Log dosyasını kontrol et
+        log_path = os.path.join(version_path, "cluster_log.txt")
+        log_content = ""
+        if os.path.exists(log_path):
+            with open(log_path, "r", encoding="utf-8") as log_file:
+                log_content = log_file.read()
+            print(f"[DEBUG CREATE NEW VERSION] Cluster log içeriği:\n{log_content}")
+            
+            # Log'dan gerçek cluster sayısını al
+            import re
+            cluster_match = re.search(r"Oluşturulan küme sayısı: (\d+)", log_content)
+            if cluster_match:
+                cluster_count = int(cluster_match.group(1))
         
-        # Veriyi kaydet
-        save_model_data(model, model_data)
+        # versions.json dosyasını kontrol et
+        updated_model_data = get_model_data(model)
+        updated_version_data = updated_model_data["versions"].get(new_version, {})
+        actual_clusters = updated_version_data.get("clusters", {})
+        actual_cluster_count = len(actual_clusters)
+        
+        print(f"[DEBUG CREATE NEW VERSION] Gerçek cluster sayısı: {actual_cluster_count}")
+        print(f"[DEBUG CREATE NEW VERSION] Cluster anahtarları: {list(actual_clusters.keys())}")
+        
+        # Eğer versions.json'da cluster yoksa
+        if actual_cluster_count == 0:
+            print("[DEBUG CREATE NEW VERSION] UYARI: versions.json'da cluster bulunamadı")
+            
+            # Auto cluster sonucunu versions.json'a aktar
+            # (auto_cluster.py'nin doldurması gerekiyordu ama bir sorun var)
+            model_data["current_version"] = new_version
+            if new_version not in model_data["versions"]:
+                model_data["versions"][new_version] = {
+                    "created_at": datetime.now().isoformat(),
+                    "comment": comment,
+                    "algorithm": algorithm,
+                    "parameters": parameters,
+                    "clusters": {}  # Bunu auto_cluster.py dolduracak
+                }
+            
+            # Veriyi kaydet
+            save_model_data(model, model_data)
         
         return jsonify({
             "status": "ok", 
             "version": new_version,
-            "cluster_count": cluster_count,
+            "cluster_count": actual_cluster_count or cluster_count,
             "message": f"{model} modeli için {new_version} versiyonu oluşturuldu."
         })
     
     except Exception as e:
         import traceback
-        print(f"Versiyon oluşturma hatası: {str(e)}")
-        print(traceback.format_exc())
-        return jsonify({"status": "error", "message": str(e)})
+        error_trace = traceback.format_exc()
+        print(f"[DEBUG CREATE NEW VERSION] Hata: {str(e)}")
+        print(f"[DEBUG CREATE NEW VERSION] Hata detayları:\n{error_trace}")
+        
+        return jsonify({
+            "status": "error", 
+            "message": str(e),
+            "details": error_trace.split("\n")
+        })
 
 @app.route("/available-versions")
 def available_versions():

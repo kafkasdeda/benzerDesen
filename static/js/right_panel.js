@@ -176,7 +176,8 @@ function loadClusterRepresentatives(model, version) {
     .then(response => {
       // Veri format kontrolü
       if (!response.data || !response.data.clusters) {
-        loadingMsg.innerHTML = "❌ Cluster verisi beklenen formatta değil veya boş.";
+        loadingMsg.innerHTML = `❌ Cluster verisi beklenen formatta değil veya boş.<br><br>
+                             <small>Detaylar: ${JSON.stringify(response)}</small>`;
         
         // Yeni cluster oluştur butonunu yine de göster
         const createButton = document.createElement("button");
