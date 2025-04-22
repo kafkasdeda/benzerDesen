@@ -5,7 +5,8 @@
 # Bu dosya, Power User arayüzünden gelen parametrelere göre otomatik görsel kümeleri oluşturur.
 # Desteklenen algoritmalar: KMeans, DBSCAN, Hierarchical
 # Giriş verileri: image_features/{model_type}_features.npy ve corresponding image list
-# Çıktı: exported_clusters/{model_type}/{version}/cluster-{id}/image.jpg
+# Çıktı: exported_clusters/{model_type}/{version}/thumbnails/{image.jpg}
+# versions.json güncellenir
 
 import os
 import json
@@ -15,6 +16,42 @@ from datetime import datetime
 from sklearn.cluster import KMeans, DBSCAN, AgglomerativeClustering
 from sklearn.metrics.pairwise import cosine_distances
 from sklearn.preprocessing import StandardScaler
+
+# Yardımcı fonksiyonlar
+def get_model_data(model_type):
+    """Model JSON verisini okur"""
+    model_path = os.path.join("exported_clusters", model_type, "versions.json")
+    
+    if not os.path.exists(model_path):
+        # Yeni model dosyası oluştur
+        data = {
+            "current_version": "v1",
+            "versions": {}
+        }
+        # Model klasörünü oluştur
+        os.makedirs(os.path.join("exported_clusters", model_type), exist_ok=True)
+        with open(model_path, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2, ensure_ascii=False)
+        return data
+        
+    try:
+        with open(model_path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except json.JSONDecodeError:
+        # Bozuksa yeniden oluştur
+        return {
+            "current_version": "v1",
+            "versions": {}
+        }
+
+def save_model_data(model_type, data):
+    """Model JSON verisini kaydeder"""
+    model_path = os.path.join("exported_clusters", model_type, "versions.json")
+    os.makedirs(os.path.dirname(model_path), exist_ok=True)
+    
+    with open(model_path, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)
+    return True
 
 # 1. Ayarları oku
 with open("cluster_config.json", "r", encoding="utf-8") as f:
@@ -66,56 +103,75 @@ elif algorithm == "hierarchical":
 else:
     raise ValueError(f"Bilinmeyen algoritma: {algorithm}")
 
-# 4. Sonuçları klasörlere ayır
+# 4. Sonuçları model verilerine ekle
 output_dir = os.path.join("exported_clusters", model_type, version)  # Versiyon eklendi
-os.makedirs(output_dir, exist_ok=True)  # Versiyon klasörünü oluştur
+os.makedirs(output_dir, exist_ok=True)  # Ana klasörü oluştur
 
-# Önceki cluster'ları temizle
-for item in os.listdir(output_dir):
-    if item.startswith("cluster-"):
-        shutil.rmtree(os.path.join(output_dir, item), ignore_errors=True)
+# Thumbnail klasörünü oluştur
+thumbnail_dir = os.path.join(output_dir, "thumbnails")
+os.makedirs(thumbnail_dir, exist_ok=True)
 
-# representatives.json için temel yapı oluştur
-rep_data = {
-    "representatives": [],
-    "clusters": [],
-    "version_comment": f"{model_type} modeli {version} versiyonu - {algorithm} ile oluşturuldu",
-    "last_updated": datetime.now().isoformat()
-}
+# Model datasını al
+model_data = get_model_data(model_type)
 
+# Versiyon yoksa oluştur
+if version not in model_data["versions"]:
+    model_data["versions"][version] = {
+        "created_at": datetime.now().isoformat(),
+        "comment": f"{model_type} modeli {version} versiyonu - {algorithm} ile oluşturuldu",
+        "algorithm": algorithm,
+        "parameters": {
+            "k": k if algorithm == "kmeans" else None,
+            "eps": eps if algorithm == "dbscan" else None,
+            "min_samples": min_samples if algorithm == "dbscan" else None,
+            "linkage": linkage if algorithm == "hierarchical" else None
+        },
+        "clusters": {}
+    }
+
+# Mevcut version verisi
+version_data = model_data["versions"][version]
+
+# Önceki cluster'ları temizle (eğer varsa)
+version_data["clusters"] = {}
+
+# Görselleri işle ve cluster'lara ekle
 for idx, label in enumerate(labels):
     if label == -1:
         continue  # DBSCAN outlier
+        
+    # Cluster adı
     cluster_name = f"cluster-{label}"
-    cluster_folder = os.path.join(output_dir, cluster_name)
-    os.makedirs(cluster_folder, exist_ok=True)
     
-    # Kaynak ve hedef dosya yollarını oluştur
-    source_path = image_paths[idx]  # Tam yol zaten image_paths içinde var
+    # Kaynak dosya bilgileri
+    source_path = image_paths[idx]  # Tam yol
     filename = os.path.basename(source_path)
-    target_path = os.path.join(cluster_folder, filename)
     
-    # Dosyayı kopyala
-    if os.path.exists(source_path):
-        shutil.copy2(source_path, target_path)
-        
-        # representatives.json için veri ekle
-        rep_data["clusters"].append({
-            "cluster": cluster_name,
-            "filename": filename,
+    # Eğer cluster yoksa oluştur
+    if cluster_name not in version_data["clusters"]:
+        version_data["clusters"][cluster_name] = {
+            "representative": filename,
+            "images": [],
             "comment": ""
-        })
-        
-        # Her cluster'ın ilk görselini temsilci olarak ekle
-        if cluster_name not in [r["cluster"] for r in rep_data["representatives"]]:
-            rep_data["representatives"].append({
-                "cluster": cluster_name,
-                "filename": filename
-            })
+        }
+    
+    # Görseli cluster'a ekle
+    if filename not in version_data["clusters"][cluster_name]["images"]:
+        version_data["clusters"][cluster_name]["images"].append(filename)
+    
+    # Thumbnail'i kopyala
+    src_thumb = os.path.join("thumbnails", filename)
+    dst_thumb = os.path.join(thumbnail_dir, filename)
+    
+    if os.path.exists(src_thumb):
+        shutil.copy2(src_thumb, dst_thumb)
+    else:
+        print(f"[UYARI] {filename} için thumbnail bulunamadı")
 
-# representatives.json dosyasını kaydet
-rep_path = os.path.join(output_dir, "representatives.json")
-with open(rep_path, "w", encoding="utf-8") as f:
-    json.dump(rep_data, f, indent=2, ensure_ascii=False)
+# Güncel versiyonu ayarla
+model_data["current_version"] = version
 
-print(f"✅ Otomatik clusterlama tamamlandı. {len(set(labels)) - (1 if -1 in labels else 0)} küme oluşturuldu.")
+# Model verisini kaydet
+save_model_data(model_type, model_data)
+
+print(f"✅ Otomatik clusterlama tamamlandı. {len(version_data['clusters'])} küme oluşturuldu.")

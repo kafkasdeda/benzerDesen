@@ -1,8 +1,7 @@
 {
-  "model_type": "color",
-  "algorithm": "kmeans",
-  "k": "50",
-  "eps": "0.5",
-  "min_samples": "5",
-  "linkage": "ward"
+  "model_type": "pattern",
+  "version": "v1",
+  "algorithm": "dbscan",
+  "eps": 1,
+  "min_samples": 15
 }

@@ -29,6 +29,58 @@ import traceback
 
 app = Flask(__name__)
 
+# Model JSON yönetimi için yardımcı fonksiyonlar
+def get_model_data(model):
+    """Model JSON verisini okur"""
+    model_path = os.path.join("exported_clusters", model, "versions.json")
+    
+    if not os.path.exists(model_path):
+        # Yeni model dosyası oluştur
+        data = {
+            "current_version": "v1",
+            "versions": {}
+        }
+        # Model klasörünü oluştur
+        os.makedirs(os.path.join("exported_clusters", model), exist_ok=True)
+        with open(model_path, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2, ensure_ascii=False)
+        return data
+        
+    try:
+        with open(model_path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except json.JSONDecodeError:
+        # Bozuksa yeniden oluştur
+        return {
+            "current_version": "v1",
+            "versions": {}
+        }
+
+def save_model_data(model, data):
+    """Model JSON verisini kaydeder"""
+    model_path = os.path.join("exported_clusters", model, "versions.json")
+    os.makedirs(os.path.dirname(model_path), exist_ok=True)
+    
+    with open(model_path, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)
+    return True
+
+def get_next_version(model):
+    """Bir sonraki versiyon adını döndürür (v1, v2, ...)"""
+    data = get_model_data(model)
+    versions = data["versions"].keys()
+    
+    if not versions:
+        return "v1"
+        
+    # v1, v2, ... formatındaki versiyonları bul
+    v_numbers = [int(v[1:]) for v in versions if v.startswith("v") and v[1:].isdigit()]
+    
+    if not v_numbers:
+        return "v1"
+        
+    return f"v{max(v_numbers) + 1}"
+
 # Metadata güncelleme yardımcı fonksiyonu
 def update_metadata(filename, updates):
     """Görsel metadatasını günceller"""
@@ -116,10 +168,20 @@ def check_updates():
 def serve_thumbnail(filename):
     return send_from_directory('thumbnails', filename)
 
-@app.route('/clusters/<model>/<version>/representatives.json')
-def serve_representatives(model, version):
-    folder = os.path.join("exported_clusters", model, version)
-    return send_from_directory(folder, "representatives.json")
+@app.route("/clusters/<model>/<version>/data")
+def serve_cluster_data(model, version):
+    """Model versiyon bilgilerini döndürür"""
+    model_data = get_model_data(model)
+    
+    # Eğer versiyon yoksa hata döndür
+    if version not in model_data.get("versions", {}):
+        return jsonify({"error": "Versiyon bulunamadı"}), 404
+    
+    # Sadece istenen versiyonun verisini döndür
+    return jsonify({
+        "version": version,
+        "data": model_data["versions"][version]
+    })
 
 @app.route("/find-similar", methods=["GET", "POST"])
 def find_similar():
@@ -217,19 +279,17 @@ def update_version_comment():
     version = data.get("version")
     comment = data.get("version_comment", "")
 
-    path = os.path.join("exported_clusters", model, version, "representatives.json")
-
-    if not os.path.exists(path):
-        return jsonify({"status": "error", "message": "Dosya bulunamadı."})
+    if not model or not version:
+        return jsonify({"status": "error", "message": "Model ve versiyon belirtilmelidir."})
 
     try:
-        with open(path, "r", encoding="utf-8") as f:
-            content = json.load(f)
-
-        content["version_comment"] = comment
-
-        with open(path, "w", encoding="utf-8") as f:
-            json.dump(content, f, indent=2, ensure_ascii=False)
+        model_data = get_model_data(model)
+        
+        if version not in model_data.get("versions", {}):
+            return jsonify({"status": "error", "message": "Belirtilen versiyon bulunamadı."})
+        
+        model_data["versions"][version]["comment"] = comment
+        save_model_data(model, model_data)
 
         return jsonify({"status": "ok"})
     except Exception as e:
@@ -246,79 +306,64 @@ def create_cluster():
     if not model or not version or not filenames:
         return jsonify({"status": "error", "message": "Model, versiyon ve görsel listesi gerekli."})
 
-    # Ana klasörü oluştur
-    cluster_base = os.path.join("exported_clusters", model, version)
-    os.makedirs(cluster_base, exist_ok=True)
-    
-    reps_path = os.path.join(cluster_base, "representatives.json")
-
-    # representatives.json dosyası yoksa oluştur
-    if not os.path.exists(reps_path):
-        rep_data = {
-            "representatives": [],
-            "clusters": [],
-            "version_comment": f"{model} modeli {version} versiyonu",
-            "last_updated": datetime.now().isoformat()
-        }
-    else:
-        try:
-            with open(reps_path, "r", encoding="utf-8") as f:
-                rep_data = json.load(f)
-        except json.JSONDecodeError:
-            # Dosya bozuk ise yeniden oluştur
-            rep_data = {
-                "representatives": [],
-                "clusters": [],
-                "version_comment": f"{model} modeli {version} versiyonu",
-                "last_updated": datetime.now().isoformat()
-            }
-
     try:
-        clusters = rep_data.get("clusters", [])
-
-        # Eski cluster'lardan çıkar (aynı görseller varsa)
-        clusters = [c for c in clusters if c["filename"] not in filenames]
-
+        # Model verisini al
+        model_data = get_model_data(model)
+        
+        # Versiyon kontrolü
+        if version not in model_data["versions"]:
+            model_data["versions"][version] = {
+                "created_at": datetime.now().isoformat(),
+                "comment": f"{model} modeli {version} versiyonu",
+                "algorithm": "manual",
+                "parameters": {},
+                "clusters": {}
+            }
+        
+        # Eski cluster'lardan seçili görselleri çıkar
+        version_data = model_data["versions"][version]
+        for cluster_name, cluster_data in list(version_data["clusters"].items()):
+            cluster_data["images"] = [img for img in cluster_data["images"] if img not in filenames]
+            
+            # Eğer cluster boşalmışsa ve temsil eden görsel de çıkarıldıysa, cluster'ı sil
+            if not cluster_data["images"] or cluster_data["representative"] in filenames:
+                if cluster_data["images"]:
+                    # Boş değilse ama temsil eden görsel çıkarıldıysa, yeni temsil eden görsel seç
+                    cluster_data["representative"] = cluster_data["images"][0]
+                else:
+                    # Tamamen boşsa cluster'ı sil
+                    del version_data["clusters"][cluster_name]
+        
         # Yeni cluster adı
-        cluster_ids = [c["cluster"] for c in clusters]
-        existing_ids = [int(c.split("-")[-1]) for c in cluster_ids if c.startswith("cluster-")] 
-        next_id = max(existing_ids + [0]) + 1
+        existing_clusters = list(version_data["clusters"].keys())
+        cluster_numbers = [int(c.split("-")[-1]) for c in existing_clusters if c.startswith("cluster-") and c.split("-")[-1].isdigit()]
+        next_id = max(cluster_numbers + [0]) + 1
         new_cluster_name = f"cluster-{next_id}"
-
-        # Yeni klasör oluştur
-        new_folder = os.path.join(cluster_base, new_cluster_name)
-        os.makedirs(new_folder, exist_ok=True)
-
-        # Görselleri kopyala ve representative listesine ekle
-        for i, fname in enumerate(filenames):
-            src = os.path.join("realImages", fname)
-            dst = os.path.join(new_folder, fname)
-            if os.path.exists(src):
-                shutil.copy2(src, dst)
-                # Metadatada güncelle
-                update_metadata(fname, {"cluster": new_cluster_name})
-                # Cluster listesine ekle
-                clusters.append({
-                    "cluster": new_cluster_name,
-                    "filename": fname,
-                    "comment": ""
-                })
-
-        # ✅ Temsilci olarak ilk görseli representatives listesine ekle
-        rep_data.setdefault("representatives", [])
-        existing = [r["cluster"] for r in rep_data["representatives"]]
-        if new_cluster_name not in existing and filenames:
-            rep_data["representatives"].append({
-                "cluster": new_cluster_name,
-                "filename": filenames[0]
-            })
-
-        rep_data["clusters"] = clusters
-        rep_data.setdefault("version_comment", f"{model} modeli {version} versiyonu")
-        rep_data["last_updated"] = datetime.now().isoformat()
-
-        with open(reps_path, "w", encoding="utf-8") as f:
-            json.dump(rep_data, f, indent=2, ensure_ascii=False)
+        
+        # Thumbnail klasörünü oluştur (eğer yoksa)
+        thumbnail_path = os.path.join("exported_clusters", model, version, "thumbnails")
+        os.makedirs(thumbnail_path, exist_ok=True)
+        
+        # Görsellerin thumbnail'larını kopyala
+        for fname in filenames:
+            src_thumb = os.path.join("thumbnails", fname)
+            dst_thumb = os.path.join(thumbnail_path, fname)
+            
+            if os.path.exists(src_thumb):
+                shutil.copy2(src_thumb, dst_thumb)
+                
+            # Metadatada güncelle
+            update_metadata(fname, {"cluster": new_cluster_name})
+        
+        # Yeni cluster'a görselleri ekle
+        version_data["clusters"][new_cluster_name] = {
+            "representative": filenames[0],
+            "images": filenames,
+            "comment": ""
+        }
+        
+        # Model verisini kaydet
+        save_model_data(model, model_data)
 
         return jsonify({"status": "ok", "new_cluster": new_cluster_name})
 
@@ -396,100 +441,205 @@ def init_model_version():
 @app.route("/move-to-cluster", methods=["POST"])
 def move_to_cluster():
     data = request.get_json()
-    model = data.get("model", "pattern")  # Model parametresi eklendi
-    version = data.get("version", "v1")    # Versiyon parametresi eklendi
+    model = data.get("model", "pattern") 
+    version = data.get("version", "v1")   
     cluster_name = data.get("cluster")
     images = data.get("images", [])
 
     if not cluster_name or not images:
         return jsonify({"status": "error", "message": "Eksik bilgi"}), 400
 
-    # Dosya yolları
-    metadata_path = "image_metadata_map.json"
-    cluster_dir = os.path.join("exported_clusters", model, version, cluster_name)  # Doğru klasör yapısı
-
-    # Klasörü oluştur
-    os.makedirs(cluster_dir, exist_ok=True)
-
-    # Metadata dosyasını yükle
-    with open(metadata_path, "r", encoding="utf-8") as f:
-        metadata = json.load(f)
-
-    moved = []
-
-    # Representatives dosyasını kontrol et
-    rep_path = os.path.join("exported_clusters", model, version, "representatives.json")
-    if os.path.exists(rep_path):
-        try:
-            with open(rep_path, "r", encoding="utf-8") as f:
-                rep_data = json.load(f)
-        except json.JSONDecodeError:
-            rep_data = {"representatives": [], "clusters": []}
-    else:
-        rep_data = {"representatives": [], "clusters": [], "version_comment": "", "last_updated": datetime.now().isoformat()}
-
-    # Eski cluster'lardan görselleri çıkar
-    rep_data["clusters"] = [c for c in rep_data.get("clusters", []) if c["filename"] not in images]
-
-    for img in images:
-        src_path = os.path.join("realImages", img)
-        dst_path = os.path.join(cluster_dir, img)
-
-        # Eğer kaynak varsa kopyala
-        if os.path.exists(src_path):
-            shutil.copy2(src_path, dst_path)
-            moved.append(img)
-            
-            # Cluster listesine ekle
-            rep_data["clusters"].append({
-                "cluster": cluster_name,
-                "filename": img,
-                "comment": ""
-            })
-        else:
-            print(f"⚠️ {img} bulunamadı")
-
-        # Metadata'da cluster güncelle
-        if img in metadata:
-            metadata[img]["cluster"] = cluster_name
-        else:
-            print(f"📛 Metadata'da {img} bulunamadı")
-
-    # Metadata'yı kaydet
-    with open(metadata_path, "w", encoding="utf-8") as f:
-        json.dump(metadata, f, indent=2, ensure_ascii=False)
+    try:
+        # Model verisini al
+        model_data = get_model_data(model)
         
-    # Representatives dosyasını güncelle
-    rep_data["last_updated"] = datetime.now().isoformat()
-    with open(rep_path, "w", encoding="utf-8") as f:
-        json.dump(rep_data, f, indent=2, ensure_ascii=False)
+        # Versiyon kontrolü
+        if version not in model_data["versions"]:
+            return jsonify({"status": "error", "message": "Versiyon bulunamadı"}), 404
+            
+        version_data = model_data["versions"][version]
+        
+        # Cluster kontrolü
+        if cluster_name not in version_data["clusters"]:
+            return jsonify({"status": "error", "message": "Cluster bulunamadı"}), 404
+        
+        # Metadata dosyasını yükle
+        metadata_path = "image_metadata_map.json"
+        with open(metadata_path, "r", encoding="utf-8") as f:
+            metadata = json.load(f)
 
-    return jsonify({"status": "ok", "moved": moved, "cluster": cluster_name})
+        moved = []
+        
+        # Görselleri diğer clusterlardan çıkar
+        for existing_cluster, cluster_data in list(version_data["clusters"].items()):
+            if existing_cluster == cluster_name:
+                continue
+                
+            # Görselleri filtrele
+            cluster_data["images"] = [img for img in cluster_data["images"] if img not in images]
+            
+            # Temsil eden görsel taşındıysa, yeni temsil eden seç
+            if cluster_data["representative"] in images and cluster_data["images"]:
+                cluster_data["representative"] = cluster_data["images"][0]
+            
+            # Eğer cluster boşalmışsa ve temsil eden görsel de taşındıysa, cluster'ı sil
+            if not cluster_data["images"]:
+                del version_data["clusters"][existing_cluster]
+        
+        # Görselleri thumbnail olarak kopyala
+        thumbnail_path = os.path.join("exported_clusters", model, version, "thumbnails")
+        os.makedirs(thumbnail_path, exist_ok=True)
+        
+        for img in images:
+            src_thumb = os.path.join("thumbnails", img)
+            dst_thumb = os.path.join(thumbnail_path, img)
+            
+            if os.path.exists(src_thumb):
+                shutil.copy2(src_thumb, dst_thumb)
+                moved.append(img)
+            else:
+                print(f"⚠️ Thumbnail bulunamadı: {img}")
+            
+            # Hedef cluster'a ekle
+            if img not in version_data["clusters"][cluster_name]["images"]:
+                version_data["clusters"][cluster_name]["images"].append(img)
+
+            # Metadata'da cluster güncelle
+            if img in metadata:
+                metadata[img]["cluster"] = cluster_name
+            else:
+                print(f"📛 Metadata'da {img} bulunamadı")
+
+        # Metadata'yı kaydet
+        with open(metadata_path, "w", encoding="utf-8") as f:
+            json.dump(metadata, f, indent=2, ensure_ascii=False)
+            
+        # Model verisini kaydet
+        save_model_data(model, model_data)
+
+        return jsonify({"status": "ok", "moved": moved, "cluster": cluster_name})
+        
+    except Exception as e:
+        import traceback
+        print(f"Görsel taşıma hatası: {str(e)}")
+        print(traceback.format_exc())
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+@app.route("/create-new-version", methods=["POST"])
+def create_new_version():
+    """Yeni bir model versiyonu oluşturur ve clustering yapar"""
+    data = request.get_json()
+    
+    model = data.get("model", "pattern")
+    algorithm = data.get("algorithm", "kmeans")
+    parameters = data.get("parameters", {})
+    comment = data.get("comment", "")
+    
+    # Yeni versiyon adını belirle
+    new_version = get_next_version(model)
+    
+    # Model datasını al
+    model_data = get_model_data(model)
+    
+    # Cluster config oluştur
+    cluster_config = {
+        "model_type": model,
+        "version": new_version,
+        "algorithm": algorithm,
+        **parameters
+    }
+    
+    # Config'i kaydet
+    with open("cluster_config.json", "w", encoding="utf-8") as f:
+        json.dump(cluster_config, f, indent=2, ensure_ascii=False)
+    
+    try:
+        # Versiyon klasörünü oluştur
+        version_path = os.path.join("exported_clusters", model, new_version)
+        thumbnail_path = os.path.join(version_path, "thumbnails")
+        os.makedirs(thumbnail_path, exist_ok=True)
+        
+        # Auto cluster'ı çalıştır
+        python_exe = sys.executable
+        env = os.environ.copy()
+        env["PYTHONIOENCODING"] = "utf-8"
+        
+        result = subprocess.run(
+            [python_exe, "auto_cluster.py"], 
+            capture_output=True, 
+            text=True, 
+            check=True, 
+            env=env
+        )
+        
+        # Çıktıdan cluster bilgilerini al
+        cluster_count = 0
+        for line in result.stdout.splitlines():
+            if "küme oluşturuldu" in line:
+                parts = line.split()
+                try:
+                    cluster_count = int(parts[parts.index("küme") - 1])
+                except (ValueError, IndexError):
+                    pass
+        
+        # Auto cluster sonucunu versions.json'a aktar
+        # (auto_cluster.py'ye de değişiklikler gerekecek)
+        model_data["current_version"] = new_version
+        if new_version not in model_data["versions"]:
+            model_data["versions"][new_version] = {
+                "created_at": datetime.now().isoformat(),
+                "comment": comment,
+                "algorithm": algorithm,
+                "parameters": parameters,
+                "clusters": {}  # Bunu auto_cluster.py dolduracak
+            }
+        
+        # Veriyi kaydet
+        save_model_data(model, model_data)
+        
+        return jsonify({
+            "status": "ok", 
+            "version": new_version,
+            "cluster_count": cluster_count,
+            "message": f"{model} modeli için {new_version} versiyonu oluşturuldu."
+        })
+    
+    except Exception as e:
+        import traceback
+        print(f"Versiyon oluşturma hatası: {str(e)}")
+        print(traceback.format_exc())
+        return jsonify({"status": "error", "message": str(e)})
 
 @app.route("/available-versions")
 def available_versions():
     """Bir model için mevcut tüm versiyonları listeler"""
     model = request.args.get("model", "pattern")
     
-    base_path = os.path.join("exported_clusters", model)
-    versions = []
-    
     try:
-        if os.path.exists(base_path):
-            for item in os.listdir(base_path):
-                full_path = os.path.join(base_path, item)
-                if os.path.isdir(full_path):
-                    # Versiyon adını oluştur
-                    version_name = f"Versiyon {item[1:]}" if item.startswith("v") else item
-                    versions.append({"id": item, "name": version_name})
+        model_data = get_model_data(model)
+        versions = []
+        
+        for version_id in model_data["versions"].keys():
+            version_data = model_data["versions"][version_id]
+            version_name = f"Versiyon {version_id[1:]}" if version_id.startswith("v") else version_id
+            
+            # İsteğe bağlı olarak versiyon hakkında daha fazla bilgi eklenebilir
+            versions.append({
+                "id": version_id,
+                "name": version_name,
+                "algorithm": version_data.get("algorithm", "unknown"),
+                "created_at": version_data.get("created_at", ""),
+                "comment": version_data.get("comment", "")
+            })
+        
+        # Eğer liste boşsa varsayılan ekle
+        if not versions:
+            versions.append({"id": "v1", "name": "Versiyon 1"})
+            
+        return jsonify(versions)
     except Exception as e:
         print(f"Versiyon listesi alınırken hata: {str(e)}")
-        
-    # Eğer liste boşsa varsayılan ekle
-    if not versions:
-        versions.append({"id": "v1", "name": "Versiyon 1"})
-        
-    return jsonify(versions)
+        return jsonify([{"id": "v1", "name": "Versiyon 1"}])
 
 if __name__ == "__main__":
     app.run(debug=True)
