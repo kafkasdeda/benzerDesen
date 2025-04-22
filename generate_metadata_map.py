@@ -1,6 +1,6 @@
 # generate_metadata_map.py
 # Oluşturulma: 2025-04-19
-# Hazırlayan: Kafkas ❤️ Luna
+# Hazırlayan: Kafkas
 # Açıklama:
 # Bu script, realImages klasöründeki görsellerin metadata bilgilerini
 # (yunportalclaude.json + yunportalclaudedetail.json) ve varsa cluster bilgisini birleştirir.

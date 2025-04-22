@@ -1,6 +1,6 @@
 // right_panel.js
 // Oluşturulma: 2025-04-20
-// Hazırlayan: Kafkas ❤️ Luna
+// Hazırlayan: Kafkas
 // Açıklama:
 // Sağ panelde, model versiyonuna ait temsilci görseller (her bir cluster için) gösterilir.
 // Ayrıca model versiyonuna ait genel yorum (version_comment) üstte gösterilir ve kullanıcı tarafından düzenlenebilir.
@@ -68,7 +68,8 @@ function loadClusterRepresentatives(model, version) {
 
       data.clusters.forEach(item => {
         const box = document.createElement("div");
-        box.className = "image-box clustered";
+        box.className = "cluster-box";
+       
 
         const img = document.createElement("img");
         img.src = `thumbnails/${item.filename}`;
@@ -85,6 +86,49 @@ function loadClusterRepresentatives(model, version) {
 
         box.appendChild(img);
         box.appendChild(tooltip);
+        const moveButton = document.createElement("button");
+        moveButton.textContent = "Seçilenleri Bu Cluster'a Taşı";
+        moveButton.className = "move-to-cluster-btn";
+        moveButton.className = "move-button";
+        moveButton.style.marginTop = "6px";
+        moveButton.style.display = "block";
+        moveButton.style.width = "100%";
+
+        moveButton.onclick = () => {
+        const selected = window.selectedImages || [];
+        if (!selected.length) {
+            alert("Lütfen önce orta panelden görsel(ler) seçin.");
+            return;
+        }
+
+        fetch("/move-to-cluster", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+            cluster: item.cluster,
+            images: selected
+            })
+        })
+            .then(res => res.json())
+            .then(data => {
+            console.log("✅ Taşıma başarılı:", data);
+            alert("Seçilen görseller ilgili cluster'a taşındı.");
+            document.querySelectorAll("#center-results .image-box input[type='checkbox']").forEach(cb => {
+            cb.checked = false;
+              });
+            })
+            .catch(err => {
+            console.error("🚫 Taşıma hatası:", err);
+            alert("Bir hata oluştu.");
+            });
+        };
+
+box.appendChild(moveButton);
+
+
+
+
+
         container.appendChild(box);
       });
 

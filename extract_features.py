@@ -1,6 +1,6 @@
 # extract_features.py
 # Oluşturulma: 2025-04-19
-# Hazırlayan: Kafkas ❤️ Luna
+# Hazırlayan: Kafkas
 # Açıklama:
 # Bu script, realImages/ klasöründeki tüm görselleri işler,
 # model türüne (desen, renk, doku) göre uygun şekilde dönüştürür,

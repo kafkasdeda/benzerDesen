@@ -1,6 +1,6 @@
 # app.py
 # Oluşturulma: 2025-04-19
-# Hazırlayan: Kafkas ❤️ Luna
+# Hazırlayan: Kafkas
 # Açıklama:
 # Bu Flask uygulaması, Power User (PU) arayüzüyle etkileşime girer.
 # Kullanıcılara metadata güncelleme, model eğitimi ve feedback sistemlerini yönetme imkânı sağlar.
@@ -99,14 +99,14 @@ def serve_representatives(model, version):
     folder = os.path.join("exported_clusters", model, version)
     return send_from_directory(folder, "representatives.json")
 
-@app.route("/find-similar")
+@app.route("/find-similar", methods=["GET", "POST"])
 def find_similar():
+    filters = request.get_json() if request.method == "POST" else None
     filename = request.args.get("filename")
     model = request.args.get("model", "pattern")
     topN = int(request.args.get("topN", 100))
     metric = request.args.get("metric", "cosine")
 
-    # Feature dosyasını oku
     feature_path = f"image_features/{model}_features.npy"
     index_path = f"image_features/{model}_filenames.json"
     metadata_path = "image_metadata_map.json"
@@ -117,7 +117,6 @@ def find_similar():
     features = np.load(feature_path)
     with open(index_path, "r", encoding="utf-8") as f:
         filenames = json.load(f)
-
     with open(metadata_path, "r", encoding="utf-8") as f:
         metadata = json.load(f)
 
@@ -127,30 +126,67 @@ def find_similar():
     idx = filenames.index(filename)
     query_vector = features[idx].reshape(1, -1)
 
+    # 🎯 Eğer filtre varsa, sadece filtreyi geçen indeksleri topla
+    allowed_indices = []
+    if filters:
+        mix_filters = filters.get("mixFilters", [])
+        feature_filters = filters.get("features", [])
+        cluster_status = filters.get("cluster", "")
+
+        for i, fname in enumerate(filenames):
+            meta = metadata.get(fname, {})
+            feature_map = {f[0]: f[1] for f in meta.get("features", [])}
+            cluster = meta.get("cluster")
+
+            match_mix = all(
+                mix["min"] <= feature_map.get(mix["type"], 0) <= mix["max"]
+                for mix in mix_filters
+            )
+
+            match_feature = all(f in feature_map for f in feature_filters)
+
+            match_cluster = True
+            if cluster_status == "clustered" and not cluster:
+                match_cluster = False
+            elif cluster_status == "unclustered" and cluster:
+                match_cluster = False
+
+            if match_mix and match_feature and match_cluster:
+                allowed_indices.append(i)
+    else:
+        allowed_indices = list(range(len(filenames)))
+
+    if not allowed_indices:
+        return jsonify([])
+
+    # 🔍 Sadece filtreyi geçenler ile similarity hesapla
+    filtered_features = features[allowed_indices]
     if metric == "cosine":
-        sims = cosine_similarity(query_vector, features)[0]
-        sorted_idx = np.argsort(-sims)
+        sims = cosine_similarity(query_vector, filtered_features)[0]
     elif metric == "euclidean":
-        dists = euclidean_distances(query_vector, features)[0]
-        sorted_idx = np.argsort(dists)
+        dists = euclidean_distances(query_vector, filtered_features)[0]
+        sims = 1 / (1 + dists)
     else:
         return jsonify([])
 
-    results = []
-    for i in sorted_idx[1:topN+1]:
-        fname = filenames[i]
+    sorted_local_idx = np.argsort(-sims)
+    final_results = []
+    for local_idx in sorted_local_idx[:topN]:
+        global_idx = allowed_indices[local_idx]
+        fname = filenames[global_idx]
         meta = metadata.get(fname, {})
-        results.append({
+        final_results.append({
             "filename": fname,
             "design": meta.get("design"),
             "season": meta.get("season"),
             "quality": meta.get("quality"),
             "features": meta.get("features", []),
             "cluster": meta.get("cluster"),
-            "similarity": float(sims[i]) if metric == "cosine" else None
+            "similarity": float(sims[local_idx])
         })
 
-    return jsonify(results)
+    return jsonify(final_results)
+
 
 @app.route("/update-version-comment", methods=["POST"])
 def update_version_comment():
@@ -241,6 +277,89 @@ def create_cluster():
 
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)})
+
+# --- YENİ: Feedback kaydı alma endpointi ---
+@app.route("/submit-feedback", methods=["POST"])
+def submit_feedback():
+    feedback = request.get_json()
+    print("📩 Feedback alındı:", feedback)
+
+    feedback_file = "feedback_log.json"
+    feedback_list = []
+
+    if os.path.exists(feedback_file):
+        with open(feedback_file, "r", encoding="utf-8") as f:
+            try:
+                feedback_list = json.load(f)
+            except json.JSONDecodeError:
+                feedback_list = []
+
+    # Aynı anchor-output-model-version varsa güncelle / iptal et
+    anchor = feedback.get("anchor")
+    output = feedback.get("output")
+    model = feedback.get("model")
+    version = feedback.get("version")
+
+    feedback_list = [f for f in feedback_list if not (
+        f.get("anchor") == anchor and
+        f.get("output") == output and
+        f.get("model") == model and
+        f.get("version") == version
+    )]
+
+    if feedback.get("feedback") is not None:
+        feedback_list.append(feedback)
+
+    with open(feedback_file, "w", encoding="utf-8") as f:
+        json.dump(feedback_list, f, indent=2, ensure_ascii=False)
+
+    return jsonify({"status": "ok"})
+
+@app.route("/move-to-cluster", methods=["POST"])
+def move_to_cluster():
+    data = request.get_json()
+    cluster_name = data.get("cluster")
+    images = data.get("images", [])
+
+    if not cluster_name or not images:
+        return jsonify({"error": "Eksik bilgi"}), 400
+
+    # Dosya yolları
+    metadata_path = "image_metadata_map.json"
+    cluster_dir = f"exported_clusters/{cluster_name}"
+
+    # Klasörü oluştur
+    os.makedirs(cluster_dir, exist_ok=True)
+
+    # Metadata dosyasını yükle
+    with open(metadata_path, "r", encoding="utf-8") as f:
+        metadata = json.load(f)
+
+    moved = []
+
+    for img in images:
+        src_path = os.path.join("realImages", img)
+        dst_path = os.path.join(cluster_dir, img)
+
+        # Eğer kaynak varsa taşı
+        if os.path.exists(src_path):
+            shutil.copy2(src_path, dst_path)
+            moved.append(img)
+        else:
+            print(f"⚠️ {img} bulunamadı")
+
+        # Metadata'da cluster güncelle
+        if img in metadata:
+            metadata[img]["cluster"] = cluster_name
+        else:
+            print(f"📛 Metadata'da {img} bulunamadı")
+
+    # Metadata'yı kaydet
+    with open(metadata_path, "w", encoding="utf-8") as f:
+        json.dump(metadata, f, indent=2, ensure_ascii=False)
+
+    return jsonify({"moved": moved, "cluster": cluster_name})
+
 
 if __name__ == "__main__":
     app.run(debug=True)

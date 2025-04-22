@@ -1,0 +1,38 @@
+./
+    .gitignore
+    .zipignore
+    app.py
+    auto_cluster.py
+    check_updates.py
+    cluster_config.json
+    extract_features.py
+    feedback_log.json
+    folder_structure.txt
+    generate_folder_structure.py
+    generate_metadata_map.py
+    generate_representatives.py
+    generate_thumbnails.py
+    merged_metadata.json
+    merge_metadata.py
+    requirements.txt
+    smart_zip.py
+    tests.py
+    train_model.py
+image_features/
+    pattern_filenames.json
+models/
+realImages_json/
+    image_list.json
+    New Text Document.txt
+    yunportalclaude.json
+    yunportalclaudedetail.json
+static/
+    js/
+        center_panel.js
+        left_panel.js
+        right_panel.js
+templates/
+    cluster_options.html
+    index.html
+    pu.html
+    train.html

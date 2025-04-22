@@ -1,6 +1,6 @@
 # auto_cluster.py
 # Oluşturulma: 2025-04-19
-# Hazırlayan: Kafkas ❤️ Luna
+# Hazırlayan: Kafkas
 # Açıklama:
 # Bu dosya, Power User arayüzünden gelen parametrelere göre otomatik görsel kümeleri oluşturur.
 # Desteklenen algoritmalar: KMeans, DBSCAN, Hierarchical

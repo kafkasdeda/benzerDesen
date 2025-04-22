@@ -1,6 +1,6 @@
 <!-- pu.html -->
 <!-- Oluşturulma: 2025-04-19 -->
-<!-- Hazırlayan: Kafkas ❤️ Luna -->
+<!-- Hazırlayan: Kafkas -->
 <!-- Açıklama:
      PU ekranı 3 ana panelden oluşur:
      - Sol panel: realImages klasöründeki tüm görselleri lazy loading ile listeler.
@@ -14,13 +14,66 @@
 <head>
   <meta charset="UTF-8">
   <title>PU Ekranı - Pattern Cluster Görünümü</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nouislider@14.6.3/distribute/nouislider.min.css">
   <style>
     body {
       display: flex;
       font-family: Arial, sans-serif;
       margin: 0;
     }
+    .move-button {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 5px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.cluster-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 150px;
+  margin: 10px;
+}
+
+.cluster-box img {
+  width: 100%;
+  border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.move-to-cluster-btn {
+  margin-top: 8px;
+  padding: 6px 8px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 13px;
+  cursor: pointer;
+  width: 100%;
+  white-space: normal;
+  text-align: center;
+  word-wrap: break-word;
+}
+
+.image-box.clustered {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 8px;
+}
+
+
+
+.move-button:hover {
+  background-color: #388e3c;
+}
     .panel {
+      min-width: 300px;
       flex: 1;
       height: 100vh;
       overflow-y: auto;
@@ -70,15 +123,21 @@
     .image-box:hover .tooltip {
       display: block;
     }
-        /* Center panel horizontal yayılma */
-        #center-panel {
+
+    /* Center panel horizontal yayılma */
+    #center-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    #center-results {
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
       justify-content: center;
       align-content: flex-start;
     }
-    #center-panel .image-box {
+    #center-results .image-box {
       width: 150px;
       height: 150px;
     }
@@ -87,26 +146,186 @@
 <body>
   <div class="panel" id="left-panel">
     <h2>🖼️ Sol Panel - Tüm Görseller</h2>
+          <label><input type="checkbox" id="center-pre-filter" checked> 🔍 Önce filtre uygula</label>
+      <br><br>
+      <label>🌟 Karışım:</label>
+      <select id="blend-filter">
+        <option value="">Tümü</option>
+      </select>
+      <br><br>
+      <label>✨ Özellik:</label>
+      <select id="feature-filter">
+        <option value="">Tümü</option>
+      </select>
+      <br><br>
+      <label>🔗 Cluster Durumu:</label>
+      <select id="cluster-filter">
+        <option value="">Tümü</option>
+        <option value="clustered">Yalnızca Cluster'lı</option>
+        <option value="unclustered">Yalnızca Cluster'sız</option>
+      </select>
+      <br><br>
+      <div id="karisim-panel">
+        <label>⚖️ Karışım Ekle:</label>
+        <button onclick="addKarisimFilter()">+ Karışım Ekle</button>
+        <div class="karisim-wrapper" style="margin-top: 5px;"></div>
+      </div>
     <div class="image-grid" id="image-container">
       <!-- Görseller buraya JS ile yüklenecek -->
     </div>
   </div>
 
   <div id="center-panel" class="panel">
-    Benzer görseller burada gösterilecek.
+    <h2>🌟 Orta Panel - Benzer Görsel Sonuçları</h2>
+    
+    <!-- Arama Parametreleri Kulakçığı -->
+    <div class="search-panel-header" style="cursor: pointer; padding: 10px; background-color: #f5f5f5; border: 1px solid #ddd; border-radius: 5px 5px 0 0; margin-bottom: 0; display: flex; justify-content: space-between; align-items: center;">
+      <h3 style="margin: 0;">💡 Filtreleme Parametreleri</h3>
+      <span id="toggle-search-panel" style="font-size: 20px;">▼</span>
+    </div>
+    
+    <!-- Filtreleme Paneli (başlangıçta gizli) -->
+    <div id="search-panel-content" class="search-panel" style="margin-bottom: 15px; border: 1px solid #ddd; border-top: none; padding: 10px; border-radius: 0 0 5px 5px; display: none;">
+      
+      <div class="filter-section">
+        <div class="filter-row" style="display: flex; margin-bottom: 8px; align-items: center;">
+          <label style="width: 120px;">🎯 Model:</label>
+          <select id="model-selector" style="flex-grow: 1; padding: 5px;">
+            <option value="pattern">Desen</option>
+            <option value="color">Renk</option>
+            <option value="texture">Doku</option>
+          </select>
+        </div>
+        
+        <div class="filter-row" style="display: flex; margin-bottom: 8px; align-items: center;">
+          <label style="width: 120px;">🧠 Versiyon:</label>
+          <select id="version-selector" style="flex-grow: 1; padding: 5px;">
+            <option value="v1">v1</option>
+          </select>
+        </div>
+        
+        <div class="filter-row" style="display: flex; margin-bottom: 8px; align-items: center;">
+          <label style="width: 120px;">📏 Metrik:</label>
+          <select id="metric-selector" style="flex-grow: 1; padding: 5px;">
+            <option value="cosine">Cosine</option>
+            <option value="euclidean">Euclidean</option>
+          </select>
+        </div>
+        
+        <div class="filter-row" style="display: flex; margin-bottom: 8px; align-items: center;">
+          <label style="width: 120px;">🔢 Top N Sonuç:</label>
+          <input type="number" id="topn-input" value="10" min="1" max="100" style="flex-grow: 1; padding: 5px;">
+        </div>
+      </div>
+      
+      <!-- Hammadde Karışımı Bölümü -->
+      <div class="material-mixer" style="margin-top: 15px; border-top: 1px solid #eee; padding-top: 15px;">
+        <h4 style="margin-top: 0;">🧵 Hammadde Karışımı (Opsiyonel):</h4>
+        
+        <div class="material-table">
+          <div class="material-header" style="display: grid; grid-template-columns: 100px 1fr 60px 30px; font-weight: bold; margin-bottom: 5px; padding-bottom: 5px; border-bottom: 1px solid #eee;">
+            <span class="material-name">Hammadde</span>
+            <span class="material-range">Oran (%)</span>
+            <span class="material-value">Değer</span>
+            <span class="material-action"></span>
+          </div>
+          
+          <div id="material-rows">
+            <!-- Dinamik olarak eklenecek hammadde satırları -->
+          </div>
+        </div>
+        
+        <div class="material-total" style="display: flex; justify-content: space-between; align-items: center; margin: 10px 0;">
+          <span>Toplam: <span id="total-percentage">0</span>%</span>
+          <div class="progress-bar" style="width: 70%; height: 10px; background-color: #eee; border-radius: 5px; overflow: hidden;">
+            <div id="total-progress" style="height: 100%; background-color: #3366cc; transition: width 0.3s; width: 0%;"></div>
+          </div>
+        </div>
+        
+        <div class="material-actions" style="display: flex; gap: 10px; margin-top: 10px;">
+          <select id="material-selector" style="flex-grow: 1; padding: 5px;"></select>
+          <button id="add-material" style="padding: 5px 10px;">+ Karışım Ekle</button>
+        </div>
+      </div>
+      
+      <!-- Teknik Özellikler Bölümü -->
+      <div class="feature-section" style="margin-top: 15px; border-top: 1px solid #eee; padding-top: 15px;">
+        <h4 style="margin-top: 0;">🧬 Teknik Özellikler (Opsiyonel):</h4>
+        <div class="feature-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;">
+          <label><input type="checkbox" value="MONOSTRETCH" class="feature-checkbox"> MONOSTRETCH</label>
+          <label><input type="checkbox" value="COMFORT" class="feature-checkbox"> COMFORT</label>
+          <label><input type="checkbox" value="BREATHABLE" class="feature-checkbox"> BREATHABLE</label>
+          <label><input type="checkbox" value="WASHABLE" class="feature-checkbox"> WASHABLE</label>
+          <label><input type="checkbox" value="UVPROTECTION" class="feature-checkbox"> UV PROTECTION</label>
+          <label><input type="checkbox" value="THERMALCOMFORT" class="feature-checkbox"> THERMAL COMFORT</label>
+        </div>
+      </div>
+      
+      <!-- Cluster Durumu -->
+      <div class="cluster-section" style="margin-top: 15px; border-top: 1px solid #eee; padding-top: 15px;">
+        <h4 style="margin-top: 0;">🧩 Cluster Durumu:</h4>
+        <div>
+          <label><input type="radio" name="center-cluster" value="" checked> Tüm</label>
+          <label><input type="radio" name="center-cluster" value="clustered"> Cluster'lı</label>
+          <label><input type="radio" name="center-cluster" value="unclustered"> Cluster'sız</label>
+        </div>
+      </div>
+      
+      <!-- Aksiyon Butonları -->
+      <div class="filter-actions" style="display: flex; justify-content: space-between; margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee;">
+        <button id="reset-filters" style="padding: 8px 15px;">🔁 Parametreleri Sıfırla</button>
+        <button id="apply-filters" style="padding: 8px 15px; background-color: #3366cc; color: white; border: none; border-radius: 4px;">🔍 Arama Yap</button>
+      </div>
+    </div>
+
+    <div id="center-results" class="image-grid">
+      Benzer görseller burada gösterilecek.
+    </div>
   </div>
 
   <div class="panel" id="right-panel">
-    <h2>🧠 Sağ Panel - Cluster Temsilcileri</h2>
+    <h2>🧐 Sağ Panel - Cluster Temsilcileri</h2>
   </div>
 
-  <!-- Script sırası önemlidir: önce center_panel.js, sonra left_panel.js -->
   <script src="{{ url_for('static', filename='js/center_panel.js') }}"></script>
   <script src="{{ url_for('static', filename='js/left_panel.js') }}"></script>
   <script src="{{ url_for('static', filename='js/right_panel.js') }}"></script>
   <script>
-    // Örnek: desen modeli ve v1 versiyonu yüklensin
-    loadClusterRepresentatives("pattern", "v1");
+  // Örnek: desen modeli ve v1 versiyonu yüklensin
+  window.addEventListener("DOMContentLoaded", () => {
+    if (typeof loadClusterRepresentatives === "function") {
+      loadClusterRepresentatives("pattern", "v1");
+    }
+  });
+</script>
+  <script>
+    function addKarisimFilter() {
+      if (window.addKarisimFilter) {
+        window.addKarisimFilter();
+      } else {
+        console.warn("⛔ window.addKarisimFilter tanımlı değil.");
+      }
+    }
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/nouislider@14.6.3/distribute/nouislider.min.js"></script>
+  <script>
+    // Hammadde dropdown'unu dinamik doldur
+    window.addEventListener("DOMContentLoaded", () => {
+      const selector = document.getElementById("material-selector");
+      if (!selector || !window.blendSet) return;
+
+      const defaultOption = document.createElement("option");
+      defaultOption.value = "";
+      defaultOption.textContent = "Hammadde Seçin";
+      selector.appendChild(defaultOption);
+
+      window.blendSet.forEach(htype => {
+        const opt = document.createElement("option");
+        opt.value = htype;
+        opt.textContent = htype;
+        selector.appendChild(opt);
+      });
+    });
   </script>
 </body>
 </html>

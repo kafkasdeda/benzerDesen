@@ -2,7 +2,7 @@
 # Bu dosya, realImages klasöründeki görseller ve realImages_json içindeki JSON dosyalarında bir değişiklik olup olmadığını kontrol eder.
 # Yeni görseller veya güncellenmiş JSON tespit edilirse, merge_metadata.py, generate_thumbnails.py ve generate_representatives.py çalıştırılır.
 # Oluşturulma: 2025-04-19
-# Hazırlayan: Kafkas ❤️ Luna
+# Hazırlayan: Kafkas
 
 import os
 import time

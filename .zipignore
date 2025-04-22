@@ -1,0 +1,13 @@
+luna_env/
+realImages/
+thumbnails/
+__pycache__/
+*.pt
+*.pkl
+*.npy
+image_metadata_map.json
+exported_clusters/
+.git/
+benzerDesen_clean.zip
+exported_clusters/
+realImages_json/

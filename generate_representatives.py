@@ -1,6 +1,6 @@
 # generate_representatives.py
 # Oluşturulma: 2025-04-20
-# Hazırlayan: Kafkas ❤️ Luna
+# Hazırlayan: Kafkas
 # Açıklama:
 # Bu script, exported_clusters/pattern klasöründeki her cluster klasöründen bir temsilci görsel (ilk jpg) seçer.
 # Bunları exported_clusters/pattern/v1/representatives.json dosyasına yazar.

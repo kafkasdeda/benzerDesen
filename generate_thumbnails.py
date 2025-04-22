@@ -1,6 +1,6 @@
 # generate_thumbnails.py
 # Oluşturulma: 2025-04-19
-# Hazırlayan: Kafkas ❤️ Luna
+# Hazırlayan: Kafkas
 # Açıklama:
 # Bu script, realImages klasöründeki tüm .jpg/.png görsellerin
 # küçük boyutlu versiyonlarını oluşturur ve thumbnails/ klasörüne kaydeder.
