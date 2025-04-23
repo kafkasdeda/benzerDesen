@@ -38,6 +38,10 @@ function initRightPanel() {
         <span style="font-size: 24px;">🧵</span>
         <span>Doku</span>
       </button>
+      <button class="model-button" data-model="color+pattern" style="padding: 8px; border-radius: 4px; border: 2px solid #ddd; cursor: pointer; display: flex; flex-direction: column; align-items: center;">
+        <span style="font-size: 24px;">✨</span>
+        <span>Renk+Desen</span>
+      </button>
     </div>
   `;
   
@@ -176,8 +180,7 @@ function loadClusterRepresentatives(model, version) {
     .then(response => {
       // Veri format kontrolü
       if (!response.data || !response.data.clusters) {
-        loadingMsg.innerHTML = `❌ Cluster verisi beklenen formatta değil veya boş.<br><br>
-                             <small>Detaylar: ${JSON.stringify(response)}</small>`;
+        loadingMsg.innerHTML = "❌ Cluster verisi bulunamadı.";
         
         // Yeni cluster oluştur butonunu yine de göster
         const createButton = document.createElement("button");

@@ -304,10 +304,16 @@ def find_similar():
 
     # 🔍 Sadece filtreyi geçenler ile similarity hesapla
     filtered_features = features[allowed_indices]
-    if metric == "cosine":
+    # Belirtilen metrik veya model türüne göre benzerlik hesapla
+    if metric == "cosine" or model == "pattern" or model == "color+pattern":
         sims = cosine_similarity(query_vector, filtered_features)[0]
-    elif metric == "euclidean":
+    elif metric == "euclidean" or model == "color":
         dists = euclidean_distances(query_vector, filtered_features)[0]
+        sims = 1 / (1 + dists)
+    elif model == "texture":
+        # Manhattan mesafesi için özel hesaplama
+        from sklearn.metrics.pairwise import manhattan_distances
+        dists = manhattan_distances(query_vector, filtered_features)[0]
         sims = 1 / (1 + dists)
     else:
         return jsonify([])
@@ -627,9 +633,6 @@ def create_new_version():
     with open("cluster_config.json", "w", encoding="utf-8") as f:
         json.dump(cluster_config, f, indent=2, ensure_ascii=False)
     
-    print(f"\n[DEBUG CREATE NEW VERSION] Başlıyor: model={model}, versiyon={new_version}, algoritma={algorithm}")
-    print(f"[DEBUG CREATE NEW VERSION] Parametreler: {parameters}")
-    
     try:
         # Versiyon klasörünü oluştur
         version_path = os.path.join("exported_clusters", model, new_version)
@@ -641,8 +644,6 @@ def create_new_version():
         env = os.environ.copy()
         env["PYTHONIOENCODING"] = "utf-8"
         
-        print(f"[DEBUG CREATE NEW VERSION] auto_cluster.py çalıştırılıyor: {python_exe} auto_cluster.py")
-        
         result = subprocess.run(
             [python_exe, "auto_cluster.py"], 
             capture_output=True, 
@@ -650,14 +651,6 @@ def create_new_version():
             check=True, 
             env=env
         )
-        
-        # Standart çıktı ve hata çıktısını göster
-        print("[DEBUG CREATE NEW VERSION] auto_cluster.py stdout:")
-        print(result.stdout)
-        
-        if result.stderr:
-            print("[DEBUG CREATE NEW VERSION] auto_cluster.py stderr:")
-            print(result.stderr)
         
         # Çıktıdan cluster bilgilerini al
         cluster_count = 0
@@ -669,47 +662,11 @@ def create_new_version():
                 except (ValueError, IndexError):
                     pass
         
-        # Log dosyasını kontrol et
-        log_path = os.path.join(version_path, "cluster_log.txt")
-        log_content = ""
-        if os.path.exists(log_path):
-            with open(log_path, "r", encoding="utf-8") as log_file:
-                log_content = log_file.read()
-            print(f"[DEBUG CREATE NEW VERSION] Cluster log içeriği:\n{log_content}")
-            
-            # Log'dan gerçek cluster sayısını al
-            import re
-            cluster_match = re.search(r"Oluşturulan küme sayısı: (\d+)", log_content)
-            if cluster_match:
-                cluster_count = int(cluster_match.group(1))
-        
-        # versions.json dosyasını kontrol et
+        # Güncel verileri al
         updated_model_data = get_model_data(model)
         updated_version_data = updated_model_data["versions"].get(new_version, {})
         actual_clusters = updated_version_data.get("clusters", {})
         actual_cluster_count = len(actual_clusters)
-        
-        print(f"[DEBUG CREATE NEW VERSION] Gerçek cluster sayısı: {actual_cluster_count}")
-        print(f"[DEBUG CREATE NEW VERSION] Cluster anahtarları: {list(actual_clusters.keys())}")
-        
-        # Eğer versions.json'da cluster yoksa
-        if actual_cluster_count == 0:
-            print("[DEBUG CREATE NEW VERSION] UYARI: versions.json'da cluster bulunamadı")
-            
-            # Auto cluster sonucunu versions.json'a aktar
-            # (auto_cluster.py'nin doldurması gerekiyordu ama bir sorun var)
-            model_data["current_version"] = new_version
-            if new_version not in model_data["versions"]:
-                model_data["versions"][new_version] = {
-                    "created_at": datetime.now().isoformat(),
-                    "comment": comment,
-                    "algorithm": algorithm,
-                    "parameters": parameters,
-                    "clusters": {}  # Bunu auto_cluster.py dolduracak
-                }
-            
-            # Veriyi kaydet
-            save_model_data(model, model_data)
         
         return jsonify({
             "status": "ok", 
@@ -719,16 +676,7 @@ def create_new_version():
         })
     
     except Exception as e:
-        import traceback
-        error_trace = traceback.format_exc()
-        print(f"[DEBUG CREATE NEW VERSION] Hata: {str(e)}")
-        print(f"[DEBUG CREATE NEW VERSION] Hata detayları:\n{error_trace}")
-        
-        return jsonify({
-            "status": "error", 
-            "message": str(e),
-            "details": error_trace.split("\n")
-        })
+        return jsonify({"status": "error", "message": str(e)})
 
 @app.route("/available-versions")
 def available_versions():
