@@ -1,10 +1,25 @@
 // left_panel.js
 // Oluşturulma: 2025-04-19
+// Güncelleme: 2025-04-29 (Performans optimizasyonları)
+// Güncelleme: 2025-04-30 (Uyumluyu Ara butonu eklendi)
 // Hazırlayan: Kafkas
 // Açıklama:
 // Sol panelde tüm görseller listelenir. Hover'da metadata ve büyük görsel görünür.
 // Bir görsele tıklanınca seçilen modele göre benzerleri orta panelde yüklenir.
 // Ek olarak: Karışım, özellik ve cluster filtrelerine göre dinamik filtreleme yapılır.
+
+// Biraz daha hızlı çalışması için önbelleğe alınan veriler
+const cachedMetadata = {};
+const cachedElements = {};
+
+// Teknik özellikler burada tanımlanıyor (sadece bir kez)
+const featureSet = new Set([
+  "MONOSTRETCH", "BISTRETCH", "POWERSTRETCH", "NATURALSTRETCH",
+  "LIGHTWEIGHT", "COMFORT", "WASHABLE", "BREATHABLE",
+  "ANTIBACTERIAL", "EASYIRONING", "MOISTUREMANAGMENT", "UVPROTECTION",
+  "WRINKLERESISTANCE", "WATERREPELLENT", "THERMALCOMFORT", "QUICKDRY",
+  "RWS", "RCSGRS"
+]);
 
 window.onload = function () {
   console.log("✅ left_panel.js window.onload tetiklendi");
@@ -47,115 +62,295 @@ window.onload = function () {
     .then(metadataMap => {
       console.log("📦 Metadata başarıyla alındı. Toplam:", Object.keys(metadataMap).length);
 
+      // Global olarak featureSet tanımla
+      window.featureSet = featureSet;
+
+      // Performans iyileştirmesi: Görselleri döküman parçası kullanarak toplu ekle
       const container = document.getElementById("image-container");
       const filenames = Object.keys(metadataMap);
       let allBoxes = []; // 🎯 Filtrelemeye yardımcı olmak için tüm box'ları saklıyoruz
       const blendSet = new Set();
       
+      // Hızlı render için DocumentFragment kullan
+      const fragment = document.createDocumentFragment();
       
-      const featureSet = new Set([
-        "MONOSTRETCH", "BISTRETCH", "POWERSTRETCH", "NATURALSTRETCH",
-        "LIGHTWEIGHT", "COMFORT", "WASHABLE", "BREATHABLE",
-        "ANTIBACTERIAL", "EASYIRONING", "MOISTUREMANAGMENT", "UVPROTECTION",
-        "WRINKLERESISTANCE", "WATERREPELLENT", "THERMALCOMFORT", "QUICKDRY",
-        "RWS", "RCSGRS"
-      ]);
-      window.featureSet = featureSet;
-
-      filenames.forEach((name) => {
-        const data = metadataMap[name];
-        const box = document.createElement("div");
-        box.className = "image-box";
-        box.style.cursor = "pointer";
-
-        const blendKeys = data.features.map(f => f[0]);
-        const blendMap = Object.fromEntries(data.features);
-
-        box.dataset.blend = blendKeys.join(",");
-        box.dataset.features = data.features.filter(f => featureSet.has(f[0])).map(f => f[0]).join(",");
-        box.dataset.cluster = data.cluster || "";
-        box.dataset.blendMap = JSON.stringify(blendMap);
-
-        blendKeys.forEach(k => blendSet.add(k));
-
-        box.addEventListener("click", () => {
-          console.log("🔁 Benzer görseller yükleniyor:", name);
-
-          window.currentSelectedImage = name;
-          const model = window.currentModel || "pattern";
-          const version = window.currentVersion || "v1";
-          const topN = parseInt(document.getElementById("topn-input")?.value || "10");
-          const metric = document.getElementById("metric-selector")?.value || "cosine";
-
-          // Eski elementler için geriye dönük uyumluluk kontrolleri
-          if (document.getElementById("model-selector")) document.getElementById("model-selector").value = model;
-          if (document.getElementById("topn-input")) document.getElementById("topn-input").value = topN;
-          if (document.getElementById("metric-selector")) document.getElementById("metric-selector").value = metric;
+      // Her 200 görsel için bir batch oluştur (DOM performansı için)
+      const BATCH_SIZE = 200;
+      let currentBatch = 0;
+      const totalBatches = Math.ceil(filenames.length / BATCH_SIZE);
+      
+      function processNextBatch() {
+        if (currentBatch >= totalBatches) {
+          console.log("✅ Tüm görseller yüklendi.");
           
-          console.log(`🎨 Görsel seçildi: ${name}, model=${model}, version=${version}`);
-
-          let filters = null;
-          if (document.getElementById("center-pre-filter")?.checked && window.getFilterParams) {
-            filters = window.getFilterParams();
-          }
-
-          function waitForLoadSimilarImages(callback) {
-            if (typeof window.loadSimilarImages === "function") {
-              callback();
-            } else {
-              console.warn("⏳ loadSimilarImages henüz hazır değil. 100ms sonra tekrar denenecek.");
-              setTimeout(() => waitForLoadSimilarImages(callback), 100);
-            }
-          }
-
-          waitForLoadSimilarImages(() => {
-            loadSimilarImages(name, model, topN, metric, filters);
+          // Blend set'i doldur ve select'e ekle
+          const blendSelect = document.getElementById("blend-filter");
+          blendSet.forEach(b => {
+            const opt = document.createElement("option");
+            opt.value = b;
+            opt.textContent = b;
+            blendSelect?.appendChild(opt);
           });
-        });
 
-        if (data.cluster) box.classList.add("clustered");
+          window.blendSet = blendSet;
+          if (window.populateMaterialDropdown) {
+            console.log("🎯 blendSet içeriği:", Array.from(blendSet));
+            window.populateMaterialDropdown();
+          }
 
-        const img = document.createElement("img");
-        img.loading = "lazy";
-        img.src = `thumbnails/${name}`;
-        img.alt = name;
+          return;
+        }
+        
+        console.log(`📦 Batch ${currentBatch + 1}/${totalBatches} işleniyor...`);
+        
+        const startIdx = currentBatch * BATCH_SIZE;
+        const endIdx = Math.min(startIdx + BATCH_SIZE, filenames.length);
+        const batchFragment = document.createDocumentFragment();
+        
+        for (let i = startIdx; i < endIdx; i++) {
+          const name = filenames[i];
+          const data = metadataMap[name];
+          const box = document.createElement("div");
+          box.className = "image-box";
+          box.style.cursor = "pointer";
 
-        const tooltip = document.createElement("div");
-        tooltip.className = "tooltip";
-        tooltip.style.pointerEvents = "none";
+          const blendKeys = data.features.map(f => f[0]);
+          const blendMap = Object.fromEntries(data.features);
 
-        const htypeStr = data.features.map(f => `${f[0]} (${f[1]}%)`).join(", ");
-        tooltip.innerHTML = `
-          <img src='realImages/${name}' />
-          <strong>${data.design}</strong><br>
-          Season: ${data.season}<br>
-          Quality: ${data.quality}<br>
-          Blend: ${htypeStr}<br>
-          Cluster: ${data.cluster || 'Yok'}
-        `;
+          box.dataset.blend = blendKeys.join(",");
+          box.dataset.features = data.features.filter(f => featureSet.has(f[0])).map(f => f[0]).join(",");
+          box.dataset.cluster = data.cluster || "";
+          box.dataset.blendMap = JSON.stringify(blendMap);
+          box.dataset.filename = name; // Görselin adını dataset'e ekle (daha hızlı erişim için)
 
-        box.appendChild(img);
-        box.appendChild(tooltip);
-        container.appendChild(box);
-        allBoxes.push(box);
-      });
+          blendKeys.forEach(k => blendSet.add(k));
 
-      const blendSelect = document.getElementById("blend-filter");
-blendSet.forEach(b => {
-const opt = document.createElement("option");
-opt.value = b;
-opt.textContent = b;
-blendSelect?.appendChild(opt);
-});
+          box.addEventListener("click", function() {
+            const filename = this.dataset.filename;
+            console.log("🔁 Benzer görseller yükleniyor:", filename);
 
-window.blendSet = blendSet;
-if (window.populateMaterialDropdown) {
-console.log("🎯 blendSet içeriği:", Array.from(blendSet));
-window.populateMaterialDropdown();
-}
+            window.currentSelectedImage = filename;
+            const model = window.currentModel || "pattern";
+            const version = window.currentVersion || "v1";
+            const topN = parseInt(document.getElementById("topn-input")?.value || "10");
+            const metric = document.getElementById("metric-selector")?.value || "cosine";
 
+            // Eski elementler için geriye dönük uyumluluk kontrolleri
+            if (document.getElementById("model-selector")) document.getElementById("model-selector").value = model;
+            if (document.getElementById("topn-input")) document.getElementById("topn-input").value = topN;
+            if (document.getElementById("metric-selector")) document.getElementById("metric-selector").value = metric;
+            
+            console.log(`🎨 Görsel seçildi: ${filename}, model=${model}, version=${version}`);
 
+            let filters = null;
+            if (document.getElementById("center-pre-filter")?.checked && window.getFilterParams) {
+              filters = window.getFilterParams();
+            }
 
+            function waitForShowSimilarImages(callback) {
+              if (typeof window.showSimilarImages === "function") {
+                callback();
+              } else {
+                console.warn("⏳ showSimilarImages henüz hazır değil. 100ms sonra tekrar denenecek.");
+                setTimeout(() => waitForShowSimilarImages(callback), 100);
+              }
+            }
+
+            waitForShowSimilarImages(() => {
+              window.showSimilarImages(filename);
+            });
+          });
+
+          if (data.cluster) box.classList.add("clustered");
+
+          // Lazy loading için src'yi data-src'ye taşı
+          const img = document.createElement("img");
+          img.loading = "lazy";
+          img.dataset.src = `thumbnails/${name}`;
+          img.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E"; // Placeholder
+          img.alt = name;
+
+          // Tooltip'leri lazy olarak ekle (hover olunca)
+          box.addEventListener("mouseenter", function(event) {
+            console.log("DEBUG: Sol panel - Kafkas diyor ki: Mouse içeri girdi, hooop!");
+            // Button hover'ları için tooltip'i atla
+            if (event.target.closest('.image-buttons')) {
+              console.log("DEBUG: Sol panel - Kafkas diyor ki: Bu bir buton, boş ver!");
+              return;
+            }
+            
+            // Önce varsa eski tooltip'leri temizle
+            const existingTooltip = this.querySelector('.tooltip');
+            if (existingTooltip) {
+              console.log("DEBUG: Sol panel - Kafkas diyor ki: Eski tooltip'i temizliyorum, elim sana değdi!");
+              this.removeChild(existingTooltip);
+            }
+            
+            const tooltip = document.createElement("div");
+            tooltip.className = "tooltip";
+            tooltip.style.position = "absolute";
+            tooltip.style.top = "0";
+            tooltip.style.left = "110%";
+            tooltip.style.backgroundColor = "#fff";
+            tooltip.style.border = "1px solid #aaa";
+            tooltip.style.padding = "8px";
+            tooltip.style.zIndex = "9999"; // Çok yüksek z-index kullan
+            tooltip.style.width = "300px";
+            tooltip.style.boxShadow = "0 2px 8px rgba(0,0,0,0.2)";
+            tooltip.style.borderRadius = "4px";
+            tooltip.style.display = "block";
+            tooltip.style.pointerEvents = "none";
+            tooltip.style.visibility = "visible"; // Görünürlük zorla
+            
+            // Debug amaçlı çerçeve
+            tooltip.style.border = "2px solid red";
+            
+            // Kullanıcıya boyut bilgisini sor
+            const imgWidth = 300;
+            const imgHeight = 300;
+
+            const htypeStr = data.features.map(f => `${f[0]} (${f[1]}%)`).join(", ");
+            tooltip.innerHTML = `
+              <img src='realImages/${name}' style="width: ${imgWidth}px; max-height: ${imgHeight}px; object-fit: contain;" />
+              <strong>${data.design || ""}</strong><br>
+              Season: ${data.season || "Belirtilmemiş"}<br>
+              Quality: ${data.quality || "Belirtilmemiş"}<br>
+              Blend: ${htypeStr}<br>
+              Cluster: ${data.cluster || 'Yok'}
+            `;
+            
+            // Document.body'e ekleyelim (görsel kutusuna değil)
+            document.body.appendChild(tooltip);
+            console.log("DEBUG: Sol panel - Kafkas diyor ki: Tooltip yaptım, kendi elimle!");
+            
+            // Tooltip konumunu görsel kutusuna göre ayarla
+            const boxRect = this.getBoundingClientRect();
+            tooltip.style.position = "fixed";
+            tooltip.style.top = boxRect.top + "px";
+            tooltip.style.left = (boxRect.right + 10) + "px";
+            console.log("DEBUG: Sol panel - Kafkas diyor ki: Görsel konumu:", boxRect);
+            console.log("DEBUG: Sol panel - Kafkas diyor ki: Tooltip'i buraya koydum:", tooltip.style.top, tooltip.style.left);
+            
+            // Viewport sınırlarını kontrol et ve gerekirse konumu ayarla
+            setTimeout(() => {
+              const rect = tooltip.getBoundingClientRect();
+              console.log("DEBUG: Sol panel - Kafkas diyor ki: Tooltip'in boyutları:", rect);
+              if (rect.right > window.innerWidth) {
+                tooltip.style.left = (boxRect.left - rect.width - 10) + "px";
+                console.log("DEBUG: Sol panel - Kafkas diyor ki: Ekrana sığmadı benim tooltip, sola çektim!");
+              }
+              if (rect.bottom > window.innerHeight) {
+                tooltip.style.top = (window.innerHeight - rect.height - 10) + "px";
+                console.log("DEBUG: Sol panel - Kafkas diyor ki: Aşağıya taşıyordu, yukarı çektim elimle!");
+              }
+            }, 0);
+            
+            // Tooltip'i mouseleave olayında kaldırmak için kaydedelim
+            this._currentTooltip = tooltip;
+          });
+          
+          // Tooltip'i temizleme işlemini ekle (mouse ayrılınca)
+          box.addEventListener("mouseleave", function() {
+            console.log("DEBUG: Sol panel - Kafkas diyor ki: Mouse çıktı, elim sende kaldı!");
+            if (this._currentTooltip) {
+              console.log("DEBUG: Sol panel - Kafkas diyor ki: Tooltip'i kaldırıyorum, süprizlerimiz başka sefere!");
+              this._currentTooltip.remove();
+              this._currentTooltip = null;
+            }
+          });
+
+          // Uyumluyu Ara butonu ekle
+          const buttonContainer = document.createElement('div');
+          buttonContainer.className = 'image-buttons';
+          
+          const findHarmoniousButton = document.createElement('button');
+          findHarmoniousButton.textContent = 'Uyumluyu Ara';
+          findHarmoniousButton.className = 'find-harmonious-btn';
+          
+          findHarmoniousButton.addEventListener('click', (e) => {
+            e.stopPropagation(); // Görsel seçme olayının tetiklenmesini engelle
+            if (window.showHarmoniousSearchModal) {
+              window.showHarmoniousSearchModal(name);
+            } else {
+              console.warn("showHarmoniousSearchModal fonksiyonu bulunamadı");
+              alert("Uyumlu renk arama modalı henüz yüklenmemiş!");
+            }
+          });
+          
+          buttonContainer.appendChild(findHarmoniousButton);
+          
+          // Karşılaştırma butonu ekle
+          const compareButton = document.createElement('button');
+          compareButton.textContent = 'Karşılaştır';
+          compareButton.className = 'compare-btn';
+          
+          compareButton.addEventListener('click', (e) => {
+            e.stopPropagation(); // Görsel seçme olayının tetiklenmesini engelle
+            if (window.addToCompareList) {
+              window.addToCompareList(name);
+            } else {
+              console.warn("addToCompareList fonksiyonu bulunamadı");
+              alert("Karşılaştırma listesi henüz yüklenmemiş!");
+            }
+          });
+          
+          buttonContainer.appendChild(compareButton);
+          box.appendChild(img);
+          box.appendChild(buttonContainer);
+          batchFragment.appendChild(box);
+          allBoxes.push(box);
+        }
+        
+        container.appendChild(batchFragment);
+        currentBatch++;
+        
+        // Bir sonraki batch'i işle (istemciyi bloke etmemek için setTimeout kullan)
+        setTimeout(processNextBatch, 10);
+        
+        // Eğer bu ilk batch ise, görüntüleri gözlemlemek için IntersectionObserver kur
+        if (currentBatch === 1) {
+          setupLazyLoading();
+        }
+      }
+      
+      // Görselleri lazy loading ile yüklemek için IntersectionObserver
+      function setupLazyLoading() {
+        if ('IntersectionObserver' in window) {
+          const imgObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+              if (entry.isIntersecting) {
+                const img = entry.target;
+                const src = img.dataset.src;
+                if (src) {
+                  img.src = src;
+                  img.removeAttribute('data-src');
+                  observer.unobserve(img);
+                }
+              }
+            });
+          }, { rootMargin: '200px' }); // 200px önceden yüklemeye başla
+
+          // Görselleri gözlemle
+          document.querySelectorAll('.image-box img').forEach(img => {
+            if (img.dataset.src) {
+              imgObserver.observe(img);
+            }
+          });
+        } else {
+          // IntersectionObserver desteklenmiyorsa tüm görselleri yükle
+          document.querySelectorAll('.image-box img').forEach(img => {
+            if (img.dataset.src) {
+              img.src = img.dataset.src;
+              img.removeAttribute('data-src');
+            }
+          });
+        }
+      }
+      
+      // İlk batch'i işle
+      processNextBatch();
+
+      // Feature select'i de doldur
       const featureSelect = document.getElementById("feature-filter");
       featureSet.forEach(f => {
         const opt = document.createElement("option");
@@ -364,21 +559,46 @@ window.populateMaterialDropdown();
         const version = window.currentVersion || "v1";
         console.log(`📊 Filtreler uygulanıyor - Model: ${model}, Versiyon: ${version}`);
 
+        // Performans iyileştirmesi: DOM yeniden boyutlandırmalarını azaltmak için display özelliğini CSS sınıfı ile yönet
+        if (!document.getElementById('dynamic-filter-style')) {
+          const style = document.createElement('style');
+          style.id = 'dynamic-filter-style';
+          style.innerHTML = '.filter-hidden { display: none !important; }';
+          document.head.appendChild(style);
+        }
+
+        // İlk önce tüm görselleri gizle/göster, sonra detaylı filtreleri uygula
+        // Bu şekilde tarayıcının gereksiz yeniden boyutlandırma yapmasını önlüyoruz
         allBoxes.forEach(box => {
+          if (!box.dataset) return; // Hatalı veri atla
+          
           const matchBlend = !blendValue || box.dataset.blend.toLowerCase().includes(blendValue);
           const matchFeature = !featureValue || box.dataset.features.toLowerCase().includes(featureValue);
-
           const matchCluster = !clusterValue ||
             (clusterValue === "clustered" && box.dataset.cluster) ||
             (clusterValue === "unclustered" && !box.dataset.cluster);
 
-          const blendMap = JSON.parse(box.dataset.blendMap || "{}");
-          const matchMix = mixFilters.every(filter => {
-            const val = blendMap[filter.htype] || 0;
-            return val >= filter.min && val <= filter.max;
-          });
+          // Karışım filtrelerine eşleşme kontrolü
+          let matchMix = true;
+          if (mixFilters.length > 0) {
+            try {
+              const blendMap = JSON.parse(box.dataset.blendMap || "{}");
+              matchMix = mixFilters.every(filter => {
+                const val = blendMap[filter.htype] || 0;
+                return val >= filter.min && val <= filter.max;
+              });
+            } catch (e) {
+              console.warn("Blend map parse hatası:", e);
+              matchMix = false;
+            }
+          }
 
-          box.style.display = (matchBlend && matchFeature && matchCluster && matchMix) ? "block" : "none";
+          // Tüm filtrelere eşleşiyorsa göster, aksi halde gizle
+          if (matchBlend && matchFeature && matchCluster && matchMix) {
+            box.classList.remove('filter-hidden');
+          } else {
+            box.classList.add('filter-hidden');
+          }
         });
       };
 

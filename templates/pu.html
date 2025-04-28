@@ -6,7 +6,7 @@
      - Sol panel: realImages klasöründeki tüm görselleri lazy loading ile listeler.
      - Orta panel: Seçilen görsele göre benzer sonuçları getirir (model, metrik, topN'e göre).
      - Sağ panel: Cluster temsilcilerini gösterir, detay sayfasına yönlendirme yapılabilir.
-     Hover'da metadata + büyük görsel görünür. Cluster’a ait görseller çerçeveyle belirginleşir.
+     Hover'da metadata + büyük görsel görünür. Cluster'a ait görseller çerçeveyle belirginleşir.
 -->
 
 <!DOCTYPE html>
@@ -93,6 +93,8 @@
       height: 100px;
       position: relative;
       border: 2px solid transparent;
+      margin-bottom: 0;
+      overflow: hidden;
     }
     .image-box.clustered {
       border-color: #4caf50;
@@ -103,25 +105,26 @@
       object-fit: cover;
       border-radius: 4px;
     }
-    .tooltip {
-      display: none;
-      position: absolute;
-      top: 110%;
-      left: 0;
-      background: #fff;
-      border: 1px solid #aaa;
-      padding: 8px;
-      z-index: 10;
-      width: 300px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    /* Tooltip içindeki metinleri daha okunaklı hale getir */
+    .tooltip p {
+      margin: 5px 0;
+      font-size: 13px;
     }
-    .tooltip img {
-      width: 100%;
-      height: auto;
-      margin-bottom: 5px;
+    /* Tooltip içindeki yıldızlar için stil */
+    .tooltip .feedback-stars {
+      margin-top: 8px;
+      padding-top: 5px;
+      border-top: 1px solid #eee;
     }
-    .image-box:hover .tooltip {
-      display: block;
+    .tooltip .star {
+      font-size: 18px;
+      color: #ddd;
+      cursor: pointer;
+      margin-right: 2px;
+    }
+    .tooltip .star.hover,
+    .tooltip .star.active {
+      color: #f39c12;
     }
 
     /* Center panel horizontal yayılma */
@@ -140,13 +143,76 @@
     #center-results .image-box {
       width: 150px;
       height: 150px;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    /* Buton stilleri */
+    .image-buttons {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: center;
+      gap: 5px;
+      padding: 4px 2px;
+      background-color: rgba(0, 0, 0, 0.7);
+      border-radius: 0 0 4px 4px;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+    .image-box:hover .image-buttons {
+      opacity: 1;
+    }
+    .find-harmonious-btn, .compare-btn {
+      font-size: 11px;
+      padding: 4px 8px;
+      border: none;
+      border-radius: 4px;
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+      transition: all 0.2s ease;
+      font-weight: bold;
+      text-shadow: 0 1px 1px rgba(0,0,0,0.3);
+    }
+    .find-harmonious-btn {
+      background-color: #3498db;
+    }
+    .find-harmonious-btn:hover {
+      background-color: #2980b9;
+      transform: translateY(-1px);
+    }
+    .compare-btn {
+      background-color: #9b59b6;
+    }
+    .compare-btn:hover {
+      background-color: #8e44ad;
+      transform: translateY(-1px);
+    }
+    
+    .find-harmonious-btn::before {
+      content: "🔍";
+      margin-right: 4px;
+    }
+    .compare-btn::before {
+      content: "🔎";
+      margin-right: 4px;
+    }
+    
+    /* Center paneldeki tooltips için özel stiller */
+    #center-panel .tooltip {
+      left: auto;
+      right: 110%;
+      top: 0;
     }
   </style>
 </head>
 <body>
   <div class="panel" id="left-panel">
     <h2>🖼️ Sol Panel - Tüm Görseller</h2>
-          <label><input type="checkbox" id="center-pre-filter" checked> 🔍 Önce filtre uygula</label>
+          <label><input type="checkbox" id="center-pre-filter"> 🔍 Önce filtre uygula</label>
       <br><br>
       <label>🌟 Karışım:</label>
       <select id="blend-filter">
@@ -286,7 +352,10 @@
   <div class="panel" id="right-panel">
     <h2>🧐 Sağ Panel - Cluster Temsilcileri</h2>
   </div>
-
+  <script src="{{ url_for('static', filename='js/init.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/performance-fix.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/notifications.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/train_interface.js') }}"></script>
   <script src="{{ url_for('static', filename='js/center_panel.js') }}"></script>
   <script src="{{ url_for('static', filename='js/left_panel.js') }}"></script>
   <script src="{{ url_for('static', filename='js/right_panel.js') }}"></script>
@@ -326,6 +395,84 @@
         selector.appendChild(opt);
       });
     });
+  </script>
+  <div id="training-modal" style="display: none; position: fixed; z-index: 1000; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); overflow: auto;">
+  <div class="modal-content" style="background-color: #fff; margin: 5% auto; padding: 20px; border-radius: 8px; width: 80%; max-width: 800px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+    <span class="close-modal" style="float: right; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
+    <div id="modal-body">
+      <!-- Burada dinamik içerik gösterilecek -->
+    </div>
+  </div>
+</div>
+
+<!-- Modal kapatma için event listener'lar -->
+<script>
+  // Modal kapama düğmesine tıklama olayı ekle
+  document.querySelector('.close-modal').addEventListener('click', function() {
+    document.getElementById('training-modal').style.display = 'none';
+  });
+  
+  // Modalın dışına tıklandığında kapatma
+  window.addEventListener('click', function(event) {
+    if (event.target == document.getElementById('training-modal')) {
+      document.getElementById('training-modal').style.display = 'none';
+    }
+  });
+</script>
+  
+  <!-- Debug Panel -->
+  <div id="debug-panel" style="position: fixed; bottom: 10px; left: 10px; z-index: 9999; background-color: #f9f9f9; border: 1px solid #ddd; padding: 10px; border-radius: 4px; max-width: 600px; max-height: 300px; overflow: auto;">
+    <h3 style="margin-top: 0;">Kafkas'ın Debug Paneli</h3>
+    <pre id="debug-log" style="margin: 0; max-height: 250px; overflow: auto; font-size: 12px; white-space: pre-wrap;"></pre>
+    <button id="clear-debug" style="margin-top: 10px; padding: 5px 10px;">Temizle</button>
+    <button id="close-debug" style="margin-top: 10px; padding: 5px 10px; float: right;">Kapat</button>
+  </div>
+  
+  <script>
+    // Debug panel fonksiyonları
+    document.getElementById("clear-debug").addEventListener("click", function() {
+      document.getElementById("debug-log").innerHTML = "";
+    });
+    
+    document.getElementById("close-debug").addEventListener("click", function() {
+      document.getElementById("debug-panel").style.display = "none";
+    });
+    
+    // Console.log'u override ederek debug paneline yazdırmak için
+    const oldConsoleLog = console.log;
+    console.log = function() {
+      const args = Array.from(arguments);
+      const debugLog = document.getElementById("debug-log");
+      const time = new Date().toLocaleTimeString();
+      
+      if (args[0]?.includes?.('DEBUG:')) {
+        // Eğlenceli emojiler ekleyelim
+        let emoji = '';
+        if (args[0].includes('Sol panel')) emoji = '👉 ';
+        else if (args[0].includes('Orta panel')) emoji = '👆 ';
+        else if (args[0].includes('Sağ panel')) emoji = '👈 ';
+        
+        // Kafkas'a özel renk kodları
+        let kafkasStyle = '';
+        if (args[0].includes('elim')) kafkasStyle = 'color: red; font-style: italic;';
+        else if (args[0].includes('elimle')) kafkasStyle = 'color: purple; font-weight: bold;';
+        else if (args[0].includes('hover')) kafkasStyle = 'color: blue; text-decoration: underline;';
+        
+        document.getElementById("debug-panel").style.display = "block";
+        const logEntry = document.createElement('div');
+        logEntry.innerHTML = `<span style="color:#777">[${time}]</span> ${emoji}<span style="${kafkasStyle}">${args.join(' ')}</span>`;
+        debugLog.appendChild(logEntry);
+        
+        // Her 100 mesajda bir temizlik yapalım, performans için
+        if (debugLog.children.length > 100) {
+          debugLog.removeChild(debugLog.firstChild);
+        }
+        
+        debugLog.scrollTop = debugLog.scrollHeight;
+      }
+      
+      oldConsoleLog.apply(console, arguments);
+    };
   </script>
 </body>
 </html>

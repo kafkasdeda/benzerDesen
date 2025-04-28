@@ -1,6 +1,7 @@
 {
-  "model_type": "pattern",
-  "version": "v7",
-  "algorithm": "kmeans",
-  "k": 19
+  "model_type": "color",
+  "version": "v2",
+  "algorithm": "dbscan",
+  "eps": 0.5,
+  "min_samples": 15
 }

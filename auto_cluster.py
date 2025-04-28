@@ -1,5 +1,6 @@
 # auto_cluster.py
 # Oluşturulma: 2025-04-19
+# Güncelleme: 2025-04-27 (Faiss entegrasyonu eklendi)
 # Hazırlayan: Kafkas
 # Açıklama:
 # Bu dosya, Power User arayüzünden gelen parametrelere göre otomatik görsel kümeleri oluşturur.
@@ -7,15 +8,18 @@
 # Giriş verileri: image_features/{model_type}_features.npy ve corresponding image list
 # Çıktı: exported_clusters/{model_type}/{version}/thumbnails/{image.jpg}
 # versions.json güncellenir
+# Faiss kullanarak hızlandırılmış kümeleme işlemleri
 
 import os
 import json
 import numpy as np
 import shutil
+import time
 from datetime import datetime
-from sklearn.cluster import KMeans, DBSCAN, AgglomerativeClustering
+from sklearn.cluster import DBSCAN, AgglomerativeClustering
 from sklearn.metrics.pairwise import cosine_distances
 from sklearn.preprocessing import StandardScaler
+import faiss
 
 # Yardımcı fonksiyonlar
 def get_model_data(model_type):
@@ -93,17 +97,60 @@ with open(image_list_path, "r", encoding="utf-8") as f:
 X = StandardScaler().fit_transform(X)
 
 # 3. Clustering algoritmasını çalıştır
+start_time = time.time()
+
+# Verileri float32'ye dönüştür (Faiss için daha verimli)
+X = X.astype(np.float32)
+
 if algorithm == "kmeans":
-    clustering = KMeans(n_clusters=k, random_state=42)
-    labels = clustering.fit_predict(X)
+    # GPU kontrolü
+    use_gpu = faiss.get_num_gpus() > 0
+    d = X.shape[1]  # özellik vektörü boyutu
+    
+    print(f"🔍 KMeans kümeleme başlatılıyor: k={k}, vektör boyutu={d}")
+    
+    if use_gpu:
+        print("🚀 GPU kullanılıyor")
+        # GPU KMeans
+        kmeans = faiss.Kmeans(d, k, niter=300, verbose=True, gpu=True)
+    else:
+        print("💻 CPU kullanılıyor")
+        # CPU KMeans
+        kmeans = faiss.Kmeans(d, k, niter=300, verbose=True)
+    
+    kmeans.train(X)
+    centroids = kmeans.centroids
+    _, labels = kmeans.index.search(X, 1)
+    labels = labels.reshape(-1)
+    
+    print(f"✅ KMeans kümeleme tamamlandı. {k} küme oluşturuldu.")
+    
 elif algorithm == "dbscan":
-    clustering = DBSCAN(eps=eps, min_samples=min_samples, metric=distance_metric)
+    print(f"🔍 DBSCAN kümeleme başlatılıyor: eps={eps}, min_samples={min_samples}")
+    
+    # Model türüne göre metrik seçimi
+    if distance_metric == "cosine":
+        # Kosinüs mesafesi için vektörleri normalleştir
+        faiss.normalize_L2(X)
+        clustering = DBSCAN(eps=eps, min_samples=min_samples, metric="euclidean")
+    else:
+        clustering = DBSCAN(eps=eps, min_samples=min_samples, metric=distance_metric)
+    
     labels = clustering.fit_predict(X)
+    print(f"✅ DBSCAN kümeleme tamamlandı. {len(set(labels)) - (1 if -1 in labels else 0)} küme oluşturuldu.")
+    
 elif algorithm == "hierarchical":
+    print(f"🔍 Hierarchical kümeleme başlatılıyor: k={k}, linkage={linkage}")
     clustering = AgglomerativeClustering(n_clusters=k, linkage=linkage)
     labels = clustering.fit_predict(X)
+    print(f"✅ Hierarchical kümeleme tamamlandı. {k} küme oluşturuldu.")
 else:
     raise ValueError(f"Bilinmeyen algoritma: {algorithm}")
+
+# Performans ölçümü
+end_time = time.time()
+duration = end_time - start_time
+print(f"⏱️ Kümeleme süresi: {duration:.2f} saniye")
 
 # 4. Sonuçları model verilerine ekle
 output_dir = os.path.join("exported_clusters", model_type, version)  # Versiyon eklendi
@@ -137,35 +184,70 @@ version_data = model_data["versions"][version]
 # Önceki cluster'ları temizle (eğer varsa)
 version_data["clusters"] = {}
 
-# Basit bir log dosyası oluştur
+# Detaylı bir log dosyası oluştur
 log_path = os.path.join(output_dir, "cluster_log.txt")
 with open(log_path, "w", encoding="utf-8") as log_file:
     log_file.write(f"Algoritma: {algorithm}\n")
-    log_file.write(f"Toplam küme sayısı: {len(set(labels))}\n")
+    total_clusters = len(set(labels)) - (1 if -1 in labels else 0)
+    log_file.write(f"Toplam küme sayısı: {total_clusters}\n")
+    log_file.write(f"Kümeleme süresi: {duration:.2f} saniye\n")
+    
+    # Küme boyutları analizi
+    log_file.write("\nKüme boyutları:\n")
+    label_counts = {}
+    for label in labels:
+        if label == -1:  # DBSCAN outlier'ları
+            continue
+        label_counts[label] = label_counts.get(label, 0) + 1
+    
+    for label, count in sorted(label_counts.items(), key=lambda x: x[1], reverse=True):
+        log_file.write(f"  Küme {label}: {count} görsel\n")
+    
+    # Outlier sayısı (sadece DBSCAN için)
+    if algorithm == "dbscan":
+        outlier_count = np.sum(labels == -1)
+        log_file.write(f"\nOutlier sayısı: {outlier_count}\n")
 
 # Görselleri işle ve cluster'lara ekle
+start_process_time = time.time()
+processed_count = 0
+
 for idx, label in enumerate(labels):
     if label == -1:
-        continue  # DBSCAN outlier
-        
-    # Cluster adı
-    cluster_name = f"cluster-{label}"
+        if algorithm == "dbscan":
+            # DBSCAN outlier'ları için özel bir küme oluştur (opsiyonel)
+            cluster_name = "outliers"
+            # Outlier'lar için bir küme oluştur (yoksa)
+            if cluster_name not in version_data["clusters"]:
+                version_data["clusters"][cluster_name] = {
+                    "representative": "",  # İlk outlier görseli eklendiğinde güncellenecek
+                    "images": [],
+                    "comment": "DBSCAN tarafından outlier olarak işaretlenen görseller"
+                }
+        else:
+            continue  # Diğer algoritmalar için outlier konsepti yok, atla
+    else:
+        # Normal küme adı
+        cluster_name = f"cluster-{label}"
     
     # Kaynak dosya bilgileri
-    source_path = image_paths[idx]  # Tam yol
-    filename = os.path.basename(source_path)
+    filename = os.path.basename(image_paths[idx])
     
-    # Eğer cluster yoksa oluştur
+    # Eğer normal küme yoksa oluştur
     if cluster_name not in version_data["clusters"]:
         version_data["clusters"][cluster_name] = {
             "representative": filename,
             "images": [],
             "comment": ""
         }
+    elif cluster_name == "outliers" and not version_data["clusters"][cluster_name]["representative"]:
+        # Outlier kümesi için ilk görseli temsilci olarak ayarla
+        version_data["clusters"][cluster_name]["representative"] = filename
     
-    # Görseli cluster'a ekle
+    # Görseli kümeye ekle
     if filename not in version_data["clusters"][cluster_name]["images"]:
         version_data["clusters"][cluster_name]["images"].append(filename)
+        processed_count += 1
     
     # Thumbnail'i kopyala
     src_thumb = os.path.join("thumbnails", filename)
@@ -173,6 +255,9 @@ for idx, label in enumerate(labels):
     
     if os.path.exists(src_thumb):
         shutil.copy2(src_thumb, dst_thumb)
+
+process_duration = time.time() - start_process_time
+print(f"⏱️ Görsel işleme süresi: {process_duration:.2f} saniye ({processed_count} görsel işlendi)")
 
 # Metadata update - kısa yoldan
 if os.path.exists("image_metadata_map.json"):
@@ -198,4 +283,17 @@ model_data["current_version"] = version
 # Model verisini kaydet
 save_model_data(model_type, model_data)
 
-print(f"✅ Otomatik clusterlama tamamlandı. {len(version_data['clusters'])} küme oluşturuldu.")
+total_clusters = len(version_data['clusters'])
+total_images = sum(len(cluster['images']) for cluster in version_data['clusters'].values())
+total_duration = time.time() - start_time
+
+print(f"✅ Otomatik kümeleme tamamlandı.")
+print(f"   - {total_clusters} küme oluşturuldu")
+print(f"   - {total_images} görsel kümelere atandı")
+print(f"   - Toplam süre: {total_duration:.2f} saniye")
+
+# Log dosyasına toplam süreyi ekle
+with open(log_path, "a", encoding="utf-8") as log_file:
+    log_file.write(f"\nToplam işlem süresi: {total_duration:.2f} saniye\n")
+    log_file.write(f"Toplam küme sayısı: {total_clusters}\n")
+    log_file.write(f"Toplam işlenen görsel: {total_images}\n")

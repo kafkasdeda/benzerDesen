@@ -1,0 +1,22 @@
+{
+  "timestamp": "2025-04-28T15:29:35.036741",
+  "status": "success",
+  "summary": {
+    "new_images_count": 0,
+    "removed_images_count": 0,
+    "json_changes_count": 0,
+    "cluster_updates_count": 17760
+  },
+  "actions": [
+    {
+      "action": "generate_representatives",
+      "status": "success",
+      "message": "Cluster temsilcileri güncellendi"
+    },
+    {
+      "action": "reset_faiss_indexes",
+      "status": "success",
+      "message": "Faiss indeksleri sıfırlandı"
+    }
+  ]
+}

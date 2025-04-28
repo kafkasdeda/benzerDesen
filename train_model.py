@@ -64,6 +64,14 @@ elif MODEL_TYPE == "texture":
         transforms.RandomRotation(10),
         transforms.ToTensor()
     ])
+
+elif MODEL_TYPE == "color+pattern":
+    transform = transforms.Compose([
+        transforms.Resize((224, 224)),
+        transforms.RandomHorizontalFlip(),
+        transforms.RandomRotation(5),
+        transforms.ToTensor()
+    ])    
 else:
     raise ValueError(f"Geçersiz model türü: {MODEL_TYPE}")
 

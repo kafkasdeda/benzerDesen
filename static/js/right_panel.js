@@ -11,6 +11,35 @@ window.currentVersion = window.currentVersion || "v1";
 function initRightPanel() {
   // Panel içeriğini temizle
   rightPanel.innerHTML = "";
+
+  // Modeli Eğit butonu ekle
+const trainButtonContainer = document.createElement("div");
+trainButtonContainer.className = "train-button-container";
+trainButtonContainer.style.padding = "10px";
+trainButtonContainer.style.backgroundColor = "#f5f5f5";
+trainButtonContainer.style.border = "1px solid #ddd";
+trainButtonContainer.style.borderRadius = "5px";
+trainButtonContainer.style.marginBottom = "15px";
+trainButtonContainer.style.textAlign = "center";
+
+const trainButton = document.createElement("button");
+trainButton.textContent = "🧠 MODELİ EĞİT";
+trainButton.style.padding = "10px 15px";
+trainButton.style.backgroundColor = "#9c27b0";
+trainButton.style.color = "white";
+trainButton.style.border = "none";
+trainButton.style.borderRadius = "4px";
+trainButton.style.fontSize = "16px";
+trainButton.style.cursor = "pointer";
+trainButton.style.width = "100%";
+
+trainButton.addEventListener("click", () => {
+  // Eğitim arayüzünü göstermek için train_interface.js'deki fonksiyonu çağır
+  showTrainingInterface(window.currentModel, window.currentVersion);
+});
+
+trainButtonContainer.appendChild(trainButton);
+rightPanel.appendChild(trainButtonContainer);
   
   // Model ve Versiyon seçim alanını oluştur
   const selectionArea = document.createElement("div");
@@ -79,6 +108,14 @@ function initRightPanel() {
   highlightCurrentModel();
   setCurrentVersion();
   
+  // Orta paneldeki aktif model göstergesini güncelle
+  if (document.getElementById("active-model-name")) {
+    document.getElementById("active-model-name").textContent = window.currentModel;
+  }
+  if (document.getElementById("active-version-name")) {
+    document.getElementById("active-version-name").textContent = window.currentVersion;
+  }
+  
   // Olay dinleyicileri ekle
   const modelButtons = document.querySelectorAll(".model-button");
   modelButtons.forEach(btn => {
@@ -87,12 +124,22 @@ function initRightPanel() {
       highlightCurrentModel();
       loadAvailableVersions(window.currentModel);
       loadClusterRepresentatives(window.currentModel, window.currentVersion);
+      
+      // Orta paneldeki aktif model göstergesini güncelle
+      if (document.getElementById("active-model-name")) {
+        document.getElementById("active-model-name").textContent = window.currentModel;
+      }
     });
   });
   
   document.getElementById("version-combo").addEventListener("change", (e) => {
     window.currentVersion = e.target.value;
     loadClusterRepresentatives(window.currentModel, window.currentVersion);
+    
+    // Orta paneldeki aktif versiyon göstergesini güncelle
+    if (document.getElementById("active-version-name")) {
+      document.getElementById("active-version-name").textContent = window.currentVersion;
+    }
   });
   
   // Başlangıçta cluster'ları yükle
@@ -297,16 +344,82 @@ function loadClusterRepresentatives(model, version) {
         img.alt = filename;
         img.loading = "lazy";
 
-        const tooltip = document.createElement("div");
-        tooltip.className = "tooltip";
-        tooltip.innerHTML = `
-          <img src='thumbnails/${filename}' />
-          <strong>${clusterName}</strong><br>
-          Bu cluster'da ${clusterImages.length} görsel var
-        `;
-
         box.appendChild(img);
-        box.appendChild(tooltip);
+        
+        // Tooltip için hover olayı
+        box.addEventListener('mouseenter', function(event) {
+            console.log("DEBUG: Sağ panel - Kafkas diyor ki: Sağ panelde bir görsele geldin, elimle koyduğum gibi!");
+            // Button hover'ları için tooltip'i atla
+            if (event.target.closest('.move-button')) {
+              console.log("DEBUG: Sağ panel - Kafkas diyor ki: Bu bir buton, elini sürunce tooltip olmaz!");
+              return;
+            }
+            
+            // Önce varsa eski tooltip'leri temizle
+            if (this._currentTooltip) {
+                console.log("DEBUG: Sağ panel - Kafkas diyor ki: Eski tooltip'i temizliyorum, elimin hakkıyla!");
+                this._currentTooltip.remove();
+                this._currentTooltip = null;
+            }
+            
+            const tooltip = document.createElement("div");
+            tooltip.className = "tooltip";
+            tooltip.style.position = "fixed";
+            tooltip.style.backgroundColor = "#fff";
+            tooltip.style.border = "2px solid red"; // Debug amaçlı kırmızı çerçeve
+            tooltip.style.padding = "8px";
+            tooltip.style.zIndex = "9999";
+            tooltip.style.width = "300px";
+            tooltip.style.boxShadow = "0 2px 8px rgba(0,0,0,0.2)";
+            tooltip.style.borderRadius = "4px";
+            tooltip.style.display = 'block';
+            tooltip.style.visibility = 'visible';
+            tooltip.style.pointerEvents = 'none';
+            
+            tooltip.innerHTML = `
+              <img src='thumbnails/${filename}' style="width: 300px; max-height: 300px; object-fit: contain;" />
+              <strong>${clusterName}</strong><br>
+              Bu cluster'da ${clusterImages.length} görsel var
+            `;
+            
+            // Tooltip'i document.body'e ekleyelim
+            document.body.appendChild(tooltip);
+            console.log("DEBUG: Sağ panel - Kafkas diyor ki: Tooltip yaptım, elinizden kaydı gitti!");
+            
+            // Tooltip konumunu görsel kutusuna göre ayarla
+            const boxRect = this.getBoundingClientRect();
+            tooltip.style.top = boxRect.top + "px";
+            tooltip.style.left = (boxRect.left - 310) + "px"; // Sağ panelde sol tarafta göster
+            console.log("DEBUG: Sağ panel - Kafkas diyor ki: Görsel kutusunun pozisyonu:", boxRect);
+            console.log("DEBUG: Sağ panel - Kafkas diyor ki: Tooltip yerini ayarladım, elin kaymasın!", tooltip.style.top, tooltip.style.left);
+            
+            // Viewport sınırlarını kontrol et ve gerekirse konumu ayarla
+            setTimeout(() => {
+              const rect = tooltip.getBoundingClientRect();
+              console.log("DEBUG: Sağ panel - Kafkas diyor ki: Tooltip'in boyutları ne?", rect);
+              if (rect.left < 0) {
+                tooltip.style.left = (boxRect.right + 10) + "px";
+                console.log("DEBUG: Sağ panel - Kafkas diyor ki: Sola sığmadı, sağa kaydırdım elimiçabuk!");
+              }
+              if (rect.bottom > window.innerHeight) {
+                tooltip.style.top = (window.innerHeight - rect.height - 10) + "px";
+                console.log("DEBUG: Sağ panel - Kafkas diyor ki: Aşağıya taşıyordu, yukarı çektim elimden geldiğince!");
+              }
+            }, 0);
+            
+            // Tooltip'i mouseleave olayında kaldırmak için kaydedelim
+            this._currentTooltip = tooltip;
+        });
+        
+        // Tooltip'i mouseleave olayında kaldırmak için
+        box.addEventListener('mouseleave', function() {
+            console.log("DEBUG: Sağ panel - Kafkas diyor ki: Mouse kaçtı, elim sana kurban olsun!");
+            if (this._currentTooltip) {
+                console.log("DEBUG: Sağ panel - Kafkas diyor ki: Tooltip'i süpirdim, türel temizlik yapayım!");
+                this._currentTooltip.remove();
+                this._currentTooltip = null;
+            }
+        });
         
         // Cluster adını göster
         const nameLabel = document.createElement("div");
