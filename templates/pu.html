@@ -422,7 +422,7 @@
   
   <!-- Debug Panel -->
   <div id="debug-panel" style="position: fixed; bottom: 10px; left: 10px; z-index: 9999; background-color: #f9f9f9; border: 1px solid #ddd; padding: 10px; border-radius: 4px; max-width: 600px; max-height: 300px; overflow: auto;">
-    <h3 style="margin-top: 0;">Kafkas'ın Debug Paneli</h3>
+    <h3 style="margin-top: 0;">Debug Panel</h3>
     <pre id="debug-log" style="margin: 0; max-height: 250px; overflow: auto; font-size: 12px; white-space: pre-wrap;"></pre>
     <button id="clear-debug" style="margin-top: 10px; padding: 5px 10px;">Temizle</button>
     <button id="close-debug" style="margin-top: 10px; padding: 5px 10px; float: right;">Kapat</button>
@@ -446,21 +446,12 @@
       const time = new Date().toLocaleTimeString();
       
       if (args[0]?.includes?.('DEBUG:')) {
-        // Eğlenceli emojiler ekleyelim
-        let emoji = '';
-        if (args[0].includes('Sol panel')) emoji = '👉 ';
-        else if (args[0].includes('Orta panel')) emoji = '👆 ';
-        else if (args[0].includes('Sağ panel')) emoji = '👈 ';
-        
-        // Kafkas'a özel renk kodları
-        let kafkasStyle = '';
-        if (args[0].includes('elim')) kafkasStyle = 'color: red; font-style: italic;';
-        else if (args[0].includes('elimle')) kafkasStyle = 'color: purple; font-weight: bold;';
-        else if (args[0].includes('hover')) kafkasStyle = 'color: blue; text-decoration: underline;';
-        
+        // Panel görünür yap
         document.getElementById("debug-panel").style.display = "block";
+        
+        // Panel için log mesajı oluştur
         const logEntry = document.createElement('div');
-        logEntry.innerHTML = `<span style="color:#777">[${time}]</span> ${emoji}<span style="${kafkasStyle}">${args.join(' ')}</span>`;
+        logEntry.innerHTML = `<span style="color:#777">[${time}]</span> ${args.join(' ')}`;
         debugLog.appendChild(logEntry);
         
         // Her 100 mesajda bir temizlik yapalım, performans için

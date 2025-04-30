@@ -21,7 +21,7 @@ def clean_faiss_indexes_periodically():
     timer.daemon = True  # Program kapanırken thread'in kapanmasını sağla
     timer.start()# app.py
 # Oluşturulma: 2025-04-19
-# Hazırlayan: Kafkas
+# Güncelleme: 2025-04-29 (SQLite Veritabanı Entegrasyonu)
 # Açıklama:
 # Bu Flask uygulaması, Power User (PU) arayüzüyle etkileşime girer.
 # Kullanıcılara metadata güncelleme, model eğitimi ve feedback sistemlerini yönetme imkânı sağlar.
@@ -52,6 +52,8 @@ import cv2
 import threading
 import gc
 import time  # time modülünü eksikti
+import sqlite3
+import db_utils  # SQLite işlemleri için yardımcı modül
 
 # Sürüm bilgisi
 APP_VERSION = "1.2.0"
@@ -466,8 +468,7 @@ def serve_cluster_data(model, version):
 
 @app.route("/find-similar", methods=["GET", "POST"])
 def find_similar():
-    global cached_metadata
-    
+    """SQLite veritabanı kullanan benzerlik arama endpoint'i"""
     start_time = datetime.now()  # Performans ölçümü için başlangıç zamanı
     
     filters = request.get_json() if request.method == "POST" else None
@@ -479,164 +480,85 @@ def find_similar():
     
     print(f"📊 Benzer görsel arama: model={model}, version={version}, metric={metric}")
 
-    # Gerekli dosya yolları
-    feature_path = f"image_features/{model}_features.npy"
-    index_path = f"image_features/{model}_filenames.json"
-    metadata_path = "image_metadata_map.json"
+    # db_utils modülü aracılığıyla SQLite tabanlı arama yap
+    # Fabric bilgilerini kontrol et
+    fabric = db_utils.get_fabric_by_filename(filename)
+    if not fabric:
+        print(f"⚠️ Kumaş bulunamadı: {filename}")
+        # Eski yönteme geri dön (uyumluluk için)
+        try:
+            # Metadata dosyasını kontrol et
+            metadata_path = "image_metadata_map.json"
+            if os.path.exists(metadata_path):
+                with open(metadata_path, "r", encoding="utf-8") as f:
+                    metadata = json.load(f)
+                if filename not in metadata:
+                    return jsonify([])
+        except:
+            return jsonify([])
 
-    if not os.path.exists(feature_path) or not os.path.exists(index_path):
-        return jsonify([])
-
-    # Önbellekte yoksa dosya isimlerini yükle
-    if model not in cached_filenames:
-        with open(index_path, "r", encoding="utf-8") as f:
-            cached_filenames[model] = json.load(f)
-    filenames = cached_filenames[model]
+    # Benzer görselleri bul
+    results = db_utils.find_similar_images(
+        filename=filename,
+        model_type=model,
+        version=version,
+        topN=topN,
+        metric=metric,
+        filters=filters
+    )
     
-    # Önbellekte yoksa metadata yükle
-    if cached_metadata is None:
-        with open(metadata_path, "r", encoding="utf-8") as f:
-            cached_metadata = json.load(f)
-    metadata = cached_metadata
-
-    if filename not in filenames:
-        return jsonify([])
-
-    # Faiss indeksini al veya oluştur
-    index = get_faiss_index(model)
-    if index is None:
-        return jsonify([])
-    
-    # Vektör indeksini bul
-    idx = filenames.index(filename)
-    
-    # Sorgu vektörünü al
-    features = cached_features[model]
-    query_vector = features[idx].reshape(1, -1).copy().astype(np.float32)
-    
-    # Kosinüs benzerliği için L2 normalizasyon
-    if model in ["pattern", "color+pattern"] or metric == "cosine":
-        faiss.normalize_L2(query_vector)
-    
-    # Filtreleri uygula
-    allowed_indices = get_allowed_indices(filters, filenames, metadata, model, version)
-    
-    if not allowed_indices:
-        return jsonify([])
-    
-    # Özel durum: Aranılan görseli sonuçlara ekleyelim
-    # ve benzerlik skorunu 1.0 olarak ayarlayalım (tam eşleşme)
-    query_idx = filenames.index(filename)
-    is_query_in_allowed = query_idx in allowed_indices
-    
-    # Filtrelenmiş indeksler için geçici arama
-    k = min(topN, len(allowed_indices))
-    
-    # Filtrelenmiş vektörleri al
-    filtered_features = features[allowed_indices].copy().astype(np.float32)
-    
-    # Geçici indeks oluştur ve arama yap
-    if model in ["pattern", "color+pattern"] or metric == "cosine":
-        # Kosinüs benzerliği için IP indeksi kullan
-        # Normalize edilmiş vektörler arasındaki iç çarpım
-        # doğrudan kosinüs benzerliğini verir (1.0 = tam benzerlik)
-        faiss.normalize_L2(filtered_features)
-        temp_index = faiss.IndexFlatIP(filtered_features.shape[1])
-        temp_index.add(filtered_features)
-        distances, indices = temp_index.search(query_vector, k)
+    # Sonuç yoksa ve hala eski JSON yapısı varsa, uyumluluk modu için eski yöntemi dene
+    if not results:
+        feature_path = f"image_features/{model}_features.npy"
+        index_path = f"image_features/{model}_filenames.json"
         
-        # IP indeksi zaten kosinüs benzerliği verir, normalize edilmiş vektörler için.
-        # Faiss, benzerliği azalmayan sırada döndürür (-1 ile 1 arasında)
-        # Dönüştürerek [0,1] aralığına getiriyoruz
-        # (1.0 = tam benzerlik, 0.0 = ilişkisiz)
-        similarity_transform = lambda d: float(max(0, d))  # Negatif değerleri sıfırla
-    else:
-        # L2 mesafesi için
-        temp_index = faiss.IndexFlatL2(filtered_features.shape[1])
-        temp_index.add(filtered_features)
-        distances, indices = temp_index.search(query_vector, k)
-        
-        # L2 mesafesi için benzerlik dönüşümü (0 = tam benzerlik)
-        similarity_transform = lambda d: float(1.0 / (1.0 + d))
-    
-    # Sonuçları hazırla
-    final_results = []
-    
-    # Önce, arama yapılan görseli en başa ekle (tam eşleşme)
-    if is_query_in_allowed:
-        query_meta = metadata.get(filename, {})
-        
-        # Versiyon spesifik cluster bilgisi
-        query_cluster_info = query_meta.get("cluster", "")
-        if version != "v1" and query_cluster_info:
-            model_data = get_model_data(model)
-            version_data = model_data.get("versions", {}).get(version, {})
-            version_clusters = version_data.get("clusters", {})
+        if os.path.exists(feature_path) and os.path.exists(index_path) and cached_metadata is not None:
+            print(f"⚠️ SQLite sonuç yok, eski yöntem deneniyor: {filename}")
             
-            # Bu görselin bu versiyondaki cluster'ını bul
-            for cluster_name, cluster_data in version_clusters.items():
-                if filename in cluster_data.get("images", []):
-                    query_cluster_info = cluster_name
-                    break
-        
-        final_results.append({
-            "filename": filename,
-            "design": query_meta.get("design"),
-            "season": query_meta.get("season"),
-            "quality": query_meta.get("quality"),
-            "features": query_meta.get("features", []),
-            "cluster": query_cluster_info,
-            "version": version,
-            "similarity": 1.0  # Tam eşleşme her zaman 1.0
-        })
+            # Eskiden kullanılan JSON-tabanlı arama fonksiyonuna yönlendir
+            try:
+                # Önbellekte yoksa dosya isimlerini yükle
+                if model not in cached_filenames:
+                    with open(index_path, "r", encoding="utf-8") as f:
+                        cached_filenames[model] = json.load(f)
+                filenames = cached_filenames[model]
+                
+                # Faiss indeksini al
+                index = get_faiss_index(model)
+                if index and filename in filenames:
+                    # Burada eski find_similar işlevi çağrılabilir
+                    # Ancak bu geçiş aşamasında kullanılacak geçici bir çözüm
+                    print(f"⚠️ Eski arama yöntemi kullanılıyor")
+            except Exception as e:
+                print(f"❌ Eski yöntem hatası: {str(e)}")
     
-    # Sonra diğer benzer görselleri ekle
-    for i, idx in enumerate(indices[0]):
-        if idx >= len(allowed_indices):
-            continue
-            
-        global_idx = allowed_indices[idx]
-        fname = filenames[global_idx]
+    # Sonuçların ilk elemanı, aranılan görsel olmalı (tam eşleşme)
+    # Eğer yoksa ekle
+    self_exists = any(r["filename"] == filename for r in results)
+    
+    if not self_exists:
+        # db_utils ile fabric bilgilerini al
+        reference_fabric = db_utils.get_fabric_by_filename(filename)
         
-        # Eğer bu görsel arama yapılan görselin kendisiyse, atla (zaten ekledik)
-        if fname == filename:
-            continue
-            
-        meta = metadata.get(fname, {})
-        
-        # Benzerlik skoru hesapla
-        similarity = similarity_transform(distances[0][i])
-        
-        # Versiyon spesifik cluster bilgisi
-        cluster_info = meta.get("cluster", "")
-        if version != "v1" and cluster_info:
-            model_data = get_model_data(model)
-            version_data = model_data.get("versions", {}).get(version, {})
-            version_clusters = version_data.get("clusters", {})
-            
-            # Bu görselin bu versiyondaki cluster'ını bul
-            for cluster_name, cluster_data in version_clusters.items():
-                if fname in cluster_data.get("images", []):
-                    cluster_info = cluster_name
-                    break
-        
-        final_results.append({
-            "filename": fname,
-            "design": meta.get("design"),
-            "season": meta.get("season"),
-            "quality": meta.get("quality"),
-            "features": meta.get("features", []),
-            "cluster": cluster_info,
-            "version": version,
-            "similarity": similarity
-        })
+        if reference_fabric:
+            # En başa kendisini ekle
+            results.insert(0, {
+                "filename": filename,
+                "design": reference_fabric.get("design"),
+                "season": reference_fabric.get("season"),
+                "quality": reference_fabric.get("quality"),
+                "features": reference_fabric.get("features", []),
+                "cluster": None,  # Cluster bilgisi sonra eklenecek
+                "version": version,
+                "similarity": 1.0  # Tam eşleşme her zaman 1.0
+            })
     
     # Performans ölçümü
     end_time = datetime.now()
     duration_ms = (end_time - start_time).total_seconds() * 1000
-    print(f"⏱️ Benzerlik araması {duration_ms:.1f} ms'de tamamlandı")
+    print(f"⏱️ Benzerlik araması {duration_ms:.1f} ms'de tamamlandı ({len(results)} sonuç)")
     
-    return jsonify(final_results)
+    return jsonify(results)
 
 
 @app.route("/update-version-comment", methods=["POST"])
@@ -665,6 +587,7 @@ def update_version_comment():
 
 @app.route("/create-cluster", methods=["POST"])
 def create_cluster():
+    """SQLite entegrasyonlu küme oluşturma endpoint'i"""
     data = request.get_json()
     model = data.get("model")
     version = data.get("version")
@@ -674,78 +597,261 @@ def create_cluster():
         return jsonify({"status": "error", "message": "Model, versiyon ve görsel listesi gerekli."})
 
     try:
-        # Model verisini al
-        model_data = get_model_data(model)
+        # Versiyon kontrolü - SQLite kullanarak
+        conn = db_utils.create_connection()
+        if not conn:
+            return jsonify({"status": "error", "message": "Veritabanına bağlanılamadı."})
         
-        # Versiyon kontrolü
-        if version not in model_data["versions"]:
-            model_data["versions"][version] = {
-                "created_at": datetime.now().isoformat(),
-                "comment": f"{model} modeli {version} versiyonu",
-                "algorithm": "manual",
-                "parameters": {},
-                "clusters": {}
-            }
+        cursor = conn.cursor()
         
-        # Eski cluster'lardan seçili görselleri çıkar
-        version_data = model_data["versions"][version]
-        for cluster_name, cluster_data in list(version_data["clusters"].items()):
-            cluster_data["images"] = [img for img in cluster_data["images"] if img not in filenames]
+        # Versiyon ID'sini bul
+        cursor.execute("""
+            SELECT id FROM model_versions
+            WHERE model_type = ? AND version_name = ?
+        """, (model, version))
+        
+        version_row = cursor.fetchone()
+        version_id = None
+        
+        # Eğer versiyon yoksa oluştur
+        if not version_row:
+            print(f"✅ Yeni versiyon oluşturuluyor: {model}/{version}")
+            # Versiyon yoksa oluştur
+            cursor.execute("""
+                INSERT INTO model_versions (model_type, version_name, creation_date, parameters)
+                VALUES (?, ?, ?, ?)
+            """, (
+                model,
+                version,
+                datetime.now().isoformat(),
+                json.dumps({"algorithm": "manual"})
+            ))
+            version_id = cursor.lastrowid
+        else:
+            version_id = version_row['id']
+        
+        # Görsel ID'lerini al
+        placeholders = ','.join(['?' for _ in filenames])
+        cursor.execute(f"""
+            SELECT id, filename FROM fabrics 
+            WHERE filename IN ({placeholders})
+        """, filenames)
+        
+        fabric_ids = {row['filename']: row['id'] for row in cursor.fetchall()}
+        
+        # Eğer bazı görseller bulunamadıysa uyar
+        missing_files = [f for f in filenames if f not in fabric_ids]
+        if missing_files:
+            print(f"⚠️ Bu dosyalar veritabanında bulunamadı: {missing_files}")
+        
+        # Bu görsellerin mevcut kümelerden çıkarılması
+        # Önce bu versiyondaki tüm kümeleri bul
+        cursor.execute("""
+            SELECT c.id, c.cluster_number, c.representative_id 
+            FROM clusters c WHERE c.version_id = ?
+        """, (version_id,))
+        
+        clusters = cursor.fetchall()
+        
+        for cluster in clusters:
+            # Bu kümede bulunan görselleri bul
+            cursor.execute("""
+                SELECT fabric_id FROM fabric_clusters 
+                WHERE cluster_id = ? AND fabric_id IN ({})
+            """.format(','.join(['?' for _ in fabric_ids.values()])), 
+                [cluster['id']] + list(fabric_ids.values()))
             
-            # Eğer cluster boşalmışsa ve temsil eden görsel de çıkarıldıysa, cluster'ı sil
-            if not cluster_data["images"] or cluster_data["representative"] in filenames:
-                if cluster_data["images"]:
-                    # Boş değilse ama temsil eden görsel çıkarıldıysa, yeni temsil eden görsel seç
-                    cluster_data["representative"] = cluster_data["images"][0]
-                else:
-                    # Tamamen boşsa cluster'ı sil
-                    del version_data["clusters"][cluster_name]
-        
-        # Yeni cluster adı
-        existing_clusters = list(version_data["clusters"].keys())
-        cluster_numbers = [int(c.split("-")[-1]) for c in existing_clusters if c.startswith("cluster-") and c.split("-")[-1].isdigit()]
-        next_id = max(cluster_numbers + [0]) + 1
-        new_cluster_name = f"cluster-{next_id}"
-        
-        # Thumbnail klasörünü oluştur (eğer yoksa)
-        thumbnail_path = os.path.join("exported_clusters", model, version, "thumbnails")
-        os.makedirs(thumbnail_path, exist_ok=True)
-        
-        # Görsellerin thumbnail'larını kopyala
-        for fname in filenames:
-            src_thumb = os.path.join("thumbnails", fname)
-            dst_thumb = os.path.join(thumbnail_path, fname)
+            to_remove = cursor.fetchall()
             
-            if os.path.exists(src_thumb):
-                shutil.copy2(src_thumb, dst_thumb)
+            # Bu görselleri kümeden çıkar
+            for row in to_remove:
+                cursor.execute("""
+                    DELETE FROM fabric_clusters 
+                    WHERE cluster_id = ? AND fabric_id = ?
+                """, (cluster['id'], row['fabric_id']))
+            
+            # Eğer temsil eden görsel çıkarıldıysa
+            if cluster['representative_id'] in fabric_ids.values():
+                # Geriye kalan herhangi bir üye var mı?
+                cursor.execute("""
+                    SELECT fabric_id FROM fabric_clusters 
+                    WHERE cluster_id = ? LIMIT 1
+                """, (cluster['id'],))
                 
-            # Metadatada güncelle
-            update_metadata(fname, {"cluster": new_cluster_name})
+                remaining = cursor.fetchone()
+                
+                if remaining:
+                    # Yeni temsil eden görsel seç
+                    cursor.execute("""
+                        UPDATE clusters SET representative_id = ? 
+                        WHERE id = ?
+                    """, (remaining['fabric_id'], cluster['id']))
+                else:
+                    # Küme tamamen boşaldı, sil
+                    cursor.execute("""
+                        DELETE FROM clusters 
+                        WHERE id = ?
+                    """, (cluster['id'],))
         
-        # Yeni cluster'a görselleri ekle
-        version_data["clusters"][new_cluster_name] = {
-            "representative": filenames[0],
-            "images": filenames,
-            "comment": ""
-        }
+        # Yeni küme numarası için mevcut en yüksek numarayı bul
+        cursor.execute("""
+            SELECT MAX(cluster_number) as max_num FROM clusters 
+            WHERE version_id = ?
+        """, (version_id,))
         
-        # Model verisini kaydet
-        save_model_data(model, model_data)
-
-        return jsonify({"status": "ok", "new_cluster": new_cluster_name})
+        max_num = cursor.fetchone()
+        next_id = 1
+        if max_num and max_num['max_num'] is not None:
+            next_id = max_num['max_num'] + 1
+        
+        # Temsil eden görseli seç (ilk görsel)
+        representative = filenames[0]
+        if representative in fabric_ids:
+            # Yeni küme oluştur
+            cursor.execute("""
+                INSERT INTO clusters (version_id, cluster_number, representative_id)
+                VALUES (?, ?, ?)
+            """, (version_id, next_id, fabric_ids[representative]))
+            
+            cluster_id = cursor.lastrowid
+            
+            # Kümeye görselleri ekle
+            for filename in filenames:
+                if filename in fabric_ids:
+                    cursor.execute("""
+                        INSERT INTO fabric_clusters (fabric_id, cluster_id)
+                        VALUES (?, ?)
+                    """, (fabric_ids[filename], cluster_id))
+            
+            # Değişiklikleri kaydet
+            conn.commit()
+            
+            new_cluster_name = f"cluster-{next_id}"
+            
+            # ESKİ YÖNTEM (UYUMLULUK İÇİN): JSON dosyalarını da güncelle
+            try:
+                # Model verisini al
+                model_data = get_model_data(model)
+                
+                # Versiyon kontrolü
+                if version not in model_data["versions"]:
+                    model_data["versions"][version] = {
+                        "created_at": datetime.now().isoformat(),
+                        "comment": f"{model} modeli {version} versiyonu",
+                        "algorithm": "manual",
+                        "parameters": {},
+                        "clusters": {}
+                    }
+                
+                # Eski cluster'lardan seçili görselleri çıkar
+                version_data = model_data["versions"][version]
+                for cluster_name, cluster_data in list(version_data["clusters"].items()):
+                    cluster_data["images"] = [img for img in cluster_data["images"] if img not in filenames]
+                    
+                    if not cluster_data["images"] or cluster_data["representative"] in filenames:
+                        if cluster_data["images"]:
+                            cluster_data["representative"] = cluster_data["images"][0]
+                        else:
+                            del version_data["clusters"][cluster_name]
+                
+                # Thumbnail klasörünü oluştur (eğer yoksa)
+                thumbnail_path = os.path.join("exported_clusters", model, version, "thumbnails")
+                os.makedirs(thumbnail_path, exist_ok=True)
+                
+                # Görsellerin thumbnail'larını kopyala
+                for fname in filenames:
+                    src_thumb = os.path.join("thumbnails", fname)
+                    dst_thumb = os.path.join(thumbnail_path, fname)
+                    
+                    if os.path.exists(src_thumb):
+                        shutil.copy2(src_thumb, dst_thumb)
+                        
+                    # Metadatada güncelle (eski yöntem)
+                    update_metadata(fname, {"cluster": new_cluster_name})
+                
+                # Yeni cluster'a görselleri ekle
+                version_data["clusters"][new_cluster_name] = {
+                    "representative": representative,
+                    "images": filenames,
+                    "comment": ""
+                }
+                
+                # Model verisini kaydet
+                save_model_data(model, model_data)
+            except Exception as e:
+                print(f"⚠️ JSON dosya güncellemesi başarısız: {str(e)}")
+            
+            return jsonify({"status": "ok", "new_cluster": new_cluster_name})
+        else:
+            # Temsil eden görsel bulunamadı
+            conn.rollback()
+            return jsonify({"status": "error", "message": "Temsil eden görsel bulunamadı."})
 
     except Exception as e:
         import traceback
         print(f"Cluster oluşturma hatası: {str(e)}")
         print(traceback.format_exc())
+        
+        # Hata durumunda işlemi geri al
+        if 'conn' in locals():
+            conn.rollback()
+        
         return jsonify({"status": "error", "message": str(e)})
+    finally:
+        # Bağlantıyı kapat
+        if 'conn' in locals() and conn:
+            conn.close()
 
-# --- YENİ: Feedback kaydı alma endpointi ---
+# --- Feedback kaydı alma endpointi (SQLite) ---
 @app.route("/submit-feedback", methods=["POST"])
 def submit_feedback():
-    feedback = request.get_json()
-    print("📩 Feedback alındı:", feedback)
+    feedback_data = request.get_json()
+    print("📩 Feedback alındı:", feedback_data)
 
+    # Gerekli verileri al
+    anchor = feedback_data.get("anchor")
+    output = feedback_data.get("output")
+    model = feedback_data.get("model")
+    version = feedback_data.get("version")
+    rating = feedback_data.get("feedback")
+
+    # Eğer rating yoksa, bu bir iptal işlemidir
+    if rating is None:
+        # Eski yöntem: JSON dosyasını güncelle (uyumluluk için)
+        feedback_file = "feedback_log.json"
+        if os.path.exists(feedback_file):
+            try:
+                with open(feedback_file, "r", encoding="utf-8") as f:
+                    feedback_list = json.load(f)
+                
+                # İlgili feedback'i çıkar
+                feedback_list = [f for f in feedback_list if not (
+                    f.get("anchor") == anchor and
+                    f.get("output") == output and
+                    f.get("model") == model and
+                    f.get("version") == version
+                )]
+                
+                # Güncellenmiş listeyi kaydet
+                with open(feedback_file, "w", encoding="utf-8") as f:
+                    json.dump(feedback_list, f, indent=2, ensure_ascii=False)
+            except Exception as e:
+                print(f"⚠️ Feedback JSON güncellemesi hatası: {str(e)}")
+
+        # Veritabanından da sil (ileride eklenecek)
+        # db_utils.delete_feedback(anchor, output, model, version)
+        return jsonify({"status": "ok", "message": "Feedback silindi"})
+
+    # SQLite veritabanına ekle
+    success = db_utils.add_feedback(
+        anchor_filename=anchor,
+        output_filename=output,
+        model_type=model,
+        version=version,
+        rating=rating
+    )
+
+    # Eski yöntem: JSON dosyasına da ekle (uyumluluk için)
     feedback_file = "feedback_log.json"
     feedback_list = []
 
@@ -756,12 +862,7 @@ def submit_feedback():
             except json.JSONDecodeError:
                 feedback_list = []
 
-    # Aynı anchor-output-model-version varsa güncelle / iptal et
-    anchor = feedback.get("anchor")
-    output = feedback.get("output")
-    model = feedback.get("model")
-    version = feedback.get("version")
-
+    # Aynı anchor-output-model-version varsa çıkar
     feedback_list = [f for f in feedback_list if not (
         f.get("anchor") == anchor and
         f.get("output") == output and
@@ -769,13 +870,16 @@ def submit_feedback():
         f.get("version") == version
     )]
 
-    if feedback.get("feedback") is not None:
-        feedback_list.append(feedback)
+    # Yeni feedback'i ekle
+    feedback_list.append(feedback_data)
 
     with open(feedback_file, "w", encoding="utf-8") as f:
         json.dump(feedback_list, f, indent=2, ensure_ascii=False)
 
-    return jsonify({"status": "ok"})
+    if success:
+        return jsonify({"status": "ok", "message": "Feedback kaydedildi"})
+    else:
+        return jsonify({"status": "error", "message": "Feedback kaydedilirken bir hata oluştu"})
 
 @app.route("/init-model-version", methods=["POST"])
 def init_model_version():

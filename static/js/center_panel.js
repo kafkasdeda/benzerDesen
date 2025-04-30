@@ -24,7 +24,7 @@ function addToCompareList(filename, resultData) {
     updateCompareBar();
     
     // Console'a bilgi ver
-    console.log(`📷 Karşılaştırma listesine eklendi: ${filename}`);
+    console.log(`Karşılaştırma listesine eklendi: ${filename}`);
 }
 
 // Karşılaştırma listesinden görsel çıkar
@@ -33,7 +33,7 @@ function removeFromCompareList(filename) {
     if (index !== -1) {
         compareList.splice(index, 1);
         updateCompareBar();
-        console.log(`🚫 Karşılaştırma listesinden çıkarıldı: ${filename}`);
+        console.log(`Karşılaştırma listesinden çıkarıldı: ${filename}`);
     }
 }
 
@@ -174,7 +174,7 @@ function updateCompareBar() {
 function clearCompareList() {
     compareList = [];
     updateCompareBar();
-    console.log("🔄 Karşılaştırma listesi temizlendi");
+    console.log("Karşılaştırma listesi temizlendi");
 }
 
 // Karşılaştırma görünümünü göster
@@ -472,9 +472,9 @@ function initializeUI() {
         toggleButton.textContent = isVisible ? "▼" : "▲";
     });
     
-    // Başlangıçta filtreleme panelini açık göster
-    panelContent.style.display = "block";
-    toggleButton.textContent = "▲";
+    // Başlangıçta filtreleme panelini gizli göster
+    panelContent.style.display = "none";
+    toggleButton.textContent = "▼";
 
     // Parametreleri sıfırlama düğmesi
     const resetButton = document.getElementById("reset-filters");
@@ -590,7 +590,7 @@ function resetFilters() {
     // Cluster radio butonlarını sıfırla
     document.querySelector('input[name="center-cluster"][value=""]').checked = true;
     
-    console.log("📋 Filtreler sıfırlandı.");
+    console.log("Filtreler sıfırlandı.");
     
     // Eğer bir görsel seçiliyse, sıfırlanmış filtrelerle yeniden sonuçları getir
     if (currentFilename) {
@@ -782,7 +782,7 @@ async function fetchSimilarImages(filename) {
 
         const endTime = performance.now();
         const loadTime = Math.round(endTime - startTime);
-        console.log(`⏱️ Benzerlik araması ${loadTime}ms sürde tamamlandı`);
+        console.log(`Benzerlik araması ${loadTime}ms sürde tamamlandı`);
 
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -864,16 +864,13 @@ function displaySimilarImages(results) {
         const filename = box.dataset.filename;
         // Tooltip olayları ekle
         box.addEventListener('mouseenter', function(event) {
-            console.log("DEBUG: Orta panel - Kafkas diyor ki: Orta panelde bir görsele geldin, büyü yapayım mı?");
             // Button hover'ları için tooltip'i atla
             if (event.target.closest('.image-buttons')) {
-              console.log("DEBUG: Orta panel - Kafkas diyor ki: Buton mu tıkladın? Elime sağlık!");
               return;
             }
             
             // Önce varsa eski tooltip'leri temizle
             if (this._currentTooltip) {
-                console.log("DEBUG: Orta panel - Kafkas diyor ki: Eski tooltip'i süperelim, elini ver bana!");
                 this._currentTooltip.remove();
                 this._currentTooltip = null;
             }
@@ -881,7 +878,6 @@ function displaySimilarImages(results) {
             // İlgili görsele ait sonucu bul
             const result = results.find(r => r.filename === filename);
             if (!result) {
-                console.log("DEBUG: Orta panel - Kafkas diyor ki: Bu görsel için sonuç bulamadım, elimle koymuş gibi!");
                 return;
             }
             
@@ -926,26 +922,20 @@ function displaySimilarImages(results) {
             
             // Tooltip'i document.body'e ekleyelim
             document.body.appendChild(tooltip);
-            console.log("DEBUG: Orta panel - Kafkas diyor ki: Orta panelde tooltip yaptım, en iyisinden!");
             
             // Tooltip konumunu görsel kutusuna göre ayarla
             const boxRect = this.getBoundingClientRect();
             tooltip.style.top = boxRect.top + "px";
             tooltip.style.left = (boxRect.left - 310) + "px"; // Orta panelde sol tarafta göster
-            console.log("DEBUG: Orta panel - Kafkas diyor ki: Görsel kutusu burada:", boxRect);
-            console.log("DEBUG: Orta panel - Kafkas diyor ki: Tooltip'in adresi burasi:", tooltip.style.top, tooltip.style.left);
             
             // Viewport sınırlarını kontrol et ve gerekirse konumu ayarla
             setTimeout(() => {
               const rect = tooltip.getBoundingClientRect();
-              console.log("DEBUG: Orta panel - Kafkas diyor ki: Tooltip boyutlarında son durum:", rect);
               if (rect.left < 0) {
                 tooltip.style.left = (boxRect.right + 10) + "px";
-                console.log("DEBUG: Orta panel - Kafkas diyor ki: Sola taşıyordu, sağa geçirdim elimiçabuk!");
               }
               if (rect.bottom > window.innerHeight) {
                 tooltip.style.top = (window.innerHeight - rect.height - 10) + "px";
-                console.log("DEBUG: Orta panel - Kafkas diyor ki: Aşağıya taşıyordu, yukarı çektim, elimde kaldı!");
               }
             }, 0);
             
@@ -957,9 +947,7 @@ function displaySimilarImages(results) {
         });
         
         box.addEventListener('mouseleave', function() {
-            console.log("DEBUG: Orta panel - Kafkas diyor ki: Mouse orta panelden kaçtı, kaçtı ama elim sende kaldı!");
             if (this._currentTooltip) {
-                console.log("DEBUG: Orta panel - Kafkas diyor ki: Tooltip'i temizliyorum, süprüntü değil ki!");
                 this._currentTooltip.remove();
                 this._currentTooltip = null;
             }
@@ -1056,7 +1044,7 @@ function setupFeedbackListenersForElement(tooltipElement) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 
-                console.log(`🌟 Feedback kaydedildi: ${anchor} → ${output} = ${rating} yıldız`);
+                console.log(`Feedback kaydedildi: ${anchor} → ${output} = ${rating} yıldız`);
             } catch (error) {
                 console.error('Feedback gönderirken hata:', error);
             }

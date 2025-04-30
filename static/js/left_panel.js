@@ -22,7 +22,7 @@ const featureSet = new Set([
 ]);
 
 window.onload = function () {
-  console.log("✅ left_panel.js window.onload tetiklendi");
+  console.log("left_panel.js window.onload tetiklendi");
   
   // Model ve versiyon değişikliklerini dinle
   function listenForModelChanges() {
@@ -52,15 +52,15 @@ window.onload = function () {
     const versionsReady = listenForVersionChanges();
     
     if (modelsReady && versionsReady) {
-      clearInterval(checkInterval);
-      console.log("👍 Sağ panel elemanları başarıyla dinleniyor");
+    clearInterval(checkInterval);
+    console.log("Sağ panel elemanları başarıyla dinleniyor");
     }
   }, 500);
 
   fetch('image_metadata_map.json')
     .then(res => res.json())
     .then(metadataMap => {
-      console.log("📦 Metadata başarıyla alındı. Toplam:", Object.keys(metadataMap).length);
+      console.log("Metadata başarıyla alındı. Toplam:", Object.keys(metadataMap).length);
 
       // Global olarak featureSet tanımla
       window.featureSet = featureSet;
@@ -81,7 +81,7 @@ window.onload = function () {
       
       function processNextBatch() {
         if (currentBatch >= totalBatches) {
-          console.log("✅ Tüm görseller yüklendi.");
+          console.log("Tüm görseller yüklendi.");
           
           // Blend set'i doldur ve select'e ekle
           const blendSelect = document.getElementById("blend-filter");
@@ -94,14 +94,16 @@ window.onload = function () {
 
           window.blendSet = blendSet;
           if (window.populateMaterialDropdown) {
-            console.log("🎯 blendSet içeriği:", Array.from(blendSet));
             window.populateMaterialDropdown();
           }
 
           return;
         }
         
-        console.log(`📦 Batch ${currentBatch + 1}/${totalBatches} işleniyor...`);
+        // Session 7: İlerleme bilgisini sadece ilk ve son batch için göster
+        if (currentBatch === 0 || currentBatch === totalBatches - 1) {
+          console.log(`Görseller yükleniyor... ${Math.round((currentBatch / totalBatches) * 100)}%`);
+        }
         
         const startIdx = currentBatch * BATCH_SIZE;
         const endIdx = Math.min(startIdx + BATCH_SIZE, filenames.length);
@@ -127,7 +129,7 @@ window.onload = function () {
 
           box.addEventListener("click", function() {
             const filename = this.dataset.filename;
-            console.log("🔁 Benzer görseller yükleniyor:", filename);
+            console.log("Benzer görseller yükleniyor:", filename);
 
             window.currentSelectedImage = filename;
             const model = window.currentModel || "pattern";
@@ -140,7 +142,7 @@ window.onload = function () {
             if (document.getElementById("topn-input")) document.getElementById("topn-input").value = topN;
             if (document.getElementById("metric-selector")) document.getElementById("metric-selector").value = metric;
             
-            console.log(`🎨 Görsel seçildi: ${filename}, model=${model}, version=${version}`);
+            console.log(`Görsel seçildi: ${filename}, model=${model}, version=${version}`);
 
             let filters = null;
             if (document.getElementById("center-pre-filter")?.checked && window.getFilterParams) {
@@ -172,17 +174,14 @@ window.onload = function () {
 
           // Tooltip'leri lazy olarak ekle (hover olunca)
           box.addEventListener("mouseenter", function(event) {
-            console.log("DEBUG: Sol panel - Kafkas diyor ki: Mouse içeri girdi, hooop!");
             // Button hover'ları için tooltip'i atla
             if (event.target.closest('.image-buttons')) {
-              console.log("DEBUG: Sol panel - Kafkas diyor ki: Bu bir buton, boş ver!");
               return;
             }
             
             // Önce varsa eski tooltip'leri temizle
             const existingTooltip = this.querySelector('.tooltip');
             if (existingTooltip) {
-              console.log("DEBUG: Sol panel - Kafkas diyor ki: Eski tooltip'i temizliyorum, elim sana değdi!");
               this.removeChild(existingTooltip);
             }
             
@@ -221,27 +220,21 @@ window.onload = function () {
             
             // Document.body'e ekleyelim (görsel kutusuna değil)
             document.body.appendChild(tooltip);
-            console.log("DEBUG: Sol panel - Kafkas diyor ki: Tooltip yaptım, kendi elimle!");
             
             // Tooltip konumunu görsel kutusuna göre ayarla
             const boxRect = this.getBoundingClientRect();
             tooltip.style.position = "fixed";
             tooltip.style.top = boxRect.top + "px";
             tooltip.style.left = (boxRect.right + 10) + "px";
-            console.log("DEBUG: Sol panel - Kafkas diyor ki: Görsel konumu:", boxRect);
-            console.log("DEBUG: Sol panel - Kafkas diyor ki: Tooltip'i buraya koydum:", tooltip.style.top, tooltip.style.left);
             
             // Viewport sınırlarını kontrol et ve gerekirse konumu ayarla
             setTimeout(() => {
               const rect = tooltip.getBoundingClientRect();
-              console.log("DEBUG: Sol panel - Kafkas diyor ki: Tooltip'in boyutları:", rect);
               if (rect.right > window.innerWidth) {
                 tooltip.style.left = (boxRect.left - rect.width - 10) + "px";
-                console.log("DEBUG: Sol panel - Kafkas diyor ki: Ekrana sığmadı benim tooltip, sola çektim!");
               }
               if (rect.bottom > window.innerHeight) {
                 tooltip.style.top = (window.innerHeight - rect.height - 10) + "px";
-                console.log("DEBUG: Sol panel - Kafkas diyor ki: Aşağıya taşıyordu, yukarı çektim elimle!");
               }
             }, 0);
             
@@ -251,9 +244,7 @@ window.onload = function () {
           
           // Tooltip'i temizleme işlemini ekle (mouse ayrılınca)
           box.addEventListener("mouseleave", function() {
-            console.log("DEBUG: Sol panel - Kafkas diyor ki: Mouse çıktı, elim sende kaldı!");
             if (this._currentTooltip) {
-              console.log("DEBUG: Sol panel - Kafkas diyor ki: Tooltip'i kaldırıyorum, süprizlerimiz başka sefere!");
               this._currentTooltip.remove();
               this._currentTooltip = null;
             }
@@ -274,7 +265,7 @@ window.onload = function () {
             } else {
               console.warn("showHarmoniousSearchModal fonksiyonu bulunamadı");
               alert("Uyumlu renk arama modalı henüz yüklenmemiş!");
-            }
+              }
           });
           
           buttonContainer.appendChild(findHarmoniousButton);
@@ -316,32 +307,62 @@ window.onload = function () {
       // Görselleri lazy loading ile yüklemek için IntersectionObserver
       function setupLazyLoading() {
         if ('IntersectionObserver' in window) {
-          const imgObserver = new IntersectionObserver((entries, observer) => {
+          // Global imgObserver değişkenine atayarak diğer fonksiyonlardan erişilebilir yap
+          window.imgObserver = new IntersectionObserver((entries, observer) => {
             entries.forEach(entry => {
               if (entry.isIntersecting) {
                 const img = entry.target;
-                const src = img.dataset.src;
-                if (src) {
-                  img.src = src;
-                  img.removeAttribute('data-src');
-                  observer.unobserve(img);
+                
+                // Orijinal kaynak varsa (bellek temizleme sonrası)
+                if (img.dataset.originalSrc) {
+                  console.log('🔄 Sol panel - Orijinal kaynaktan görsel yükleniyor:', img.dataset.originalSrc);
+                  img.src = img.dataset.originalSrc;
+                  img.removeAttribute('data-originalSrc');
+                  img.classList.add('keep-in-memory'); // Tekrar temizlenmesini önlemek için işaretle
                 }
+                // Normal lazy loading durumu
+                else if (img.dataset.src) {
+                  console.log('🔄 Sol panel - Lazy loading görsel yükleniyor:', img.dataset.src);
+                  img.src = img.dataset.src;
+                  img.removeAttribute('data-src');
+                  img.classList.add('keep-in-memory'); // Temizlenmesini önlemek için işaretle
+                }
+                
+                // görsel yüklendi, gözlemi bırak
+                observer.unobserve(img);
               }
             });
-          }, { rootMargin: '200px' }); // 200px önceden yüklemeye başla
-
-          // Görselleri gözlemle
-          document.querySelectorAll('.image-box img').forEach(img => {
-            if (img.dataset.src) {
-              imgObserver.observe(img);
-            }
+          }, { 
+            rootMargin: '500px', // Görünür alandan 500px önce yüklemeye başla (eskisi: 200px)
+            threshold: 0.01     // %1 görünür olduğunda tetikle
           });
+
+          // Görselleri gözlemle (hem data-src hem de data-original-src olanları)
+          document.querySelectorAll('.image-box img[data-src], .image-box img[data-original-src]').forEach(img => {
+            window.imgObserver.observe(img);
+          });
+          
+          // 10 saniyede bir yeniden kontrol et (bellek temizleme sonrası yeni görseller için)
+          const checkInterval = setInterval(() => {
+            const pendingImages = document.querySelectorAll('.image-box img[data-src], .image-box img[data-original-src]');
+            if (pendingImages.length > 0) {
+              console.log(`🔄 Sol panel - ${pendingImages.length} adet bekleyen görsel yeniden gözleme alınıyor...`);
+              pendingImages.forEach(img => window.imgObserver.observe(img));
+            }
+          }, 10000);
+          
+          // Sayfadan ayrılınca interval'i temizle
+          window.addEventListener('beforeunload', () => clearInterval(checkInterval));
         } else {
           // IntersectionObserver desteklenmiyorsa tüm görselleri yükle
           document.querySelectorAll('.image-box img').forEach(img => {
             if (img.dataset.src) {
               img.src = img.dataset.src;
               img.removeAttribute('data-src');
+            }
+            if (img.dataset.originalSrc) {
+              img.src = img.dataset.originalSrc;
+              img.removeAttribute('data-originalSrc');
             }
           });
         }
@@ -557,7 +578,7 @@ window.onload = function () {
         // Mevcut model ve versiyonu günlükçe olarak göster
         const model = window.currentModel || "pattern";
         const version = window.currentVersion || "v1";
-        console.log(`📊 Filtreler uygulanıyor - Model: ${model}, Versiyon: ${version}`);
+        console.log(`Filtreler uygulanıyor - Model: ${model}, Versiyon: ${version}`);
 
         // Performans iyileştirmesi: DOM yeniden boyutlandırmalarını azaltmak için display özelliğini CSS sınıfı ile yönet
         if (!document.getElementById('dynamic-filter-style')) {
@@ -607,7 +628,7 @@ window.onload = function () {
       document.getElementById("cluster-filter")?.addEventListener("change", applyFilters);
     })
     .catch(err => {
-      document.getElementById("image-container").innerText = "❌ Metadata yüklenemedi: " + err;
-      console.error("❌ Metadata yüklenemedi:", err);
+      document.getElementById("image-container").innerText = "Metadata yüklenemedi: " + err;
+      console.error("Metadata yüklenemedi:", err);
     });
 };
