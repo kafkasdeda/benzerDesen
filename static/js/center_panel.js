@@ -642,8 +642,8 @@ function addMaterial() {
     const valueDisplay = document.getElementById(`${rowId}-value`);
     
     const slider = noUiSlider.create(rangeContainer, {
-        start: [0],
-        connect: [true, false],
+        start: [0, 100],      // İki değer: min ve max için
+        connect: true,        // Aradaki aralığı bağla
         step: 1,
         range: {
             'min': 0,
@@ -653,8 +653,9 @@ function addMaterial() {
     
     // Slider değişimini dinle
     slider.on('update', function(values, handle) {
-        const value = parseInt(values[handle]);
-        valueDisplay.textContent = `${value}%`;
+        const minValue = parseInt(values[0]);
+        const maxValue = parseInt(values[1]);
+        valueDisplay.textContent = `${minValue}-${maxValue}%`;
         updateTotalPercentage();
         updateMixFilters();
     });
@@ -706,14 +707,20 @@ function updateMixFilters() {
     materialRows.forEach(row => {
         const type = row.dataset.type;
         const valueText = row.querySelector(".material-value").textContent;
-        const value = parseInt(valueText);
         
-        if (!isNaN(value)) {
-            currentMixFilters.push({
-                type: type,
-                min: 0,
-                max: value
-            });
+        // Değer formatı "min-max%" şeklinde
+        const valueParts = valueText.split('-');
+        if (valueParts.length === 2) {
+            const minValue = parseInt(valueParts[0]);
+            const maxValue = parseInt(valueParts[1].replace('%', ''));
+            
+            if (!isNaN(minValue) && !isNaN(maxValue)) {
+                currentMixFilters.push({
+                    type: type,
+                    min: minValue,
+                    max: maxValue
+                });
+            }
         }
     });
 }

@@ -406,6 +406,17 @@ def serve_real_image(filename):
 
 @app.route("/check-updates")
 def check_updates():
+    # Manuel çalıştırma parametresi ekleyerek kontrol sağlıyoruz
+    force_check = request.args.get('force', 'false').lower() == 'true'
+    
+    # Eğer manuel olarak çalıştırılmadıysa, sadece mevcut durumu döndür
+    if not force_check:
+        return jsonify({
+            "status": "check_disabled",
+            "message": "Otomatik güncelleme kontrolü devre dışı bırakıldı. Manuel kontrol için ?force=true parametresini ekleyin."
+        })
+    
+    # Manuel çalıştırılması durumunda orijinal işlevi gerçekleştir
     try:
         from check_updates import check_for_updates
         changes = check_for_updates()
@@ -428,6 +439,7 @@ def check_updates():
             "status": "error",
             "message": f"❌ Hata oluştu: {str(ex)}"
         })
+    
 @app.route('/thumbnails/<path:filename>')
 def serve_thumbnail(filename):
     return send_from_directory('thumbnails', filename)
