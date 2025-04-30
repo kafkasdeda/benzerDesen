@@ -423,7 +423,9 @@ let currentFeatures = [];
 let currentMixFilters = [];
 let clusterStatus = "";
 let filterApplied = false;
-let selectedImages = new Set();
+
+// Seçili görselleri global olarak tutmak için
+window.selectedImages = new Set();
 
 // Karşılaştırma için global değişkenler
 let compareList = [];
@@ -758,6 +760,14 @@ async function updateVersions() {
 // Benzer görselleri getir
 async function fetchSimilarImages(filename) {
     try {
+        // Her yeni arama öncesinde seçimleri temizle
+        window.selectedImages.clear();
+        document.querySelectorAll('.image-box.selected').forEach(box => {
+            box.classList.remove('selected');
+        });
+        document.querySelectorAll('.select-checkbox:checked').forEach(cb => {
+            cb.checked = false;
+        });
         // Yükleniyor mesajını göster
         document.getElementById("center-results").innerHTML = `
             <div style="text-align: center; padding: 20px;">
@@ -853,12 +863,13 @@ function displaySimilarImages(results) {
     let html = '';
     
     results.forEach(result => {
-        const isSelected = selectedImages.has(result.filename);
+        const isSelected = window.selectedImages.has(result.filename);
         const selectedClass = isSelected ? 'selected' : '';
         const clustered = result.cluster ? 'clustered' : '';
         
         html += `
             <div class="image-box ${clustered} ${selectedClass}" data-filename="${result.filename}">
+                <input type="checkbox" class="select-checkbox" ${isSelected ? 'checked' : ''} />
                 <img src="/thumbnails/${result.filename}" alt="${result.filename}" />
             </div>
         `;
@@ -896,15 +907,15 @@ function displaySimilarImages(results) {
             tooltip.className = 'tooltip';
             tooltip.style.position = "fixed";
             tooltip.style.backgroundColor = "#fff";
-            tooltip.style.border = "2px solid red"; // Debug amaçlı kırmızı çerçeve
-            tooltip.style.padding = "8px";
+            tooltip.style.border = "1px solid #ddd"; // Daha ince çerçeve
+            tooltip.style.padding = "12px";
             tooltip.style.zIndex = "9999";
-            tooltip.style.width = "300px";
+            tooltip.style.width = "350px"; // Daha geniş tooltip
             tooltip.style.boxShadow = "0 2px 8px rgba(0,0,0,0.2)";
             tooltip.style.borderRadius = "4px";
             tooltip.style.display = 'block';
             tooltip.style.visibility = 'visible';
-            tooltip.style.pointerEvents = 'none';
+            tooltip.style.pointerEvents = 'auto'; // Tıklamaya izin ver
             
             tooltip.innerHTML = `
                 <img src="/realImages/${result.filename}" alt="${result.filename}" style="width: ${imgWidth}px; max-height: ${imgHeight}px; object-fit: contain;" />
@@ -1004,7 +1015,13 @@ function setupFeedbackListeners() {
 // Belirli bir tooltip elementi için feedback dinleyicileri ekle
 function setupFeedbackListenersForElement(tooltipElement) {
     // Tooltip içindeki yıldızları seç
-    const stars = tooltipElement.querySelectorAll('.feedback-stars .star');
+    const starsContainer = tooltipElement.querySelector('.feedback-stars');
+    if (!starsContainer) return;
+    
+    const stars = starsContainer.querySelectorAll('.star');
+    if (!stars || stars.length === 0) return;
+    
+    console.log(`Tooltip için yıldız dinleyicileri kuruluyor, ${stars.length} yıldız bulundu`);
     
     // Her yıldıza tıklama olayı ekle
     stars.forEach(star => {
@@ -1015,11 +1032,12 @@ function setupFeedbackListenersForElement(tooltipElement) {
             e.stopPropagation();
             
             const rating = parseInt(star.dataset.rating);
-            const starsContainer = star.parentElement;
             const anchor = starsContainer.dataset.anchor;
             const output = starsContainer.dataset.output;
             const model = starsContainer.dataset.model;
             const version = starsContainer.dataset.version;
+            
+            console.log(`Yıldıza tıklandı: ${rating}`);
             
             // Tüm yıldızları temizle
             starsContainer.querySelectorAll('.star').forEach(s => {
@@ -1028,7 +1046,10 @@ function setupFeedbackListenersForElement(tooltipElement) {
             
             // Seçilen yıldıza kadar tümünü aktifleştir
             for (let i = 1; i <= rating; i++) {
-                starsContainer.querySelector(`.star[data-rating="${i}"]`).classList.add('active');
+                const starElement = starsContainer.querySelector(`.star[data-rating="${i}"]`);
+                if (starElement) {
+                    starElement.classList.add('active');
+                }
             }
             
             // Feedback'i sunucuya gönder
@@ -1052,6 +1073,29 @@ function setupFeedbackListenersForElement(tooltipElement) {
                 }
                 
                 console.log(`Feedback kaydedildi: ${anchor} → ${output} = ${rating} yıldız`);
+                
+                // Başarı mesajı göster
+                const successMessage = document.createElement('div');
+                successMessage.textContent = `${rating} yıldız başarıyla kaydedildi!`;
+                successMessage.style.color = '#27ae60';
+                successMessage.style.fontWeight = 'bold';
+                successMessage.style.marginTop = '5px';
+                successMessage.style.textAlign = 'center';
+                
+                // Önceki başarı mesajını temizle
+                const previousMessage = starsContainer.querySelector('.success-message');
+                if (previousMessage) {
+                    previousMessage.remove();
+                }
+                
+                successMessage.className = 'success-message';
+                starsContainer.appendChild(successMessage);
+                
+                // 2 saniye sonra mesajı kaldır
+                setTimeout(() => {
+                    successMessage.remove();
+                }, 2000);
+                
             } catch (error) {
                 console.error('Feedback gönderirken hata:', error);
             }
@@ -1063,10 +1107,10 @@ function setupFeedbackListenersForElement(tooltipElement) {
         // Hover olayları
         star.addEventListener('mouseenter', () => {
             const rating = parseInt(star.dataset.rating);
-            const starsContainer = star.parentElement;
+            const starsParent = star.parentElement;
             
             // Hover'da olan yıldıza kadar tümünü aktifleştir
-            starsContainer.querySelectorAll('.star').forEach(s => {
+            starsParent.querySelectorAll('.star').forEach(s => {
                 if (parseInt(s.dataset.rating) <= rating) {
                     s.classList.add('hover');
                 } else {
@@ -1077,7 +1121,6 @@ function setupFeedbackListenersForElement(tooltipElement) {
     });
     
     // Stars container için mouseleave olayı
-    const starsContainer = tooltipElement.querySelector('.feedback-stars');
     if (starsContainer && !starsContainer.getAttribute('data-has-mouseleave')) {
         starsContainer.addEventListener('mouseleave', () => {
             // Hover'dan çıkınca tüm hover sınıfını kaldır
@@ -1095,28 +1138,40 @@ function handleImageClick(event) {
     const imageBox = event.target.closest('.image-box');
     if (!imageBox) return;
     
+    // Eğer checkbox'a tıklandıysa
+    if (event.target.classList.contains('select-checkbox')) {
+        const checkbox = event.target;
+        const filename = imageBox.dataset.filename;
+        
+        if (checkbox.checked) {
+            // Seçim ekle
+            imageBox.classList.add('selected');
+            window.selectedImages.add(filename);
+            
+            // Görsel tıklama olayını yetkilendirilen fonksiyona ilet
+            if (typeof window.handleCenterPanelImageSelect === "function") {
+                window.handleCenterPanelImageSelect(filename);
+            }
+        } else {
+            // Seçimi kaldır
+            imageBox.classList.remove('selected');
+            window.selectedImages.delete(filename);
+            
+            // Görsel tıklama olayını yetkilendirilen fonksiyona ilet
+            if (typeof window.handleCenterPanelImageDeselect === "function") {
+                window.handleCenterPanelImageDeselect(filename);
+            }
+        }
+        return; // Event'in daha fazla yayılmasını durdur
+    }
+    
     // Görsel dosya adını al
     const filename = imageBox.dataset.filename;
     
-    // Bu görsele tıklanmış mı kontrol et
-    if (imageBox.classList.contains('selected')) {
-        // Seçimi kaldır
-        imageBox.classList.remove('selected');
-        selectedImages.delete(filename);
-        
-        // Görsel tıklama olayını yetkilendirilen fonksiyona ilet
-        if (typeof window.handleCenterPanelImageDeselect === "function") {
-            window.handleCenterPanelImageDeselect(filename);
-        }
-    } else {
-        // Seçim ekle
-        imageBox.classList.add('selected');
-        selectedImages.add(filename);
-        
-        // Görsel tıklama olayını yetkilendirilen fonksiyona ilet
-        if (typeof window.handleCenterPanelImageSelect === "function") {
-            window.handleCenterPanelImageSelect(filename);
-        }
+    // Eğer görsel bölgesine tıklandıysa (checkbox dışında), benzer görselleri göster
+    if (currentFilename !== filename) {
+        currentFilename = filename;
+        fetchSimilarImages(filename);
     }
 }
 
@@ -1130,12 +1185,12 @@ function showSimilarImages(filename) {
 
 // Seçili görselleri döndür
 function getSelectedImages() {
-    return Array.from(selectedImages);
+    return Array.from(window.selectedImages);
 }
 
 // Seçili görselleri temizle
 function clearSelectedImages() {
-    selectedImages.clear();
+    window.selectedImages.clear();
     document.querySelectorAll('.image-box.selected').forEach(box => {
         box.classList.remove('selected');
     });

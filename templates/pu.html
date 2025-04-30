@@ -115,12 +115,15 @@
       margin-top: 8px;
       padding-top: 5px;
       border-top: 1px solid #eee;
+      display: flex;
+      justify-content: center;
     }
     .tooltip .star {
-      font-size: 18px;
+      font-size: 24px;
       color: #ddd;
       cursor: pointer;
-      margin-right: 2px;
+      margin-right: 5px;
+      transition: color 0.3s ease;
     }
     .tooltip .star.hover,
     .tooltip .star.active {
@@ -153,7 +156,7 @@
       bottom: 0;
       left: 0;
       right: 0;
-      display: flex;
+      display: none; /* Butonları gizle */
       justify-content: center;
       gap: 5px;
       padding: 4px 2px;
@@ -166,6 +169,7 @@
       opacity: 1;
     }
     .find-harmonious-btn, .compare-btn {
+      display: none; /* Butonları gizle */
       font-size: 11px;
       padding: 4px 8px;
       border: none;
@@ -206,6 +210,22 @@
       left: auto;
       right: 110%;
       top: 0;
+    }
+    
+    /* Checkbox stilleri */
+    .select-checkbox {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      width: 18px;
+      height: 18px;
+      z-index: 10;
+      cursor: pointer;
+    }
+    
+    /* Seçilmiş görsel stilleri */
+    .image-box.selected {
+      border: 2px solid #9b59b6; /* Mor seçim çerçevesi */
     }
   </style>
 </head>

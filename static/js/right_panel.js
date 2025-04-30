@@ -458,9 +458,16 @@ function loadClusterRepresentatives(model, version) {
             if (result.status === "ok") {
               console.log("✅ Taşıma başarılı:", result);
               alert(`Seçilen görseller '${clusterName}' cluster'a taşındı.`);
+              
+              // Seçimleri temizle
+              window.selectedImages.clear();
               document.querySelectorAll("#center-results .image-box input[type='checkbox']").forEach(cb => {
                 cb.checked = false;
               });
+              document.querySelectorAll("#center-results .image-box").forEach(box => {
+                box.classList.remove('selected');
+              });
+              
               // Sayfayı yenile
               loadClusterRepresentatives(model, version);
             } else {
@@ -822,8 +829,12 @@ function createNewCluster(model, version) {
       window.selectedImages = []; // sıfırla
       
       // Merkez paneldeki seçimleri temizle
+      window.selectedImages.clear();
       document.querySelectorAll("#center-results .image-box input[type='checkbox']").forEach(cb => {
         cb.checked = false;
+      });
+      document.querySelectorAll("#center-results .image-box").forEach(box => {
+        box.classList.remove('selected');
       });
     } else {
       alert("❌ Oluşturulamadı: " + result.message);
