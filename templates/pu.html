@@ -227,6 +227,38 @@
     .image-box.selected {
       border: 2px solid #9b59b6; /* Mor seçim çerçevesi */
     }
+    
+    /* Görsel kutusu üzerindeki yıldızlar için stil */
+    .image-box .feedback-stars {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: center;
+      padding: 5px 0;
+      background-color: rgba(0, 0, 0, 0.6);
+      z-index: 5;
+      opacity: 0.9;
+      transition: opacity 0.3s ease;
+    }
+    
+    .image-box:hover .feedback-stars {
+      opacity: 1;
+    }
+    
+    .image-box .star {
+      font-size: 18px;
+      color: #ddd;
+      cursor: pointer;
+      margin-right: 5px;
+      transition: color 0.3s ease;
+    }
+    
+    .image-box .star.hover,
+    .image-box .star.active {
+      color: #f39c12;
+    }
   </style>
 </head>
 <body>

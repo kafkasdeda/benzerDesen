@@ -1,3 +1,5 @@
+
+
 // Karşılaştırma listesine görsel ekle
 function addToCompareList(filename, resultData) {
     // Halihazırda listede mi kontrol et
@@ -807,6 +809,18 @@ async function fetchSimilarImages(filename) {
 
         const results = await response.json();
         
+        // Kullanıcının önceki feedbacklerini al
+        let previousFeedbacks = [];
+        try {
+            const feedbackResponse = await fetch(`/get-user-feedbacks?model=${currentModel}&version=${currentVersion}&anchor=${encodeURIComponent(filename)}`);
+            if (feedbackResponse.ok) {
+                previousFeedbacks = await feedbackResponse.json();
+                console.log(`${previousFeedbacks.length} adet önceki feedback bulundu`);
+            }
+        } catch (feedbackError) {
+            console.warn('Feedback bilgileri alınamadı:', feedbackError);
+        }
+        
         // Eğer sonuçlar yüklendikten sonra 2 saniyeden daha az süre geçmişse,
         // sunucu yükünü azaltmak için kısa bir gecikme ekle
         const totalTime = performance.now() - startTime;
@@ -814,7 +828,7 @@ async function fetchSimilarImages(filename) {
             await new Promise(resolve => setTimeout(resolve, 500 - totalTime));
         }
         
-        displaySimilarImages(results);
+        displaySimilarImages(results, previousFeedbacks);
 
     } catch (error) {
         console.error("Benzer görsel getirme hatası:", error);
@@ -841,7 +855,7 @@ async function fetchSimilarImages(filename) {
 }
 
 // Benzer görselleri göster
-function displaySimilarImages(results) {
+function displaySimilarImages(results, previousFeedbacks = []) {
     const container = document.getElementById("center-results");
     
     // Aktif model ve versiyon bilgisini güncelle
@@ -867,10 +881,21 @@ function displaySimilarImages(results) {
         const selectedClass = isSelected ? 'selected' : '';
         const clustered = result.cluster ? 'clustered' : '';
         
+        // Önceki feedback'i bul (varsa)
+        const previousFeedback = previousFeedbacks.find(fb => fb.output === result.filename);
+        const feedbackRating = previousFeedback ? previousFeedback.rating : 0;
+        
         html += `
             <div class="image-box ${clustered} ${selectedClass}" data-filename="${result.filename}">
                 <input type="checkbox" class="select-checkbox" ${isSelected ? 'checked' : ''} />
                 <img src="/thumbnails/${result.filename}" alt="${result.filename}" />
+                <div class="feedback-stars" data-anchor="${currentFilename}" data-output="${result.filename}" data-model="${currentModel}" data-version="${currentVersion}" data-previous-rating="${feedbackRating}">
+                    <span class="star ${feedbackRating >= 1 ? 'active' : ''}" data-rating="1">★</span>
+                    <span class="star ${feedbackRating >= 2 ? 'active' : ''}" data-rating="2">★</span>
+                    <span class="star ${feedbackRating >= 3 ? 'active' : ''}" data-rating="3">★</span>
+                    <span class="star ${feedbackRating >= 4 ? 'active' : ''}" data-rating="4">★</span>
+                    <span class="star ${feedbackRating >= 5 ? 'active' : ''}" data-rating="5">★</span>
+                </div>
             </div>
         `;
     });
@@ -917,6 +942,10 @@ function displaySimilarImages(results) {
             tooltip.style.visibility = 'visible';
             tooltip.style.pointerEvents = 'auto'; // Tıklamaya izin ver
             
+            // Önceki feedback'i bul (varsa)
+            const previousFeedback = previousFeedbacks.find(fb => fb.output === result.filename);
+            const feedbackRating = previousFeedback ? previousFeedback.rating : 0;
+            
             tooltip.innerHTML = `
                 <img src="/realImages/${result.filename}" alt="${result.filename}" style="width: ${imgWidth}px; max-height: ${imgHeight}px; object-fit: contain;" />
                 <p>${result.filename}</p>
@@ -929,32 +958,42 @@ function displaySimilarImages(results) {
                         `<span class="feature-tag">${f[0]}: ${f[1]}%</span>`
                     ).join('') : ''}
                 </div>
-                <div class="feedback-stars" data-anchor="${currentFilename}" data-output="${result.filename}" data-model="${currentModel}" data-version="${currentVersion}">
-                    <span class="star" data-rating="1">★</span>
-                    <span class="star" data-rating="2">★</span>
-                    <span class="star" data-rating="3">★</span>
-                    <span class="star" data-rating="4">★</span>
-                    <span class="star" data-rating="5">★</span>
+                <div class="feedback-stars" data-anchor="${currentFilename}" data-output="${result.filename}" data-model="${currentModel}" data-version="${currentVersion}" data-previous-rating="${feedbackRating}">
+                    <span class="star ${feedbackRating >= 1 ? 'active' : ''}" data-rating="1">★</span>
+                    <span class="star ${feedbackRating >= 2 ? 'active' : ''}" data-rating="2">★</span>
+                    <span class="star ${feedbackRating >= 3 ? 'active' : ''}" data-rating="3">★</span>
+                    <span class="star ${feedbackRating >= 4 ? 'active' : ''}" data-rating="4">★</span>
+                    <span class="star ${feedbackRating >= 5 ? 'active' : ''}" data-rating="5">★</span>
                 </div>
             `;
             
             // Tooltip'i document.body'e ekleyelim
             document.body.appendChild(tooltip);
-            
+
             // Tooltip konumunu görsel kutusuna göre ayarla
             const boxRect = this.getBoundingClientRect();
             tooltip.style.top = boxRect.top + "px";
-            tooltip.style.left = (boxRect.left - 310) + "px"; // Orta panelde sol tarafta göster
-            
+
+            // Tooltip genişliğini ölçelim
+            const tooltipWidth = tooltip.offsetWidth;
+            const margin = 10; // Arada bırakılacak boşluk miktarı
+
+            // Tooltip'i sol tarafa yerleştir (tooltip genişliği + margin kadar)
+            tooltip.style.left = (boxRect.left - tooltipWidth - margin) + "px";
+
             // Viewport sınırlarını kontrol et ve gerekirse konumu ayarla
             setTimeout(() => {
-              const rect = tooltip.getBoundingClientRect();
-              if (rect.left < 0) {
-                tooltip.style.left = (boxRect.right + 10) + "px";
-              }
-              if (rect.bottom > window.innerHeight) {
+            const rect = tooltip.getBoundingClientRect();
+            
+            // Eğer sol kenardan taşıyorsa sağa kaydır
+            if (rect.left < 0) {
+                tooltip.style.left = (boxRect.right + margin) + "px";
+            }
+            
+            // Alt kenara taşma kontrolü
+            if (rect.bottom > window.innerHeight) {
                 tooltip.style.top = (window.innerHeight - rect.height - 10) + "px";
-              }
+            }
             }, 0);
             
             // Tooltip'i mouseleave olayında kaldırmak için kaydedelim
@@ -1010,18 +1049,23 @@ function setupFeedbackListeners() {
     document.querySelectorAll('.tooltip').forEach(tooltip => {
         setupFeedbackListenersForElement(tooltip);
     });
+    
+    // Ayrıca görsellerin üzerindeki yıldızlar için de dinleyicileri kur
+    document.querySelectorAll('.image-box .feedback-stars').forEach(starsContainer => {
+        setupFeedbackListenersForElement(starsContainer);
+    });
 }
 
 // Belirli bir tooltip elementi için feedback dinleyicileri ekle
-function setupFeedbackListenersForElement(tooltipElement) {
-    // Tooltip içindeki yıldızları seç
-    const starsContainer = tooltipElement.querySelector('.feedback-stars');
+function setupFeedbackListenersForElement(element) {
+    // Element'in kendisi feedback-stars container mı, yoksa içinde mi var kontrol et
+    const starsContainer = element.classList.contains('feedback-stars') ? element : element.querySelector('.feedback-stars');
     if (!starsContainer) return;
     
     const stars = starsContainer.querySelectorAll('.star');
     if (!stars || stars.length === 0) return;
     
-    console.log(`Tooltip için yıldız dinleyicileri kuruluyor, ${stars.length} yıldız bulundu`);
+    console.log(`Yıldız dinleyicileri kuruluyor, ${stars.length} yıldız bulundu`);
     
     // Her yıldıza tıklama olayı ekle
     stars.forEach(star => {

@@ -1157,6 +1157,46 @@ def apply_updates():
             "message": f"❌ Hata oluştu: {str(ex)}"
         })
 
+@app.route("/get-user-feedbacks")
+def get_user_feedbacks():
+    """Kullanıcının önceki feedback'lerini döndürür"""
+    model = request.args.get("model")
+    version = request.args.get("version")
+    anchor = request.args.get("anchor")
+    
+    if not model or not version or not anchor:
+        return jsonify([]), 400
+    
+    try:
+        # Feedback dosyasını kontrol et (eski yöntem)
+        feedback_file = "feedback_log.json"
+        feedback_list = []
+        
+        if os.path.exists(feedback_file):
+            with open(feedback_file, "r", encoding="utf-8") as f:
+                try:
+                    feedback_list = json.load(f)
+                except json.JSONDecodeError:
+                    feedback_list = []
+        
+        # Filtrele: anchor, model ve version'a göre
+        filtered_feedbacks = [{
+            "output": item["output"],
+            "rating": item["feedback"]
+        } for item in feedback_list if 
+            item["anchor"] == anchor and 
+            item["model"] == model and 
+            item["version"] == version and
+            item["feedback"] is not None]
+        
+        print(f"[DEBUG] {len(filtered_feedbacks)} adet feedback bulundu")
+        return jsonify(filtered_feedbacks)
+    except Exception as e:
+        print(f"[ERROR] Feedback'leri alma hatası: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return jsonify([]), 500
+
 # Yeni: Değişiklikleri yoksay endpoint'i
 @app.route("/ignore-updates", methods=["POST"])
 def ignore_updates():
@@ -1177,8 +1217,6 @@ def ignore_updates():
     except Exception as ex:
         traceback.print_exc()
         return jsonify({"status": "error", "message": f"❌ Hata oluştu: {str(ex)}"})
-
-# Yeni: Sistem bilgilerini döndür
 @app.route("/system-info")
 def system_info():
     # Faiss GPU desteği kontrolü

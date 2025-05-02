@@ -7,5 +7,124 @@
     "feedback": 3,
     "user_id": "",
     "user_role": ""
+  },
+  {
+    "anchor": "22 SS - OSCAR PRESTIGE - KM13180-01.jpg",
+    "output": "AW24-CHOPARD PRESTIGE-KP61797-19.jpg",
+    "model": "pattern",
+    "version": "v1",
+    "feedback": 1
+  },
+  {
+    "anchor": "22 SS - OSCAR PRESTIGE - KM13180-01.jpg",
+    "output": "22 SS - OSCAR PRESTIGE - KM13180-04.jpg",
+    "model": "pattern",
+    "version": "v1",
+    "feedback": 5
+  },
+  {
+    "anchor": "22 SS - OSCAR PRESTIGE - KM13180-01.jpg",
+    "output": "AW23-ARROGANT-KP62062-6.jpg",
+    "model": "pattern",
+    "version": "v1",
+    "feedback": 3
+  },
+  {
+    "anchor": "22 SS - OSCAR PRESTIGE - KM13192-14.jpg",
+    "output": "SS25-ZENITH LUXURY-KP62327-37.jpg",
+    "model": "pattern",
+    "version": "v1",
+    "feedback": 5
+  },
+  {
+    "anchor": "22 SS - OSCAR PRESTIGE - KM13178-07.jpg",
+    "output": "AW23-SOLUTION PRESTIGE-KM13485-10.jpg",
+    "model": "pattern",
+    "version": "v1",
+    "feedback": 3
+  },
+  {
+    "anchor": "22 SS - OSCAR PRESTIGE - KM13180-04.jpg",
+    "output": "22 SS - OSCAR PRESTIGE - KM13180-01.jpg",
+    "model": "pattern",
+    "version": "v1",
+    "feedback": 5
+  },
+  {
+    "anchor": "22 SS - OSCAR PRESTIGE - KM13180-04.jpg",
+    "output": "SS24-RUDI-KP62442-10.jpg",
+    "model": "pattern",
+    "version": "v1",
+    "feedback": 5
+  },
+  {
+    "anchor": "22 SS - OSCAR PRESTIGE - KM13180-04.jpg",
+    "output": "22 SS - OSCAR PRESTIGE - KM13180-04.jpg",
+    "model": "pattern",
+    "version": "v1",
+    "feedback": 5
+  },
+  {
+    "anchor": "22 SS - OSCAR PRESTIGE - KM13180-04.jpg",
+    "output": "AW23-ARROGANT-KP62062-6.jpg",
+    "model": "pattern",
+    "version": "v1",
+    "feedback": 5
+  },
+  {
+    "anchor": "22 SS - OSCAR PRESTIGE - KM13180-04.jpg",
+    "output": "AW24-CHOPARD PRESTIGE-KP61797-19.jpg",
+    "model": "pattern",
+    "version": "v1",
+    "feedback": 5
+  },
+  {
+    "anchor": "22 SS - OSCAR PRESTIGE - KM13180-04.jpg",
+    "output": "SS25-MILAZZO PRESTIGE-KM14922-3.jpg",
+    "model": "pattern",
+    "version": "v1",
+    "feedback": 5
+  },
+  {
+    "anchor": "22 SS - OSCAR PRESTIGE - KM13180-04.jpg",
+    "output": "SS23-NEW CHOPARD CREPE-KP61835-7.jpg",
+    "model": "pattern",
+    "version": "v1",
+    "feedback": 5
+  },
+  {
+    "anchor": "22 SS - OSCAR PRESTIGE - KM13180-04.jpg",
+    "output": "SS25-MILAZZO PRESTIGE-KM14922-4.jpg",
+    "model": "pattern",
+    "version": "v1",
+    "feedback": 5
+  },
+  {
+    "anchor": "22 SS - OSCAR PRESTIGE - KM13180-04.jpg",
+    "output": "AW22 - Germano - KP61441-9.jpg",
+    "model": "pattern",
+    "version": "v1",
+    "feedback": 5
+  },
+  {
+    "anchor": "22 SS - OSCAR PRESTIGE - KM13180-04.jpg",
+    "output": "SS24-BOAT PRESTIGE-KM14518-3.jpg",
+    "model": "pattern",
+    "version": "v1",
+    "feedback": 2
+  },
+  {
+    "anchor": "22 SS - OSCAR PRESTIGE - KM13180-04.jpg",
+    "output": "AW25-ELEGANT FLANNEL-KP62645-7.jpg",
+    "model": "pattern",
+    "version": "v1",
+    "feedback": 5
+  },
+  {
+    "anchor": "22 SS - OSCAR PRESTIGE - KM13180-04.jpg",
+    "output": "SS22 - LACROIX TROPICAL - KP61888-11.jpg",
+    "model": "pattern",
+    "version": "v1",
+    "feedback": 2
   }
 ]
