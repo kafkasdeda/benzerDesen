@@ -54,6 +54,14 @@ import gc
 import time  # time modülünü eksikti
 import sqlite3
 import db_utils  # SQLite işlemleri için yardımcı modül
+from color_utils import (
+    extract_dominant_color_improved, 
+    analyze_image_colors, 
+    find_harmonious_colors, 
+    calculate_color_similarity,
+    identify_color_group,
+    rgb_to_hsv
+)
 
 # Sürüm bilgisi
 APP_VERSION = "1.2.0"
@@ -68,6 +76,9 @@ faiss_indexes = {}
 cached_features = {}
 cached_filenames = {}
 cached_metadata = None
+
+
+
 
 # Faiss indeksi oluşturma ve alım için yardımcı fonksiyon
 def get_faiss_index(model_type):
@@ -1284,115 +1295,100 @@ def find_harmonious():
     current_season_only = request.args.get("currentSeasonOnly", "false").lower() == "true"
     current_quality_only = request.args.get("currentQualityOnly", "false").lower() == "true"
     
-    # Parametreleri kontrol et
-    if not fabric_id:
-        return jsonify({"status": "error", "message": "fabricId parametresi gerekli."})
-        
-    if harmony_type not in ["complementary", "analogous", "triadic", "split_complementary", "monochromatic"]:
-        harmony_type = "complementary"  # Varsayılan olarak tamamlayıcı renk kullan
-    
-    # Seçilen kumaşın dosya yolu
+    # Görsel dosya yolu
     img_path = os.path.join("realImages", fabric_id)
     if not os.path.exists(img_path):
-        return jsonify({"status": "error", "message": f"Görsel dosyası bulunamadı: {fabric_id}"})
+        return jsonify({"error": "Görsel bulunamadı"})
     
-    # Metadata dosyasını kontrol et
-    if not os.path.exists("image_metadata_map.json"):
-        return jsonify({"status": "error", "message": "Metadata dosyası bulunamadı."})
-    
-    # Metadata yükle
-    with open("image_metadata_map.json", "r", encoding="utf-8") as f:
-        metadata = json.load(f)
-    
-    # Kumaşın 1x1 indirgenerek dominant renk bilgisini al
-    img = cv2.imread(img_path)
-    if img is None:
-        return jsonify({"status": "error", "message": "Görsel dosyası okunamadı."})
-    
-    # RGB dominant rengi al (BGR'den RGB'ye dönüştür)
-    dominant_color = cv2.resize(img, (1, 1))[0, 0].tolist()  # [B, G, R] formatında
-    dominant_color = dominant_color[::-1]  # [R, G, B] formatına dönüştür
+    # Geliştirilmiş renk analizi kullanarak görselin dominant rengini ve diğer özelliklerini bul
+    try:
+        # Tam renk analizi (daha yavaş ama daha doğru)
+        color_analysis = analyze_image_colors(img_path)
+        dominant_color = color_analysis["dominant_color"]
+        color_name = color_analysis["color_name"]
+        dominant_hsv = color_analysis["dominant_color_hsv"]
+        secondary_colors = color_analysis["secondary_colors"]
+    except Exception as e:
+        print(f"Renk analizi hatası: {str(e)}")
+        # Sorun durumunda daha basit yönteme dön
+        dominant_color = extract_dominant_color_improved(img_path, "histogram")
+        dominant_hsv = rgb_to_hsv(dominant_color)
+        color_name = identify_color_group(dominant_hsv)
+        secondary_colors = []
     
     # Uyumlu renkleri bul
     harmonious_colors = find_harmonious_colors(dominant_color, harmony_type)
     
-    # Referans kumaşın metadata bilgisini al (filtreleme için)
-    reference_metadata = metadata.get(fabric_id, {})
-    reference_season = reference_metadata.get("season")
-    reference_quality = reference_metadata.get("quality")
+    # İkincil renkler için de uyumlu renkler bul (maksimum 1 ikincil renk)
+    all_harmonious_colors = harmonious_colors.copy()
+    if secondary_colors and len(secondary_colors) > 0:
+        secondary_harmonious = find_harmonious_colors(secondary_colors[0], harmony_type)
+        all_harmonious_colors.extend(secondary_harmonious)
     
-    # Döndürülecek sonuçları hazırla
+    # Tüm görsellerle renk benzerliği karşılaştırması
+    with open("image_metadata_map.json", "r", encoding="utf-8") as f:
+        metadata = json.load(f)
+    
     results = []
-    found_count = 0
-    
-    # Tüm realImages klasöründeki kumaşları tara
-    all_fabrics = [f for f in os.listdir("realImages") if f.lower().endswith(('.jpg', '.jpeg', '.png'))]
-    
-    for fabric_name in all_fabrics:
-        if fabric_name == fabric_id:
-            continue  # Kendisini dışarıda bırak
-        
-        # Bu kumaşın metadata bilgisini al (eğer varsa)
-        fabric_metadata = metadata.get(fabric_name, {})
-        
-        # Filtreleme seçenekleri kontrol
-        if current_season_only and reference_season and fabric_metadata.get("season") != reference_season:
-            continue  # Mevsim eşleşmezse atla
+    for filename, meta in metadata.items():
+        if filename == fabric_id:
+            continue  # Kendisini atla
             
-        if current_quality_only and reference_quality and fabric_metadata.get("quality") != reference_quality:
-            continue  # Kalite eşleşmezse atla
-        
-        fabric_img_path = os.path.join("realImages", fabric_name)
-        fabric_img = cv2.imread(fabric_img_path)
-        if fabric_img is None:
+        # Filtreleri kontrol et
+        if current_season_only and meta.get("season") != metadata.get(fabric_id, {}).get("season"):
+            continue
+            
+        if current_quality_only and meta.get("quality") != metadata.get(fabric_id, {}).get("quality"):
             continue
         
-        # Kumaşın dominant rengini al (BGR'den RGB'ye dönüştür)
-        fabric_dominant_color = cv2.resize(fabric_img, (1, 1))[0, 0].tolist()[::-1]  # [R, G, B]
+        img_path = os.path.join("realImages", filename)
+        if not os.path.exists(img_path):
+            continue
         
-        # Bu kumaşın rengi, uyumlu renklerden herhangi birine ne kadar benzer?
-        best_similarity = 0
-        best_harmony_color = None
+        # İlgili görselin dominant rengini bul (hızlı yöntem)
+        try:
+            img_color = extract_dominant_color_improved(img_path, "histogram")
+        except Exception:
+            continue
         
-        for harmonious_color in harmonious_colors:
-            similarity = calculate_color_similarity(harmonious_color, fabric_dominant_color)
-            if similarity > best_similarity:
-                best_similarity = similarity
-                best_harmony_color = harmonious_color
+        # En yüksek renk benzerliğini bul
+        max_similarity = 0
+        for harm_color in all_harmonious_colors:
+            similarity = calculate_color_similarity(harm_color, img_color)
+            max_similarity = max(max_similarity, similarity)
         
-        # Benzerlik belirli bir eşiğin üzerindeyse, sonuçlara ekle
-        if best_similarity > threshold:
+        if max_similarity > threshold:  # Benzerlik eşiği
             results.append({
-                "filename": fabric_name,
-                "similarity": round(float(best_similarity), 3),
-                "harmony_type": harmony_type,
-                "harmony_color": best_harmony_color,
-                "dominant_color": fabric_dominant_color,
-                "design": fabric_metadata.get("design"),
-                "season": fabric_metadata.get("season"),
-                "features": fabric_metadata.get("features", []),
-                "quality": fabric_metadata.get("quality")
+                "filename": filename,
+                "harmony": max_similarity,
+                "design": meta.get("design"),
+                "season": meta.get("season"),
+                "quality": meta.get("quality"),
+                "features": meta.get("features", []),
+                "dominant_color": img_color,
+                "color_name": identify_color_group(rgb_to_hsv(img_color))
             })
-            found_count += 1
-            
-            # Sonuç sayısı limiti aşıldıysa döngüyü sonlandır
-            if found_count >= result_count:
-                break
     
-    # Benzerliğe göre sırala (en benzerden başlayarak)
-    results = sorted(results, key=lambda x: x["similarity"], reverse=True)
+    # Benzerliğe göre sırala
+    results.sort(key=lambda x: x["harmony"], reverse=True)
     
-    # Sonuçları döndür
-    return jsonify({
-        "status": "success",
-        "reference_fabric": fabric_id,
-        "reference_color": dominant_color,
-        "harmony_type": harmony_type,
-        "harmony_colors": harmonious_colors,
-        "found_count": found_count,
-        "results": results
-    })
-
+    # Sonuçları sınırla
+    results = results[:result_count]
+    
+    # Renk analizi sonuçlarını da ekle
+    result_with_info = {
+        "results": results,
+        "source_info": {
+            "fabric_id": fabric_id,
+            "dominant_color": dominant_color,
+            "color_name": color_name,
+            "harmony_type": harmony_type,
+            "hsv": [round(dominant_hsv[0] * 360), round(dominant_hsv[1] * 100), round(dominant_hsv[2] * 100)],
+            "harmonious_colors": [{"rgb": color, "name": identify_color_group(rgb_to_hsv(color))} for color in harmonious_colors]
+        }
+    }
+    
+    return jsonify(result_with_info)
 # Yeni: Faiss indekslerini sıfırlama endpoint'i
 @app.route("/reset-faiss-indexes")
 def reset_faiss_indexes():

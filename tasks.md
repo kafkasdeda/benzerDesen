@@ -80,17 +80,21 @@ Tekstil sektöründe görsel benzerlik analizi ve gruplama sistemi geliştirme p
 - [x] FEATURE-004-harmonious-search ✅
 - [x] PERF-002-batch-loading ✅
 
-- [ ] UI-008-model-version-persistence (Beklemede)
+- [x] UI-008-model-version-persistence
+   - **Durum**: Tamamlandı ✅
    - **Öncelik**: P1
    - **Tahmini**: 4s
+   - **Gerçek**: 3s
+   - **Başlangıç**: 2025-05-06
+   - **Tamamlanma**: 2025-05-06
    - **Açıklama**: Model ve versiyon seçimi bilgilerinin korunması ve localStorage entegrasyonu
    - **Kabul Kriterleri**:
-     - Versiyon bilgisinin korunması sorununun çözülmesi
-     - localStorage entegrasyonu ile kullanıcı tercihlerinin saklanması
-     - Versiyon bilgi paneli eklenmesi
-     - Yeni versiyon oluşturma ile entegrasyon
+     - Versiyon bilgisinin korunması sorununun çözülmesi ✅
+     - localStorage entegrasyonu ile kullanıcı tercihlerinin saklanması ✅
+     - Paneller arası model/versiyon senkronizasyonu ✅
+     - Olay mekanizması (Event Mechanism) eklenmesi ✅
    - **Bağımlılıklar**: UI-001
-   - **Notlar**: Session 16'da planlandı, kullanıcı deneyimi için kritik önemde
+   - **Notlar**: Session 18'de tamamlandı, kullanıcı tercihleri artık sayfalar arasında ve yeniden yüklemeler sırasında korunuyor. Sağ panelde yeterli versiyon bilgisi mevcut olduğu için ek versiyon bilgi paneli eklemeye gerek duyulmadı.
 
 - [ ] PERF-004-memory-optimization (Beklemede)
    - **Öncelik**: P1
@@ -563,10 +567,10 @@ Tekstil sektöründe görsel benzerlik analizi ve gruplama sistemi geliştirme p
 - [x] UI-006-checkbox-fixes ✅
 - [x] UI-009-feedback-stars-fix ✅
 - [x] INFRA-004-sqlite-project-management ✅
+- [x] UI-008-model-version-persistence ✅
 - [ ] INFRA-001-project-management-transition 🔄
 - [ ] INFRA-002-git-workflow-standardization 🔄
 - [ ] INFRA-003-documentation-standardization
-- [ ] UI-008-model-version-persistence
 - [ ] PERF-004-memory-optimization
 - [ ] REFAC-003-model-version-selection
 

@@ -129,6 +129,15 @@ rightPanel.appendChild(trainButtonContainer);
       if (document.getElementById("active-model-name")) {
         document.getElementById("active-model-name").textContent = window.currentModel;
       }
+      
+      // Orta panele model değişikliğini bildir (özel event)
+      const event = new CustomEvent('modelChanged', {
+        detail: {
+          model: window.currentModel,
+          source: 'rightPanel'
+        }
+      });
+      document.dispatchEvent(event);
     });
   });
   
@@ -140,6 +149,16 @@ rightPanel.appendChild(trainButtonContainer);
     if (document.getElementById("active-version-name")) {
       document.getElementById("active-version-name").textContent = window.currentVersion;
     }
+    
+    // Orta panele versiyon değişikliğini bildir (oözel event)
+    const event = new CustomEvent('versionChanged', {
+      detail: {
+        model: window.currentModel,
+        version: window.currentVersion,
+        source: 'rightPanel'
+      }
+    });
+    document.dispatchEvent(event);
   });
   
   // Başlangıçta cluster'ları yükle
@@ -849,4 +868,57 @@ function createNewCluster(model, version) {
 // Sayfa yüklenirken bu komut çalıştırılır
 window.addEventListener("DOMContentLoaded", () => {
   initRightPanel();
+  
+  // Orta panelden gelen model/versiyon değişikliklerini dinle
+  document.addEventListener('modelChanged', handleModelChangeEvent);
+  document.addEventListener('versionChanged', handleVersionChangeEvent);
 });
+
+// Orta panelden gelen model değişikliği olayını işle
+function handleModelChangeEvent(e) {
+  // Olay orta panelden geliyorsa ve mevcut modelden farklı ise güncelle
+  if (e.detail && e.detail.source === 'centerPanel' && e.detail.model !== window.currentModel) {
+    console.log('Orta panelden model değişikliği algılandı:', e.detail.model);
+    window.currentModel = e.detail.model;
+    
+    // Model butonlarını güncelle
+    highlightCurrentModel();
+    
+    // Versiyonları güncelle
+    loadAvailableVersions(window.currentModel);
+    
+    // Cluster'ları güncelle
+    loadClusterRepresentatives(window.currentModel, window.currentVersion);
+  }
+}
+
+// Orta panelden gelen versiyon değişikliği olayını işle
+function handleVersionChangeEvent(e) {
+  // Olay orta panelden geliyorsa ve mevcut versiyondan farklı ise güncelle
+  if (e.detail && e.detail.source === 'centerPanel') {
+    // Önce model değişikliğini kontrol et
+    if (e.detail.model !== window.currentModel) {
+      console.log('Orta panelden model ve versiyon değişikliği algılandı:', 
+               {model: e.detail.model, version: e.detail.version});
+      
+      window.currentModel = e.detail.model;
+      highlightCurrentModel();
+      
+      // Versiyonları güncelle, sonrasında versiyon ve cluster'ları güncelle
+      loadAvailableVersions(window.currentModel).then(() => {
+        if (e.detail.version !== window.currentVersion) {
+          window.currentVersion = e.detail.version;
+          setCurrentVersion();
+          loadClusterRepresentatives(window.currentModel, window.currentVersion);
+        }
+      });
+    }
+    // Sadece versiyon değişikliği varsa
+    else if (e.detail.version !== window.currentVersion) {
+      console.log('Orta panelden versiyon değişikliği algılandı:', e.detail.version);
+      window.currentVersion = e.detail.version;
+      setCurrentVersion();
+      loadClusterRepresentatives(window.currentModel, window.currentVersion);
+    }
+  }
+}

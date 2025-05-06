@@ -408,6 +408,7 @@ async function analyzeDominantColors() {
  * Oluşturulma: 2025-04-19
  * Güncelleme: 2025-04-28 (Uyumlu renkleri bulma özelliği eklendi)
  * Güncelleme: 2025-04-29 (Tooltip bilgi balonları eklendi)
+ * Güncelleme: 2025-05-06 (Model/versiyon bilgisi korunması eklendi)
  * Hazırlayan: Kafkas
  * 
  * Açıklama:
@@ -425,6 +426,240 @@ let currentFeatures = [];
 let currentMixFilters = [];
 let clusterStatus = "";
 let filterApplied = false;
+
+// LocalStorage için anahtar sabitleri
+const LOCAL_STORAGE_KEYS = {
+    MODEL: 'benzerDesen_selectedModel',
+    VERSION: 'benzerDesen_selectedVersion',
+    METRIC: 'benzerDesen_selectedMetric',
+    TOP_N: 'benzerDesen_selectedTopN'
+};
+
+// Kullanıcı tercihlerini localStorage'a kaydet
+function saveUserPreferences() {
+    try {
+        // currentModel, currentVersion, currentMetric ve currentTopN global değişkenlerinden
+        // güncel değerleri al
+        const modelToSave = currentModel || 'pattern';
+        const versionToSave = currentVersion || 'v1';
+        const metricToSave = currentMetric || 'cosine';
+        const topNToSave = (currentTopN || 50).toString();
+        
+        // localStorage'a kaydet
+        localStorage.setItem(LOCAL_STORAGE_KEYS.MODEL, modelToSave);
+        localStorage.setItem(LOCAL_STORAGE_KEYS.VERSION, versionToSave);
+        localStorage.setItem(LOCAL_STORAGE_KEYS.METRIC, metricToSave);
+        localStorage.setItem(LOCAL_STORAGE_KEYS.TOP_N, topNToSave);
+        
+        console.log('Kullanıcı tercihleri başarıyla kaydedildi:', {
+            model: modelToSave,
+            version: versionToSave,
+            metric: metricToSave,
+            topN: topNToSave
+        });
+        
+        return true; // Kaydetme başarılı
+    } catch (error) {
+        console.warn('Kullanıcı tercihleri kaydedilemedi:', error);
+        return false; // Kaydetme başarısız
+    }
+}
+
+// Diğer panellerden gelen model değişikliği olayını işle
+function handleModelChangeEvent(e) {
+    // Olay başka bir panelden geliyorsa (örn. sağ panel), orta paneli güncelle
+    if (e.detail && e.detail.source && e.detail.source !== 'centerPanel') {
+        const newModel = e.detail.model;
+        
+        // Eğer mevcut modelden farklıysa güncelle
+        if (currentModel !== newModel) {
+            console.log('Diğer panelden model değişikliği algılandı:', newModel);
+            
+            currentModel = newModel;
+            const modelSelector = document.getElementById('model-selector');
+            if (modelSelector) {
+                modelSelector.value = newModel;
+            }
+            
+            // Aktif model adını güncelle
+            const modelNameElement = document.getElementById("active-model-name");
+            if (modelNameElement) {
+                modelNameElement.textContent = newModel;
+            }
+            
+            // Yeni model için versiyonları güncelle
+            updateVersions().then(() => {
+                // Kullanıcı tercihlerini kaydet
+                saveUserPreferences();
+                
+                // Eğer bir görsel seçiliyse, yeni model ile arama yap
+                if (currentFilename) {
+                    fetchSimilarImages(currentFilename);
+                }
+            });
+        }
+    }
+}
+
+// Diğer panellerden gelen versiyon değişikliği olayını işle
+function handleVersionChangeEvent(e) {
+    // Olay başka bir panelden geliyorsa (örn. sağ panel), orta paneli güncelle
+    if (e.detail && e.detail.source && e.detail.source !== 'centerPanel') {
+        const newModel = e.detail.model;
+        const newVersion = e.detail.version;
+        
+        console.log('Diğer panelden versiyon değişikliği algılandı:', 
+                   {model: newModel, version: newVersion});
+        
+        // Modeli güncelle (gerekirse)
+        if (currentModel !== newModel) {
+            currentModel = newModel;
+            const modelSelector = document.getElementById('model-selector');
+            if (modelSelector) {
+                modelSelector.value = newModel;
+            }
+            
+            // Aktif model adını güncelle
+            const modelNameElement = document.getElementById("active-model-name");
+            if (modelNameElement) {
+                modelNameElement.textContent = newModel;
+            }
+            
+            // Yeni model için versiyonları güncelle
+            updateVersions().then(() => {
+                // Sonra versiyonu güncelle
+                const versionSelector = document.getElementById('version-selector');
+                if (versionSelector && versionSelector.querySelector(`option[value="${newVersion}"]`)) {
+                    currentVersion = newVersion;
+                    versionSelector.value = newVersion;
+                    
+                    // Aktif versiyon adını güncelle
+                    const versionNameElement = document.getElementById("active-version-name");
+                    if (versionNameElement) {
+                        versionNameElement.textContent = newVersion;
+                    }
+                    
+                    // Kullanıcı tercihlerini kaydet
+                    saveUserPreferences();
+                    
+                    // Eğer bir görsel seçiliyse, yeni versiyon ile arama yap
+                    if (currentFilename) {
+                        fetchSimilarImages(currentFilename);
+                    }
+                }
+            });
+        } else if (currentVersion !== newVersion) {
+            // Sadece versiyonu güncelle
+            const versionSelector = document.getElementById('version-selector');
+            if (versionSelector && versionSelector.querySelector(`option[value="${newVersion}"]`)) {
+                currentVersion = newVersion;
+                versionSelector.value = newVersion;
+                
+                // Aktif versiyon adını güncelle
+                const versionNameElement = document.getElementById("active-version-name");
+                if (versionNameElement) {
+                    versionNameElement.textContent = newVersion;
+                }
+                
+                // Kullanıcı tercihlerini kaydet
+                saveUserPreferences();
+                
+                // Eğer bir görsel seçiliyse, yeni versiyon ile arama yap
+                if (currentFilename) {
+                    fetchSimilarImages(currentFilename);
+                }
+            }
+        }
+    }
+}
+
+// Kullanıcı tercihlerini localStorage'dan yükle
+async function loadUserPreferences() {
+    try {
+        const savedModel = localStorage.getItem(LOCAL_STORAGE_KEYS.MODEL);
+        const savedVersion = localStorage.getItem(LOCAL_STORAGE_KEYS.VERSION);
+        const savedMetric = localStorage.getItem(LOCAL_STORAGE_KEYS.METRIC);
+        const savedTopN = localStorage.getItem(LOCAL_STORAGE_KEYS.TOP_N);
+        
+        console.log('Kaydedilen tercihler:', {
+            model: savedModel,
+            version: savedVersion,
+            metric: savedMetric,
+            topN: savedTopN
+        });
+        
+        // Eğer kaydedilmiş değerler varsa, bunları kullan
+        if (savedModel) {
+            // Önce modeli ayarla
+            currentModel = savedModel;
+            
+            // DOM yüklendikten sonra UI güncellemesi yapacağız
+            const modelSelector = document.getElementById('model-selector');
+            if (modelSelector) {
+                modelSelector.value = savedModel;
+            }
+            
+            // Önce model değiştiğinde versiyonları yükle
+            try {
+                await updateVersions();
+                
+                // Versiyon
+                if (savedVersion) {
+                    const versionSelector = document.getElementById('version-selector');
+                    if (versionSelector) {
+                        // Kaydedilen versiyon hala mevcut mu kontrol et
+                        const versionExists = Array.from(versionSelector.options)
+                            .some(option => option.value === savedVersion);
+                        
+                        if (versionExists) {
+                            currentVersion = savedVersion;
+                            versionSelector.value = savedVersion;
+                        } else {
+                            console.warn(`Kaydedilen versiyon (${savedVersion}) artık mevcut değil. Varsayılan versiyon kullanılıyor.`);
+                        }
+                    }
+                }
+                
+                // Metrik
+                if (savedMetric) {
+                    currentMetric = savedMetric;
+                    const metricSelector = document.getElementById('metric-selector');
+                    if (metricSelector) {
+                        metricSelector.value = savedMetric;
+                    }
+                }
+                
+                // Top N
+                if (savedTopN) {
+                    currentTopN = parseInt(savedTopN);
+                    const topnInput = document.getElementById('topn-input');
+                    if (topnInput) {
+                        topnInput.value = savedTopN;
+                    }
+                }
+                
+                // Model bilgi panelini güncelle
+                updateModelInfoPanel();
+                
+                console.log('Kullanıcı tercihleri başarıyla yüklendi:', {
+                    model: currentModel,
+                    version: currentVersion,
+                    metric: currentMetric,
+                    topN: currentTopN
+                });
+            } catch (versionError) {
+                console.error('Versiyonlar yüklenirken hata:', versionError);
+            }
+        } else {
+            console.log('Kaydedilmiş kullanıcı tercihi bulunamadı. Varsayılan değerler kullanılıyor.');
+        }
+        
+        return true; // Yükleme başarılı
+    } catch (error) {
+        console.warn('Kullanıcı tercihleri yüklenemedi:', error);
+        return false; // Yükleme başarısız
+    }
+}
 
 // Seçili görselleri global olarak tutmak için
 window.selectedImages = new Set();
@@ -460,8 +695,26 @@ document.addEventListener("DOMContentLoaded", async () => {
     
     // Arama parametreleri panelinin altına yerleştir
     document.getElementById("search-panel-content").parentNode.insertBefore(modelInfoPanel, document.getElementById("center-results"));
+    
+    // UI ve event listener'ları başlat
     initializeUI();
     initializeEventListeners();
+    
+    // Model / versiyon / metrik componenntler oluştuktan sonra localStorage'dan tercihleri yükle
+    console.log('Kullanıcı tercihleri yükleniyor...');
+    try {
+        // LocalStorage'dan tercihleri yükle
+        await loadUserPreferences();
+        console.log('Kullanıcı tercihleri başarıyla yüklendi.');
+        // Model bilgi panelini güncelle
+        updateModelInfoPanel();
+    } catch (error) {
+        console.warn('Kullanıcı tercihleri yüklenirken hata:', error);
+    }
+    
+    // Diğer panellere gönderilen model/versiyon değişikliklerini dinle
+    document.addEventListener('modelChanged', handleModelChangeEvent);
+    document.addEventListener('versionChanged', handleVersionChangeEvent);
 });
 
 // Arayüz elemanlarını hazırla
@@ -506,21 +759,75 @@ function initializeUI() {
     document.getElementById("model-selector").addEventListener("change", () => {
       currentModel = document.getElementById("model-selector").value;
       document.getElementById("active-model-name").textContent = currentModel;
+      
+      // Kullanıcı tercihlerini kaydet
+      if (saveUserPreferences()) {
+          console.log(`Model değiştirildi: ${currentModel} ve başarıyla kaydedildi`);
+      }
+      
+      // Diğer panellere bildir (source bilgisi ekleyerek)
+      const event = new CustomEvent('modelChanged', {
+        detail: {
+          model: currentModel,
+          source: 'centerPanel'
+        }
+      });
+      document.dispatchEvent(event);
     });
     
       document.getElementById("version-selector").addEventListener("change", () => {
       currentVersion = document.getElementById("version-selector").value;
       document.getElementById("active-version-name").textContent = currentVersion;
+      
+      // Kullanıcı tercihlerini kaydet
+      if (saveUserPreferences()) {
+          console.log(`Versiyon değiştirildi: ${currentVersion} ve başarıyla kaydedildi`);
+      }
+      
+      // Seçili bir görsel varsa, yeni versiyon ile arama yap
+      if (currentFilename) {
+        fetchSimilarImages(currentFilename);
+      }
+      
+      // Diğer panellere bildir (source bilgisi ekleyerek)
+      const event = new CustomEvent('versionChanged', {
+        detail: {
+          model: currentModel,
+          version: currentVersion,
+          source: 'centerPanel'
+        }
+      });
+      document.dispatchEvent(event);
     });
     
     document.getElementById("metric-selector").addEventListener("change", () => {
-    currentMetric = document.getElementById("metric-selector").value;
-    document.getElementById("active-metric-name").textContent = currentMetric;
+      currentMetric = document.getElementById("metric-selector").value;
+      document.getElementById("active-metric-name").textContent = currentMetric;
+      
+      // Kullanıcı tercihlerini kaydet
+      if (saveUserPreferences()) {
+          console.log(`Metrik değiştirildi: ${currentMetric} ve başarıyla kaydedildi`);
+      }
+      
+      // Seçili bir görsel varsa, yeni metrik ile arama yap
+      if (currentFilename && filterApplied) {
+        fetchSimilarImages(currentFilename);
+      }
     });
     
     document.getElementById("topn-input").addEventListener("change", () => {
         currentTopN = document.getElementById("topn-input").value;
         document.getElementById("active-topn-name").textContent = currentTopN;
+        
+        // Kullanıcı tercihlerini kaydet
+        if (saveUserPreferences()) {
+            console.log(`TopN değiştirildi: ${currentTopN} ve başarıyla kaydedildi`);
+        }
+        
+        // Seçili bir görsel varsa, yeni topN ile arama yap
+        if (currentFilename && filterApplied) {
+          fetchSimilarImages(currentFilename);
+        }
       });
 
     // Feature checkboxlarını dinle
@@ -745,18 +1052,44 @@ async function updateVersions() {
             
             // Versiyon selector'ı temizle ve doldur
             versionSelector.innerHTML = '';
-            versions.forEach(version => {
-                const option = document.createElement("option");
-                option.value = version.id;
-                option.textContent = version.name + (version.comment ? ` (${version.comment})` : '');
-                versionSelector.appendChild(option);
-            });
-            
-            currentVersion = versionSelector.value;
+            if (versions && versions.length > 0) {
+                versions.forEach(version => {
+                    const option = document.createElement("option");
+                    option.value = version.id;
+                    option.textContent = version.name + (version.comment ? ` (${version.comment})` : '');
+                    versionSelector.appendChild(option);
+                });
+                
+                // Yeni model için ilk versiyonu seç
+                currentVersion = versionSelector.value;
+                // Sağ paneldeki aktif versiyon bilgisini de güncelle
+                document.getElementById("active-version-name").textContent = currentVersion;
+                
+                // Eğer mevcut bir görsel seçiliyse, yeni model ve versiyon ile arama yap
+                if (currentFilename) {
+                    fetchSimilarImages(currentFilename);
+                }
+                
+                console.log(`Model değiştirildi: ${currentModel}, Versiyon: ${currentVersion}`);
+            } else {
+                console.warn(`${currentModel} modeli için versiyon bulunamadı.`);
+            }
         }
     } catch (error) {
         console.error("Versiyon listesi alınırken hata:", error);
     }
+    
+    // Model/Versiyon değişikliği ile hakkında bir olay tetikle
+    // Bu olay sağ panel gibi diğer panellere değişikliği bildirecek
+    const event = new CustomEvent('modelVersionChanged', {
+        detail: {
+            model: currentModel,
+            version: currentVersion
+        }
+    });
+    document.dispatchEvent(event);
+    
+    return true; // Başarılı güncelleme
 }
 
 // Benzer görselleri getir
@@ -770,6 +1103,19 @@ async function fetchSimilarImages(filename) {
         document.querySelectorAll('.select-checkbox:checked').forEach(cb => {
             cb.checked = false;
         });
+        
+        // Arama öncesi model ve versiyon seçimlerini kontrol et
+        // Eğer modelSelector ve versionSelector varlık çek
+        const modelSelector = document.getElementById("model-selector");
+        const versionSelector = document.getElementById("version-selector");
+        const metricSelector = document.getElementById("metric-selector");
+        const topnInput = document.getElementById("topn-input");
+        
+        // UI'daki seçimleri global değişkenlere senkronize et
+        if (modelSelector) currentModel = modelSelector.value;
+        if (versionSelector) currentVersion = versionSelector.value;
+        if (metricSelector) currentMetric = metricSelector.value;
+        if (topnInput) currentTopN = topnInput.value;
         // Yükleniyor mesajını göster
         document.getElementById("center-results").innerHTML = `
             <div style="text-align: center; padding: 20px;">
@@ -858,11 +1204,19 @@ async function fetchSimilarImages(filename) {
 function displaySimilarImages(results, previousFeedbacks = []) {
     const container = document.getElementById("center-results");
     
-    // Aktif model ve versiyon bilgisini güncelle
-    document.getElementById("active-model-name").textContent = currentModel;
-    document.getElementById("active-version-name").textContent = currentVersion;
-    document.getElementById("active-metric-name").textContent = currentMetric;
-    document.getElementById("active-topn-name").textContent = currentTopN;
+    // Aktif model bilgisi panelini güncelle
+    updateModelInfoPanel();
+    
+    // Ayrıca UI'daki model/versiyon/metrik seçimlerini güncelle
+    const modelSelector = document.getElementById("model-selector");
+    const versionSelector = document.getElementById("version-selector");
+    const metricSelector = document.getElementById("metric-selector");
+    const topnInput = document.getElementById("topn-input");
+    
+    if (modelSelector && modelSelector.value !== currentModel) modelSelector.value = currentModel;
+    if (versionSelector && versionSelector.value !== currentVersion) versionSelector.value = currentVersion;
+    if (metricSelector && metricSelector.value !== currentMetric) metricSelector.value = currentMetric;
+    if (topnInput && topnInput.value !== currentTopN) topnInput.value = currentTopN;
     
     if (!results || results.length === 0) {
         container.innerHTML = `
@@ -1223,8 +1577,23 @@ function handleImageClick(event) {
 function showSimilarImages(filename) {
     if (filename) {
         currentFilename = filename;
+        // Model ve versiyon seçimlerini koruyarak arama yapma
         fetchSimilarImages(filename);
+        
+        // Aktif model bilgisi panelini güncelle
+        updateModelInfoPanel();
+        
+        console.log('Sol panelden yeni görsel seçildi:', filename, 'Model:', currentModel, 'Versiyon:', currentVersion);
     }
+}
+
+// Aktif model bilgi panelini güncelle
+function updateModelInfoPanel() {
+    // Model, versiyon, metrik ve topN değerlerini panelde göster
+    document.getElementById("active-model-name").textContent = currentModel || 'pattern';
+    document.getElementById("active-version-name").textContent = currentVersion || 'v1';
+    document.getElementById("active-metric-name").textContent = currentMetric || 'cosine';
+    document.getElementById("active-topn-name").textContent = currentTopN || '50';
 }
 
 // Seçili görselleri döndür
