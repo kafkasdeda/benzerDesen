@@ -5,7 +5,7 @@
 C:\projeler\benzerDesen
 ```
 
-**Toplam İlerleme**: 70% (Temel benzerlik analizi, kümeleme, arayüz, performans iyileştirmeleri tamamlandı; veritabanı geçişi devam ediyor; feedback entegrasyonu ve gelişmiş UI özellikleri sonraki iterasyonlarda tamamlanacak)
+**Toplam İlerleme**: 70% (Temel benzerlik analizi, kümeleme, arayüz, performans iyileştirmeleri tamamlandı; feedback entegrasyonu ve gelişmiş UI özellikleri sonraki iterasyonlarda tamamlanacak)
 
 ## 🚀 Mevcut Durum
 
@@ -65,23 +65,11 @@ C:\projeler\benzerDesen
    - Küme taşıma işlemi sorunlarının çözülmesi
    - Feedback yıldızlarının görünürlüğünün ve işlevinin iyileştirilmesi
 
-10. **Model ve Versiyon Seçimi İyileştirmeleri - Planlama** ⏳
-    - Versiyon bilgisinin korunması sorunu analiz edildi
-    - localStorage entegrasyonu planlandı
-    - Versiyon bilgi paneli tasarlandı
-    - Versiyonlar arası entegrasyon iyileştirmeleri planlandı
-
-11. **SQLite Veritabanı Entegrasyonu Başlangıcı** ⏳
-    - Veritabanı şeması oluşturuldu
-    - Veri migrasyon aracı hazırlandı
-    - Temel veritabanı yardımcı fonksiyonları geliştirildi
-    - Bazı kritik endpoint'lerin SQLite'a dönüşümü gerçekleştirildi
-
-12. **Proje Yönetimi Geçişi Başlatıldı** ⏳
+10. **Proje Yönetimi Geçişi** ✅
     - PROJECT_INSTRUCTIONS.md, tasks.md ve PROJECT_STATUS.md dosyaları oluşturuldu
-    - Görev formatı ve takibi standardize ediliyor
-    - Git iş akışı kuralları belirleniyor
-    - Sprint yapısı ve öncelikler netleştiriliyor
+    - Görev formatı ve takibi standardize edildi
+    - Git iş akışı kuralları belirlendi
+    - Sprint yapısı ve öncelikler netleştirildi
 
 ### Proje Yapısı
 ```
@@ -155,23 +143,29 @@ Benzer Desen projesi, tekstil sektöründe görsel benzerlik analizi ve grupland
 2. Benzerlik aramasını hızlandırmak için Faiss kütüphanesinin entegrasyonu
 3. Batch loading ve DOM optimizasyonları ile performans iyileştirmeleri
 4. Manuel güncelleme kontrolüne geçiş (veri bütünlüğü için)
-5. JSON bazlı veri depolama yerine SQLite'a geçiş
-6. Formal proje yönetimi sistemine geçiş (MVP odaklı)
+5. Proje yönetim sistemi için SQLite veritabanı kullanımı (Sadece görev takibi için)
 
 ## 💡 Yapılacaklar Listesi
 
 ### 1. Yüksek Öncelikli Görevler (P0)
-- [ ] **Proje Yönetimi Geçişinin Tamamlanması**
-  - [ ] PROJECT_INSTRUCTIONS.md, tasks.md ve PROJECT_STATUS.md ile formal yönetim sistemine tam geçiş
-  - [ ] Git iş akışı standardizasyonu
-  - [ ] Görev takibi ve sprint yönetimi
+- [ ] **Model ve Versiyon Seçimi İyileştirmeleri**
+  - [ ] UI-008-model-version-persistence görevi ile model/versiyon seçimlerinin hatırlanması
+  - [ ] Versiyon değişikliğinde otomatik güncelleme
+  - [ ] Model bilgi paneli eklenmesi
+  - [ ] LocalStorage entegrasyonu
 
-- [ ] **SQLite Entegrasyonunun Tamamlanması**
-  - [ ] Kalan endpoint'lerin veritabanı implementasyonu
-  - [ ] Veritabanı performans optimizasyonu
-  - [ ] JSON -> SQLite tam geçiş
+- [ ] **Renk Modeli İyileştirmeleri**
+  - [ ] FEATURE-009-color-model-enhancement görevi ile renk spektrumu tabanlı organizasyon
+  - [ ] Kümeleme algoritması yerine doğal renk organizasyonu
+  - [ ] Renk modeli için özelleştirilmiş parametre seçenekleri
+  - [ ] Daha fazla renk varyasyonu destekleme
 
-### 2. Orta Öncelikli Görevler (P2)
+- [ ] **Bellek Yönetiminde İyileştirmeler**
+  - [ ] PERF-004 kapsamında bellek kaçaklarının tamamen giderilmesi
+  - [ ] Safari tarayıcısı için uyumluluk iyileştirmeleri
+  - [ ] Büyük veri setlerinde daha verimli çalışma
+
+### 2. Orta Öncelikli Görevler (P1)
 - [ ] **Feedback Entegrasyonu ile Eğitim** (MVP sonrası)
   - [x] Feedback toplama altyapısı ✅
   - [ ] Feedback verilerini eğitim sürecine entegre etme
@@ -184,7 +178,7 @@ Benzer Desen projesi, tekstil sektöründe görsel benzerlik analizi ve grupland
   - [ ] Gelişmiş filtreleme özellikleri
   - [ ] Kullanıcı tercihlerini saklama
 
-### 3. Düşük Öncelikli Görevler (P3)
+### 3. Düşük Öncelikli Görevler (P2)
 - [ ] **Dağıtım İyileştirmeleri**
   - [ ] Docker containerization
   - [ ] Çoklu sunucu desteği
@@ -197,6 +191,13 @@ Benzer Desen projesi, tekstil sektöründe görsel benzerlik analizi ve grupland
   - [ ] Tavsiye sistemi entegrasyonu
   - [ ] İstatistiksel raporlama
 
+### 4. Ertelenmiş Görevler
+- [ ] **SQLite Veritabanına Geçiş** (Ertelendi ⏸️)
+  - [ ] Veri yapısının veritabanına dönüştürülmesi
+  - [ ] Endpoint'lerin SQLite kullanacak şekilde güncellenmesi
+  - [ ] JSON'dan veritabanına tam geçiş
+  - [ ] Performans optimizasyonları ve testler
+
 ## 🛠️ Teknik Detaylar
 
 ### Kullanılan Teknolojiler
@@ -205,11 +206,10 @@ Benzer Desen projesi, tekstil sektöründe görsel benzerlik analizi ve grupland
 - NumPy, SciPy, scikit-learn
 - TensorFlow/Keras (özellik çıkarma)
 - Faiss (hızlı benzerlik araması)
-- SQLite (süreç içinde entegre ediliyor)
 - JavaScript, HTML5, CSS3 (frontend)
 
 ### Proje Yönetim Sistemi
-- SQLite veritabanı (proje yönetimi için yeni eklendi)
+- SQLite veritabanı (sadece proje yönetimi için)
 - Python komut satırı araçları:
   - `db_setup.py`: Veritabanı kurulumu ve veri aktarımı
   - `task_manager.py`: Görev ve proje durumu yönetimi
@@ -244,28 +244,22 @@ Güncel: 0.3 saniye (6.3x iyileştirme)
 
 ## 📋 Bir Sonraki Oturumda Yapılacaklar
 
-1. **INFRA-001-project-management-transition Tamamlanması**
-   - tasks.md'deki tüm görevleri gözden geçirme ve önceliklendirme
-   - PROJECT_STATUS.md'yi güncel duruma göre tamamen güncelleme
-   - Tamamlanmış/devam eden sprint görevlerini netleştirme
-   - Tüm takım üyelerine geçiş hakkında bilgilendirme
-
-2. **INFRA-003-documentation-standardization Başlama**
-   - Docstring formatı belirleme (Google formatı temelli)
-   - README.md ve kullanım kılavuzu taslağı oluşturma
-   - Kod stil rehberi hazırlama
-   - Sphinx dokümantasyon altyapısını kurma
-
-3. **TASK-001-complete-sqlite-integration Devam Etme**
-   - Kalan endpoint'lerin SQLite'a geçişini tamamlama
-   - Veritabanı şemasında gerekli düzenlemeleri yapma
-   - Optimizasyon ve test aşamalarını gerçekleştirme
-
-4. **UI-008-model-version-persistence Başlama**
+1. **UI-008-model-version-persistence Başlama**
    - Versiyon bilgisinin korunması sorununu çözme
    - localStorage entegrasyonu yapma
    - Versiyon bilgi paneli implementasyonu
    - Sağ panel ile entegrasyonu sağlama
+
+2. **PERF-004-memory-optimization Planlaması**
+   - Bellek kullanımı optimizasyonları için yeni görev oluşturma
+   - Safari uyumluluğu sorunlarını çözme
+   - Büyük veri setleri için iyileştirmeler geliştirme
+
+3. **INFRA-003-documentation-standardization Başlama**
+   - Docstring formatı belirleme (Google formatı temelli)
+   - README.md ve kullanım kılavuzu taslağı oluşturma
+   - Kod stil rehberi hazırlama
+   - Sphinx dokümantasyon altyapısını kurma
 
 ## 🎯 Proje Hedefleri
 
@@ -274,25 +268,25 @@ Güncel: 0.3 saniye (6.3x iyileştirme)
 - ✅ Uyumlu renk arama (tamamlandı)
 - ✅ Performans optimizasyonları (tamamlandı)
 - ✅ Kullanıcı dostu arayüz (tamamlandı)
-- ⏳ SQLite veritabanı entegrasyonu (devam ediyor - MVP için kritik)
-- ⏳ Proje yönetimi standardizasyonu (devam ediyor - MVP için kritik)
+- ✅ Proje yönetimi standardizasyonu (tamamlandı)
 - ⏳ Model/versiyon seçimi iyileştirmeleri (devam ediyor - kullanıcı deneyimi için önemli)
 - ⏳ Dokümantasyon standardizasyonu (devam ediyor - ekip iş birliği için önemli)
 - 🔜 Feedback-tabanlı öğrenme (MVP sonrası planlanan)
 - 🔜 Modern UI ve dağıtım iyileştirmeleri (MVP sonrası planlanan)
+- ⏸️ SQLite veritabanına geçiş (ertelendi)
 
 ## 📊 Zaman Çizelgesi
 
 ### Mayıs 2025 (Mevcut)
-- Hafta 1: Proje yönetimi standardizasyonu ve dokümantasyon iyileştirmeleri
-- Hafta 2: SQLite entegrasyonu tamamlama ve model/versiyon iyileştirmeleri
+- Hafta 1: Model/versiyon iyileştirmeleri ve bellek optimizasyonu
+- Hafta 2: Dokümantasyon standardizasyonu ve Feedback sistemi geliştirme
 - Hafta 3: Test ve optimizasyon
 - Hafta 4: MVP sürümü hazırlama
 
 ### Haziran 2025 (Planlanan - MVP sonrası)
 - Hafta 1-2: Feedback entegrasyonu ve eğitim
 - Hafta 3-4: Modern UI güncellemeleri ve drag-and-drop
-- Performans ve veritabanı sorgu optimizasyonları
+- Performans ve bellek yönetimi optimizasyonları
 
 ### Temmuz 2025 (Planlanan - MVP sonrası)
 - Hafta 1-2: Docker containerization ve dağıtım
@@ -312,18 +306,13 @@ MVP (Minimum Viable Product) aşağıdaki kritik kriterleri tamamlamayı hedefli
    - Bellek optimizasyonu ✅
    - DOM performans iyileştirmeleri ✅
 
-3. **Veritabanı Entegrasyonu** ⏳
-   - Veri yapısı standardizasyonu
-   - JSON -> SQLite geçişi
-   - Tüm endpoint'lerin veritabanı kullanması
+3. **Proje Yönetim Standardizasyonu** ✅
+   - Görev takibi sistemi ✅
+   - Git iş akışı kuralları ✅
+   - Sprint yapısı ve raporlama ✅
+   - Dokümantasyon standardizasyonu ⏳
 
-4. **Proje Yönetim Standardizasyonu** ⏳
-   - Görev takibi sistemi
-   - Git iş akışı kuralları
-   - Sprint yapısı ve raporlama
-   - Dokümantasyon standardizasyonu
-
-5. **Temel UI İyileştirmeleri** ✅
+4. **Temel UI İyileştirmeleri** ✅
    - Checkbox ve görsel seçim sistemi ✅
    - Feedback arayüzü ✅
    - Manuel küme yönetimi ✅
@@ -331,4 +320,4 @@ MVP (Minimum Viable Product) aşağıdaki kritik kriterleri tamamlamayı hedefli
 
 ---
 
-*Son güncelleme: 6 Mayıs 2025 (Görev yönetimi ve takım standardizasyonuna odaklandık, SQLite entegrasyonu ve model/versiyon seçimi iyileştirmelerine öncelik verildi)*
+*Son güncelleme: 6 Mayıs 2025 (SQLite veritabanı entegrasyonu ertelendi, model/versiyon seçimi ve bellek optimizasyonlarına öncelik verildi)*

@@ -4,19 +4,19 @@
 Tekstil sektöründe görsel benzerlik analizi ve gruplama sistemi geliştirme projesi.
 
 **Son Güncelleme**: 2025-05-06
-**Toplam İlerleme**: 70% (Temel benzerlik analizi, kümeleme, arayüz, performans iyileştirmeleri tamamlandı; veritabanı geçişi devam ediyor; feedback entegrasyonu ve gelişmiş UI özellikleri sonraki iterasyonlarda tamamlanacak)
+**Toplam İlerleme**: 70% (Temel benzerlik analizi, kümeleme, arayüz, performans iyileştirmeleri tamamlandı; SQLite entegrasyonu ertelendi; model/versiyon seçimi ve bellek optimizasyonlarına öncelik verildi)
 
 ## 📊 Görev Durumu Özeti
 
-| Kategori | Toplam | Tamamlanan | Devam Eden | Bekleyen |
-|----------|-------|-----------|-------------|---------|
-| Özellik | 22 | 15 | 1 | 6 |
-| UI/UX | 14 | 10 | 1 | 3 |
-| Performans | 8 | 5 | 0 | 3 |
-| Refactoring | 6 | 3 | 0 | 3 |
-| Dokümantasyon | 4 | 2 | 0 | 2 |
-| Test | 7 | 2 | 1 | 4 |
-| Altyapı | 3 | 0 | 3 | 0 |
+| Kategori | Toplam | Tamamlanan | Devam Eden | Bekleyen | Ertelenen |
+|----------|-------|-----------|-------------|---------|---------|
+| Özellik | 22 | 15 | 0 | 6 | 1 |
+| UI/UX | 14 | 10 | 0 | 4 | 0 |
+| Performans | 8 | 5 | 0 | 3 | 0 |
+| Refactoring | 6 | 3 | 0 | 3 | 0 |
+| Dokümantasyon | 4 | 2 | 0 | 2 | 0 |
+| Test | 7 | 2 | 0 | 5 | 0 |
+| Altyapı | 3 | 1 | 2 | 0 | 0 |
 
 ## 🔄 Mevcut Sprint Görevleri
 
@@ -79,17 +79,6 @@ Tekstil sektöründe görsel benzerlik analizi ve gruplama sistemi geliştirme p
 - [x] PERF-001-faiss-integration ✅
 - [x] FEATURE-004-harmonious-search ✅
 - [x] PERF-002-batch-loading ✅
-- [ ] TASK-001-complete-sqlite-integration 🔄 (Devam Ediyor)
-   - **Öncelik**: P1
-   - **Tahmini**: 6s
-   - **Başlangıç**: 2025-05-05
-   - **Açıklama**: SQLite veritabanı entegrasyonunu tamamlama
-   - **Kabul Kriterleri**:
-     - Kalan tüm endpoint'lerin SQLite ile çalışması
-     - JSON'dan veritabanına tam geçiş
-     - Performans testlerinin tamamlanması
-   - **Bağımlılıklar**: INFRA-001
-   - **Notlar**: Session 11 ve 12'de başlandı, tamamlanması gerekiyor
 
 - [ ] UI-008-model-version-persistence (Beklemede)
    - **Öncelik**: P1
@@ -102,6 +91,31 @@ Tekstil sektöründe görsel benzerlik analizi ve gruplama sistemi geliştirme p
      - Yeni versiyon oluşturma ile entegrasyon
    - **Bağımlılıklar**: UI-001
    - **Notlar**: Session 16'da planlandı, kullanıcı deneyimi için kritik önemde
+
+- [ ] PERF-004-memory-optimization (Beklemede)
+   - **Öncelik**: P1
+   - **Tahmini**: 5s
+   - **Açıklama**: Bellek yönetimi iyileştirmeleri
+   - **Kabul Kriterleri**:
+     - Bellek kaçaklarının tespit edilmesi ve giderilmesi
+     - Safari tarayıcısı için uyumluluk sorunlarının çözülmesi
+     - Büyük veri setleri için önbellek stratejilerinin geliştirilmesi
+     - Bellek kullanımını %30 azaltma
+   - **Bağımlılıklar**: PERF-003
+   - **Notlar**: Safari'deki "Uyumluyu Ara" özelliğinde yaşanan sorunları çözmek için önemli
+
+### Ertelenen Görevler
+- [ ] FEATURE-007-database-integration ⏸️ (Ertelendi)
+   - **Öncelik**: P2
+   - **Tahmini**: 10s
+   - **Açıklama**: JSON'dan veritabanına geçiş
+   - **Kabul Kriterleri**:
+     - Veritabanı şeması tasarımı
+     - Veri migrasyonu
+     - CRUD işlemleri
+     - SQL ile verimli sorgular
+   - **Bağımlılıklar**: REFAC-001-data-structure
+   - **Notlar**: Projenin karmaşıklığı nedeniyle ertelendi. Mevcut JSON yapısıyla devam edilecek.
 
 ## 📋 Detaylı Görev Listesi
 
@@ -197,7 +211,7 @@ Tekstil sektöründe görsel benzerlik analizi ve gruplama sistemi geliştirme p
 - **Notlar**: Session 3'te planlandı, MVP'den sonraya ertelendi
 
 #### FEATURE-007-database-integration
-- **Durum**: Beklemede
+- **Durum**: Ertelendi ⏸️
 - **Öncelik**: P2
 - **Tahmini**: 10s
 - **Açıklama**: JSON'dan veritabanına geçiş
@@ -206,8 +220,8 @@ Tekstil sektöründe görsel benzerlik analizi ve gruplama sistemi geliştirme p
   - Veri migrasyonu
   - CRUD işlemleri
   - SQL ile verimli sorgular
-- **Bağımlılıklar**: REFAC-001-data-structure, TASK-001-complete-sqlite-integration
-- **Notlar**: Session 11-12'de başlandı, TASK-001 olarak revize edildi
+- **Bağımlılıklar**: REFAC-001-data-structure
+- **Notlar**: Projenin karmaşıklığı nedeniyle ertelendi (Session 16). Mevcut JSON yapısıyla devam edilecek.
 
 ### UI/UX Görevleri (UI)
 
@@ -386,6 +400,19 @@ Tekstil sektöründe görsel benzerlik analizi ve gruplama sistemi geliştirme p
 - **Bağımlılıklar**: PERF-002
 - **Tamamlanma**: 2025-05-03
 
+#### PERF-004-memory-optimization
+- **Durum**: Beklemede
+- **Öncelik**: P1
+- **Tahmini**: 5s
+- **Açıklama**: Bellek yönetimi iyileştirmeleri
+- **Kabul Kriterleri**:
+  - Bellek kaçaklarının tespit edilmesi ve giderilmesi
+  - Safari tarayıcısı için uyumluluk sorunlarının çözülmesi
+  - Büyük veri setleri için önbellek stratejilerinin geliştirilmesi
+  - Bellek kullanımını %30 azaltma
+- **Bağımlılıklar**: PERF-003
+- **Notlar**: Safari'deki "Uyumluyu Ara" özelliğinde yaşanan sorunları çözmek için önemli
+
 ### Refactoring Görevleri (REFAC)
 
 #### REFAC-001-data-structure
@@ -512,6 +539,22 @@ Tekstil sektöründe görsel benzerlik analizi ve gruplama sistemi geliştirme p
   - Dokümantasyon araçlarının kurulumu (Sphinx)
 - **Bağımlılıklar**: INFRA-001
 
+#### INFRA-004-sqlite-project-management
+- **Durum**: Tamamlandı ✅
+- **Öncelik**: P0
+- **Tahmini**: 4s
+- **Gerçek**: 4s
+- **Başlangıç**: 2025-05-06
+- **Tamamlanma**: 2025-05-06
+- **Açıklama**: SQLite tabanlı proje yönetim sistemi kurulumu
+- **Kabul Kriterleri**:
+  - Veritabanı şeması tasarımı ✅
+  - Görev, proje durumu ve oturum tablolarının oluşturulması ✅
+  - Veri aktarma betikleri ✅
+  - Komut satırı yönetim araçları ✅
+- **Bağımlılıklar**: INFRA-001
+- **Notlar**: Markdown temelli sistemden veritabanı temelli sisteme geçiş, proje yönetiminde büyük performans ve verimlilik artışı sağladı
+
 ## 📈 İlerleme Takibi
 
 ### Mayıs 2025 (Mevcut)
@@ -519,19 +562,20 @@ Tekstil sektöründe görsel benzerlik analizi ve gruplama sistemi geliştirme p
 - [x] REFAC-002-update-mechanism ✅
 - [x] UI-006-checkbox-fixes ✅
 - [x] UI-009-feedback-stars-fix ✅
+- [x] INFRA-004-sqlite-project-management ✅
 - [ ] INFRA-001-project-management-transition 🔄
 - [ ] INFRA-002-git-workflow-standardization 🔄
 - [ ] INFRA-003-documentation-standardization
-- [ ] TASK-001-complete-sqlite-integration 🔄
 - [ ] UI-008-model-version-persistence
+- [ ] PERF-004-memory-optimization
 - [ ] REFAC-003-model-version-selection
 
 ### Haziran 2025 (Planlanan)
 - [ ] FEATURE-006-feedback-training-integration
 - [ ] TEST-003-feedback-integration
 - [ ] UI-007-modal-improvements
-- [ ] TEST-004-sqlite-integration-tests
-- [ ] PERF-004-query-optimization
+- [ ] TEST-004-sqlite-integration-tests (Ertelendi ⏸️)
+- [ ] PERF-005-json-cache-optimization (Yeni)
 
 ## 🚧 Bilinen Engelleyiciler
 
@@ -539,8 +583,9 @@ Tekstil sektöründe görsel benzerlik analizi ve gruplama sistemi geliştirme p
 
 ## 📝 Notlar
 
-- Yeni proje yönetim sistemi geçişi en yüksek önceliğe sahip
-- MVP için öncelikler: SQLite entegrasyonunu tamamlamak ve proje yönetimini standardize etmek
+- Proje yönetim sistemi geçişi tamamlandı
+- SQLite entegrasyonu karmaşıklığı nedeniyle ertelendi, mevcut JSON yapısına optimizasyonlar yapılacak
+- UI'da model ve versiyon seçimi iyileştirmelerine ve bellek optimizasyonlarına öncelik verildi
 - Feedback entegrasyonu ve ileri UI iyileştirmeleri MVP sonrasına ertelendi
 - Tüm görevler atomik ve bağımsız olarak tamamlanabilir olmalı
 - Her görevin net kabul kriterleri olmalı
