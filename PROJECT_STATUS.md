@@ -5,7 +5,7 @@
 C:\projeler\benzerDesen
 ```
 
-**Toplam İlerleme**: 70% (Temel benzerlik analizi, kümeleme, arayüz, performans iyileştirmeleri tamamlandı; feedback entegrasyonu ve gelişmiş UI özellikleri sonraki iterasyonlarda tamamlanacak)
+**Toplam İlerleme**: 75% (Temel benzerlik analizi, kümeleme, arayüz, performans iyileştirmeleri ve renk modeli iyileştirmeleri tamamlandı; feedback entegrasyonu ve gelişmiş UI özellikleri sonraki iterasyonlarda tamamlanacak)
 
 ## 🚀 Mevcut Durum
 
@@ -71,6 +71,20 @@ C:\projeler\benzerDesen
     - Git iş akışı kuralları belirlendi
     - Sprint yapısı ve öncelikler netleştirildi
 
+11. **Model ve Versiyon Seçimi İyileştirmeleri** ✅
+    - Model/versiyon seçimlerinin LocalStorage ile hatırlanması
+    - Versiyon değişikliğinde otomatik güncelleme
+    - Paneller arası model/versiyon senkronizasyonu
+    - Kullanıcı tercihlerinin saklanması
+
+12. **Renk Modeli İyileştirmeleri** ✅
+    - Renk modelinde kümeleme yaklaşımı yerine renk spektrumu tabanlı organizasyon
+    - RGB ve HSV renk uzayları arasında dönüşüm ve mesafe hesaplama fonksiyonları
+    - Geliştirilmiş dominant renk çıkarma algoritmaları (K-means, histogram)
+    - HSV temelli renk gruplandırma yapısı (12 ton, 3 doygunluk, 3 parlaklık ile 108 grup)
+    - Yeni `/color-spectrum`, `/dominant-colors` ve `/find-similar-colors` API endpoint'leri
+    - Faiss entegrasyonu ile renk aramasını hızlandırma
+
 ### Proje Yapısı
 ```
 benzerDesen/
@@ -86,6 +100,8 @@ benzerDesen/
 ├── db_init.py                  # Veritabanı şeması oluşturma
 ├── migrate_data.py             # JSON'dan veritabanına veri aktarma
 ├── train_handlers.py           # Eğitim işleyicileri
+├── color_utils.py              # Renk işleme fonksiyonları
+├── color_spectrum.py           # Renk spektrumu yönetimi ve algoritmaları
 │
 ├── static/
 │   ├── js/
@@ -154,11 +170,12 @@ Benzer Desen projesi, tekstil sektöründe görsel benzerlik analizi ve grupland
   - [x] Paneller arası model/versiyon senkronizasyonu ✅
   - [x] LocalStorage entegrasyonu ✅
 
-- [ ] **Renk Modeli İyileştirmeleri**
-  - [ ] FEATURE-009-color-model-enhancement görevi ile renk spektrumu tabanlı organizasyon
-  - [ ] Kümeleme algoritması yerine doğal renk organizasyonu
-  - [ ] Renk modeli için özelleştirilmiş parametre seçenekleri
-  - [ ] Daha fazla renk varyasyonu destekleme
+- [x] **Renk Modeli İyileştirmeleri** ✅
+  - [x] FEATURE-009-color-model-enhancement görevi ile renk spektrumu tabanlı organizasyon ✅
+  - [x] Kümeleme algoritması yerine doğal renk organizasyonu ✅
+  - [x] Renk modeli için özelleştirilmiş API endpoint'leri ✅
+  - [x] Daha fazla renk varyasyonu destekleme ✅
+  - [x] UI parametre özelleştirmeleri ✅
 
 - [ ] **Bellek Yönetiminde İyileştirmeler**
   - [ ] PERF-004 kapsamında bellek kaçaklarının tamamen giderilmesi
@@ -240,15 +257,12 @@ Güncel: 3 saniye (4x iyileştirme)
 Güncel: 0.3 saniye (6.3x iyileştirme)
 ```
 
-
-
 ## 📋 Bir Sonraki Oturumda Yapılacaklar
 
-1. **UI-008-model-version-persistence Başlama**
-   - Versiyon bilgisinin korunması sorununu çözme
-   - localStorage entegrasyonu yapma
-   - Versiyon bilgi paneli implementasyonu
-   - Sağ panel ile entegrasyonu sağlama
+1. **FEATURE-009-D Kümeleme Alternatifi**
+   - `auto_cluster.py` içinde renk için özel sınıflandırma ekleme
+   - Renk modeli versiyonları için özel şema yapısı geliştirme
+   - "/create-cluster" endpoint'ini renk-duyarlı hale getirme
 
 2. **PERF-004-memory-optimization Planlaması**
    - Bellek kullanımı optimizasyonları için yeni görev oluşturma
@@ -270,6 +284,7 @@ Güncel: 0.3 saniye (6.3x iyileştirme)
 - ✅ Kullanıcı dostu arayüz (tamamlandı)
 - ✅ Proje yönetimi standardizasyonu (tamamlandı)
 - ✅ Model/versiyon seçimi iyileştirmeleri (tamamlandı)
+- ✅ Renk modeli iyileştirmeleri (tamamlandı)
 - ⏳ Dokümantasyon standardizasyonu (devam ediyor - ekip iş birliği için önemli)
 - 🔜 Feedback-tabanlı öğrenme (MVP sonrası planlanan)
 - 🔜 Modern UI ve dağıtım iyileştirmeleri (MVP sonrası planlanan)
@@ -278,7 +293,7 @@ Güncel: 0.3 saniye (6.3x iyileştirme)
 ## 📊 Zaman Çizelgesi
 
 ### Mayıs 2025 (Mevcut)
-- Hafta 1: Model/versiyon iyileştirmeleri ve bellek optimizasyonu
+- Hafta 1: Model/versiyon iyileştirmeleri ve renk modeli iyileştirmeleri ✅
 - Hafta 2: Dokümantasyon standardizasyonu ve Feedback sistemi geliştirme
 - Hafta 3: Test ve optimizasyon
 - Hafta 4: MVP sürümü hazırlama
@@ -318,6 +333,14 @@ MVP (Minimum Viable Product) aşağıdaki kritik kriterleri tamamlamayı hedefli
    - Manuel küme yönetimi ✅
    - Model/versiyon seçimi iyileştirmeleri ✅
 
+   
+12. **Renk Modeli İyileştirmeleri** ✅
+- [x] FEATURE-009-color-model-enhancement görevi ile renk spektrumu tabanlı organizasyon ✅
+- [x] Kümeleme algoritması yerine doğal renk organizasyonu ✅
+- [x] Renk modeli için özelleştirilmiş API endpoint'leri ✅
+- [x] Daha fazla renk varyasyonu destekleme ✅
+- [ ] UI parametre özelleştirmeleri (planlanan)
+
 ---
 
-*Son güncelleme: 6 Mayıs 2025 (UI-008-model-version-persistence görevi tamamlandı, bir sonraki oturumda FEATURE-009-color-model-enhancement görevine başlanacak)*
+*Son güncelleme: 6 Mayıs 2025 (FEATURE-009-E-color-model-ui-parameters görevi tamamlandı, bir sonraki oturumda FEATURE-009-G testlerine odaklanılacak)*

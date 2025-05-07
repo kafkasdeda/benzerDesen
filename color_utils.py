@@ -1009,106 +1009,149 @@ def build_color_spectrum_from_files(image_folder: str,
     return spectrum
 
 
-def find_similar_colors_in_spectrum(reference_color: Union[Tuple[int, int, int], str], 
-                                   spectrum: dict, 
-                                   tolerance: float = 0.1,
-                                   max_results: int = 100) -> List[dict]:
+
+def find_similar_colors_in_spectrum(hsv_color: Tuple[float, float, float], 
+                                  hue_range: Tuple[float, float] = (0.0, 1.0),
+                                  min_saturation: float = 0.0,
+                                  min_value: float = 0.0,
+                                  color_group: Optional[str] = None,
+                                  limit: int = 100) -> List[dict]:
     """
-    Referans renge benzer renkleri spektrumda arar.
+    Verilen HSV rengine benzer renkleri spektrumda arar.
     
     Args:
-        reference_color: RGB renk değeri veya görsel dosya adı
-        spectrum: renk spektrumu yapısı
-        tolerance: Benzerlik toleransı (0-1 aralığında)
-        max_results: Maksimum sonuç sayısı
+        hsv_color: HSV renk değeri (H: 0-1, S: 0-1, V: 0-1)
+        hue_range: Aranacak ton aralığı (min, max) - 0-1 aralığında 
+        min_saturation: Minimum doygunluk değeri (0-1 aralığında)
+        min_value: Minimum parlaklık değeri (0-1 aralığında)
+        color_group: Filtrelenecek renk grubu (ör: "Kırmızı", "Mavi", vb.)
+        limit: Maksimum sonuç sayısı
         
     Returns:
-        Benzer renkli görsellerin bilgilerini içeren liste
-        
-    Examples:
-        >>> spectrum = build_color_spectrum_from_files('realImages')
-        >>> similar = find_similar_colors_in_spectrum((255, 0, 0), spectrum)
-        >>> len(similar)
-        42
+        Benzer renkli görsellerin bilgilerini içeren liste:
+        [
+            {
+                'filename': 'görsel.jpg',
+                'dominant_color': (r, g, b),
+                'color_group': 'Kırmızı',
+                'hsv': (h, s, v),
+                'similarity': 0.95,
+                'group_name': 'Orta Canlı Kırmızı'
+            },
+            ...
+        ]
     """
     import os
     
-    # Referans rengi belirle
-    reference_hsv = None
-    if isinstance(reference_color, str):
-        # Görsel dosya adı verilmişse
-        if os.path.exists(reference_color):
-            # Tam dosya yolu
-            img_path = reference_color
-        else:
-            # Sadece dosya adı
-            img_path = os.path.join("realImages", reference_color)
-        
-        try:
-            # Görsel dosyasından dominant rengi çıkar
-            rgb = extract_dominant_color_improved(img_path, method='histogram')
-            reference_hsv = rgb_to_hsv(rgb)
-        except Exception as e:
-            raise ValueError(f"Referans görsel işlenemedi: {str(e)}")
+    # Spektrum yapısını yükle
+    spectrum_file = "color_spectrum.json"
+    if not os.path.exists(spectrum_file):
+        # Spektrum yoksa oluştur
+        from color_spectrum import build_color_spectrum
+        spectrum = build_color_spectrum()
+        # Kaydet
+        import json
+        with open(spectrum_file, "w", encoding="utf-8") as f:
+            json.dump(spectrum, f, ensure_ascii=False, indent=2)
     else:
-        # RGB renk değeri verilmişse
-        reference_hsv = rgb_to_hsv(reference_color)
-    
-    if not reference_hsv:
-        raise ValueError("Geçerli bir referans renk belirtilmedi")
+        # Mevcut spektrumu yükle
+        import json
+        with open(spectrum_file, "r", encoding="utf-8") as f:
+            spectrum = json.load(f)
     
     # Referans rengin indekslerini bul
-    ref_indices = classify_color_in_spectrum(reference_hsv, spectrum)
-    ref_hue_idx, ref_sat_idx, ref_val_idx = ref_indices
+    h, s, v = hsv_color
+    ref_indices = classify_color_in_spectrum(hsv_color, spectrum)
     
     # Sonuçlar listesi
     results = []
     
-    # Renk spektrumundan benzer renkleri ara
-    hue_range = int(tolerance * spectrum['divisions'])
-    sat_range = int(tolerance * spectrum['saturation_levels']) + 1
-    val_range = int(tolerance * spectrum['value_levels']) + 1
-    
-    # Tüm olası grupları kontrol et
-    for h_offset in range(-hue_range, hue_range + 1):
-        h_idx = (ref_hue_idx + h_offset) % spectrum['divisions']
+    # Tüm görsel bilgilerini yükle
+    all_images_file = "all_images_color_data.json"
+    if os.path.exists(all_images_file):
+        with open(all_images_file, "r", encoding="utf-8") as f:
+            all_images = json.load(f)
+    else:
+        # Görsel bilgileri yoksa oluştur
+        all_images = {}
+        image_files = [f for f in os.listdir("realImages") if f.lower().endswith(('.jpg', '.jpeg', '.png', '.gif'))]
+        for img_file in image_files:
+            try:
+                img_path = os.path.join("realImages", img_file)
+                rgb = extract_dominant_color_improved(img_path, method='histogram')
+                img_hsv = rgb_to_hsv(rgb)
+                img_group = identify_color_group(img_hsv)
+                all_images[img_file] = {
+                    "dominant_color": rgb,
+                    "hsv": img_hsv,
+                    "color_group": img_group
+                }
+            except Exception as e:
+                print(f"Görsel işleme hatası ({img_file}): {str(e)}")
         
-        for s_offset in range(-sat_range, sat_range + 1):
-            s_idx = ref_sat_idx + s_offset
-            if s_idx < 0 or s_idx >= spectrum['saturation_levels']:
+        # Kaydet
+        with open(all_images_file, "w", encoding="utf-8") as f:
+            json.dump(all_images, f, ensure_ascii=False, indent=2)
+    
+    # Filtreleme kriterleri
+    h_min, h_max = hue_range
+    
+    # Renk spektrumu üzerinde arama
+    for img_filename, img_data in all_images.items():
+        img_hsv = img_data.get("hsv")
+        if not img_hsv:
+            continue
+        
+        img_h, img_s, img_v = img_hsv
+        img_group = img_data.get("color_group")
+        
+        # Ton (Hue) filtreleme - dairesel uzayda karşılaştırma
+        # Burada ton değerleri 0-1 aralığında (0=0°, 1=360°)
+        if h_min <= h_max:
+            # Normal aralık (örn: 0.1-0.3)
+            if img_h < h_min or img_h > h_max:
                 continue
-            
-            for v_offset in range(-val_range, val_range + 1):
-                v_idx = ref_val_idx + v_offset
-                if v_idx < 0 or v_idx >= spectrum['value_levels']:
-                    continue
-                
-                # Bu grubu al
-                hue_div = spectrum['hue_divisions'][h_idx]
-                sat_group = hue_div['saturation_groups'][s_idx]
-                val_group = sat_group['value_groups'][v_idx]
-                
-                # Gruptaki tüm üyeleri sonuçlara ekle
-                for img_filename in val_group['members']:
-                    # Benzerlik değeri hesapla (daha yakın gruplara daha yüksek benzerlik)
-                    similarity = 1.0 - (
-                        (abs(h_offset) / (hue_range + 1)) * 0.6 +
-                        (abs(s_offset) / (sat_range + 1)) * 0.25 +
-                        (abs(v_offset) / (val_range + 1)) * 0.15
-                    )
-                    
-                    results.append({
-                        'filename': img_filename,
-                        'group_name': f"{val_group['name']} {sat_group['name']} {hue_div['name']}",
-                        'similarity': similarity,
-                        'indices': (h_idx, s_idx, v_idx)
-                    })
+        else:
+            # Geçiş aralığı (örn: 0.9-0.1, kırmızıların olduğu bölge)
+            if img_h > h_max and img_h < h_min:
+                continue
+        
+        # Doygunluk (Saturation) filtreleme
+        if img_s < min_saturation:
+            continue
+        
+        # Parlaklık (Value) filtreleme
+        if img_v < min_value:
+            continue
+        
+        # Renk grubu filtreleme
+        if color_group and img_group != color_group:
+            continue
+        
+        # Benzerlik hesaplama
+        # Ton için dairesel mesafe, doygunluk ve parlaklık için doğrusal mesafe
+        h_distance = calculate_hue_distance(h, img_h)
+        s_distance = abs(s - img_s)
+        v_distance = abs(v - img_v)
+        
+        # Ağırlıklı benzerlik skoru
+        similarity = 1.0 - (h_distance * 0.6 + s_distance * 0.25 + v_distance * 0.15)
+        
+        # Sonuç ekle
+        results.append({
+            'filename': img_filename,
+            'dominant_color': img_data.get("dominant_color"),
+            'color_group': img_group,
+            'hsv': img_hsv,
+            'similarity': similarity,
+            'group_name': f"{img_group} (H:{int(img_h*360)}°, S:{int(img_s*100)}%, V:{int(img_v*100)}%)"
+        })
     
     # Benzerliğe göre sırala
     results.sort(key=lambda x: x['similarity'], reverse=True)
     
-    # Maksimum sonuç sayısını sınırla
-    return results[:max_results]
+    # Sonuç sayısını sınırla
+    return results[:limit]
 
 
 def get_spectrum_statistics(spectrum: dict) -> dict:

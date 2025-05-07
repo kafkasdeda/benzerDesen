@@ -63,6 +63,9 @@ from color_utils import (
     rgb_to_hsv
 )
 
+import color_utils
+import color_spectrum
+
 # Sürüm bilgisi
 APP_VERSION = "1.2.0"
 APP_LAST_UPDATED = "2025-04-28"
@@ -491,7 +494,7 @@ def serve_cluster_data(model, version):
 
 @app.route("/find-similar", methods=["GET", "POST"])
 def find_similar():
-    """SQLite veritabanı kullanan benzerlik arama endpoint'i"""
+    """SQLite veritabanı kullanan ve renk spektrumu desteği içeren benzerlik arama endpoint'i"""
     start_time = datetime.now()  # Performans ölçümü için başlangıç zamanı
     
     filters = request.get_json() if request.method == "POST" else None
@@ -501,9 +504,23 @@ def find_similar():
     topN = int(request.args.get("topN", 100))
     metric = request.args.get("metric", "cosine")
     
+    # Renk spektrumu için yeni parametreler
+    use_color_spectrum = request.args.get("use_color_spectrum", "false").lower() == "true"
+    # Eğer renk modeli ve HSV ile başlayan bir versiyon seçilmişse, otomatik olarak renk spektrumunu kullan
+    if model == "color" and version and version.startswith("HSV"):
+        use_color_spectrum = True
+        print(f"DEBUG: HSV versiyonu tespit edildi, use_color_spectrum şimdi {use_color_spectrum}")
+    hue_range = request.args.get("hue_range", "0-360")  # Ton aralığı (derece)
+    min_saturation = float(request.args.get("min_saturation", "0"))  # Min doygunluk (0-1)
+    min_value = float(request.args.get("min_value", "0"))  # Min parlaklık (0-1)
+    color_group = request.args.get("color_group", None)  # Renk grubu (ör: "Kırmızı", "Mavi", vb.)
+    
     print(f"📊 Benzer görsel arama: model={model}, version={version}, metric={metric}")
+    if use_color_spectrum and model == "color":
+        print(f"🎨 Renk spektrumu kullanılıyor: hue_range={hue_range}, min_saturation={min_saturation}, min_value={min_value}")
+        if color_group:
+            print(f"🎨 Renk grubu: {color_group}")
 
-    # db_utils modülü aracılığıyla SQLite tabanlı arama yap
     # Fabric bilgilerini kontrol et
     fabric = db_utils.get_fabric_by_filename(filename)
     if not fabric:
@@ -520,40 +537,114 @@ def find_similar():
         except:
             return jsonify([])
 
-    # Benzer görselleri bul
-    results = db_utils.find_similar_images(
-        filename=filename,
-        model_type=model,
-        version=version,
-        topN=topN,
-        metric=metric,
-        filters=filters
-    )
-    
-    # Sonuç yoksa ve hala eski JSON yapısı varsa, uyumluluk modu için eski yöntemi dene
-    if not results:
-        feature_path = f"image_features/{model}_features.npy"
-        index_path = f"image_features/{model}_filenames.json"
-        
-        if os.path.exists(feature_path) and os.path.exists(index_path) and cached_metadata is not None:
-            print(f"⚠️ SQLite sonuç yok, eski yöntem deneniyor: {filename}")
+    # Eğer renk modeli seçiliyse ve renk spektrumu kullanımı isteniyorsa
+    if model == "color" and use_color_spectrum:
+        print(f"DEBUG: Renk spektrumu araması başlıyor - HSV version kontrolü: {version} start with HSV = {version.startswith('HSV') if version else False}")
+        try:
+            # Import color_utils burada
+            from color_utils import (
+                extract_dominant_color_improved, rgb_to_hsv, 
+                identify_color_group
+            )
+
+            # Görselin dominant rengini çıkar
+            img_path = os.path.join("realImages", filename)
+            print(f"DEBUG: Dominant renk çıkarılıyor - {img_path}")
+            dominant_color = extract_dominant_color_improved(img_path, method='histogram')
+
+            # RGB'den HSV'ye dönüştür
+            hsv_color = rgb_to_hsv(dominant_color)
+            print(f"DEBUG: Dominant renk tespit edildi - RGB={dominant_color}, HSV={hsv_color}")
+
+            # Eğer renk grubu belirtilmişse, filtre bilgisini kaydedelim
+            if color_group:
+                # Görselin renk grubunu belirle
+                img_color_group = identify_color_group(hsv_color)
+                if img_color_group != color_group:
+                    print(f"⚠️ Görsel renk grubu ({img_color_group}) filtre ile eşleşmiyor ({color_group})")
+
+            # Doğrudan modülden color_spectrum fonksiyonlarını kullan
+            print(f"DEBUG: find_similar_colors_optimized çağrılıyor - hsv={hsv_color}, limit={topN}")
+            spectrum_results = color_spectrum.find_similar_colors_optimized(
+                hsv_color=hsv_color,
+                limit=topN
+            )
             
-            # Eskiden kullanılan JSON-tabanlı arama fonksiyonuna yönlendir
-            try:
-                # Önbellekte yoksa dosya isimlerini yükle
-                if model not in cached_filenames:
-                    with open(index_path, "r", encoding="utf-8") as f:
-                        cached_filenames[model] = json.load(f)
-                filenames = cached_filenames[model]
+            print(f"DEBUG: {len(spectrum_results)} adet sonuç bulundu")
+            
+            # Sonuçları formatla
+            results = []
+            for item in spectrum_results:
+                filename_result = item.get("filename")
+                if not filename_result:
+                    print(f"WARNING: filename boş - {item}")
+                    continue
+                    
+                fabric_info = db_utils.get_fabric_by_filename(filename_result)
+                if fabric_info:
+                    results.append({
+                        "filename": filename_result,
+                        "design": fabric_info.get("design"),
+                        "season": fabric_info.get("season"),
+                        "quality": fabric_info.get("quality"),
+                        "features": fabric_info.get("features", []),
+                        "cluster": None,  # Renk spektrumunda cluster kavramı yok
+                        "version": version,
+                        "similarity": item["similarity"],
+                        "color_info": {
+                            "dominant_color": item.get("dominant_color"),
+                            "color_group": item.get("color_group"),
+                            "hsv": item.get("hsv")
+                        }
+                    })
+                else:
+                    print(f"WARNING: İşlenecek fabric_info bulunamadı - {filename_result}")
+            
+            print(f"🎨 Renk spektrumu ile {len(results)} sonuç bulundu")
+        except Exception as e:
+            import traceback
+            error_details = traceback.format_exc()
+            print(f"❌ Renk spektrumu hatası: {str(e)}")
+            print(f"Hata detayları: {error_details}")
+            # Hata durumunda standart arama yöntemine geç
+            use_color_spectrum = False
+    
+    # Eğer renk spektrumu kullanılmıyorsa veya bir hata oluştuysa
+    if model != "color" or not use_color_spectrum:
+        # Benzer görselleri bul (standart yöntem)
+        results = db_utils.find_similar_images(
+            filename=filename,
+            model_type=model,
+            version=version,
+            topN=topN,
+            metric=metric,
+            filters=filters
+        )
+        
+        # Sonuç yoksa ve hala eski JSON yapısı varsa, uyumluluk modu için eski yöntemi dene
+        if not results:
+            feature_path = f"image_features/{model}_features.npy"
+            index_path = f"image_features/{model}_filenames.json"
+            
+            if os.path.exists(feature_path) and os.path.exists(index_path) and cached_metadata is not None:
+                print(f"⚠️ SQLite sonuç yok, eski yöntem deneniyor: {filename}")
                 
-                # Faiss indeksini al
-                index = get_faiss_index(model)
-                if index and filename in filenames:
-                    # Burada eski find_similar işlevi çağrılabilir
-                    # Ancak bu geçiş aşamasında kullanılacak geçici bir çözüm
-                    print(f"⚠️ Eski arama yöntemi kullanılıyor")
-            except Exception as e:
-                print(f"❌ Eski yöntem hatası: {str(e)}")
+                # Eskiden kullanılan JSON-tabanlı arama fonksiyonuna yönlendir
+                try:
+                    # Önbellekte yoksa dosya isimlerini yükle
+                    if model not in cached_filenames:
+                        with open(index_path, "r", encoding="utf-8") as f:
+                            cached_filenames[model] = json.load(f)
+                    filenames = cached_filenames[model]
+                    
+                    # Faiss indeksini al
+                    index = get_faiss_index(model)
+                    if index and filename in filenames:
+                        # Burada eski find_similar işlevi çağrılabilir
+                        # Ancak bu geçiş aşamasında kullanılacak geçici bir çözüm
+                        print(f"⚠️ Eski arama yöntemi kullanılıyor")
+                except Exception as e:
+                    print(f"❌ Eski yöntem hatası: {str(e)}")
     
     # Sonuçların ilk elemanı, aranılan görsel olmalı (tam eşleşme)
     # Eğer yoksa ekle
@@ -583,7 +674,6 @@ def find_similar():
     
     return jsonify(results)
 
-
 @app.route("/update-version-comment", methods=["POST"])
 def update_version_comment():
     data = request.get_json()
@@ -608,9 +698,20 @@ def update_version_comment():
         return jsonify({"status": "error", "message": str(e)})
 
 
-@app.route("/create-cluster", methods=["POST"])
+
+
+
+
+
+
+@app.route('/create-cluster', methods=["POST"])
 def create_cluster():
-    """SQLite entegrasyonlu küme oluşturma endpoint'i"""
+    """
+    Küme oluşturma endpoint'i.
+    Model türüne göre farklı kümeleme yaklaşımları kullanır:
+    - Model tipi "color" ise renk spektrumu tabanlı sınıflandırma kullanır
+    - Diğer modeller için standart kümeleme algoritması kullanır
+    """
     data = request.get_json()
     model = data.get("model")
     version = data.get("version")
@@ -620,210 +721,130 @@ def create_cluster():
         return jsonify({"status": "error", "message": "Model, versiyon ve görsel listesi gerekli."})
 
     try:
-        # Versiyon kontrolü - SQLite kullanarak
-        conn = db_utils.create_connection()
-        if not conn:
-            return jsonify({"status": "error", "message": "Veritabanına bağlanılamadı."})
+        # Model ve versiyon kontrolü
+        # Renk modeli için özel sınıflandırma
+        if model == "color":
+            print(f"🎨 Renk modeli için renk spektrumu tabanlı sınıflandırma kullanılıyor: {version}")
+            
+            # color_cluster.py'den işlevleri kullan
+            import color_cluster
+            
+            # Konfigürasyon
+            config = {
+                "model_type": model,
+                "version": version,
+                "divisions": 12,  # varsayılan değerler 
+                "saturation_levels": 3,
+                "value_levels": 3
+            }
+            
+            # Custom parametreler varsa ekle
+            if "parameters" in data:
+                config.update(data.get("parameters", {}))
+            
+            # Renk tabanlı kümeleme yap
+            version_data = color_cluster.cluster_images(config)
+            
+            # JSON olarak metadata güncelle (eski yöntemle uyumluluk için)
+            for fname in filenames:
+                # İlk kümeyi bul
+                assigned_cluster = None
+                for cluster_name, cluster_data in version_data.get("clusters", {}).items():
+                    if fname in cluster_data.get("images", []):
+                        assigned_cluster = cluster_name
+                        break
+                
+                if assigned_cluster:
+                    update_metadata(fname, {"cluster": assigned_cluster})
+            
+            return jsonify({"status": "ok", "message": "Renk spektrumu tabanlı sınıflandırma tamamlandı."})
         
-        cursor = conn.cursor()
-        
-        # Versiyon ID'sini bul
-        cursor.execute("""
-            SELECT id FROM model_versions
-            WHERE model_type = ? AND version_name = ?
-        """, (model, version))
-        
-        version_row = cursor.fetchone()
-        version_id = None
-        
-        # Eğer versiyon yoksa oluştur
-        if not version_row:
-            print(f"✅ Yeni versiyon oluşturuluyor: {model}/{version}")
-            # Versiyon yoksa oluştur
-            cursor.execute("""
-                INSERT INTO model_versions (model_type, version_name, creation_date, parameters)
-                VALUES (?, ?, ?, ?)
-            """, (
-                model,
-                version,
-                datetime.now().isoformat(),
-                json.dumps({"algorithm": "manual"})
-            ))
-            version_id = cursor.lastrowid
         else:
-            version_id = version_row['id']
-        
-        # Görsel ID'lerini al
-        placeholders = ','.join(['?' for _ in filenames])
-        cursor.execute(f"""
-            SELECT id, filename FROM fabrics 
-            WHERE filename IN ({placeholders})
-        """, filenames)
-        
-        fabric_ids = {row['filename']: row['id'] for row in cursor.fetchall()}
-        
-        # Eğer bazı görseller bulunamadıysa uyar
-        missing_files = [f for f in filenames if f not in fabric_ids]
-        if missing_files:
-            print(f"⚠️ Bu dosyalar veritabanında bulunamadı: {missing_files}")
-        
-        # Bu görsellerin mevcut kümelerden çıkarılması
-        # Önce bu versiyondaki tüm kümeleri bul
-        cursor.execute("""
-            SELECT c.id, c.cluster_number, c.representative_id 
-            FROM clusters c WHERE c.version_id = ?
-        """, (version_id,))
-        
-        clusters = cursor.fetchall()
-        
-        for cluster in clusters:
-            # Bu kümede bulunan görselleri bul
-            cursor.execute("""
-                SELECT fabric_id FROM fabric_clusters 
-                WHERE cluster_id = ? AND fabric_id IN ({})
-            """.format(','.join(['?' for _ in fabric_ids.values()])), 
-                [cluster['id']] + list(fabric_ids.values()))
+            # Standart kümeleme yöntemi (auto_cluster.py kullanımı)
+            print(f"🔍 Standart kümeleme algoritması kullanılıyor: {model}/{version}")
             
-            to_remove = cursor.fetchall()
+            # Model verilerini oku
+            model_path = os.path.join("exported_clusters", model, "versions.json")
             
-            # Bu görselleri kümeden çıkar
-            for row in to_remove:
-                cursor.execute("""
-                    DELETE FROM fabric_clusters 
-                    WHERE cluster_id = ? AND fabric_id = ?
-                """, (cluster['id'], row['fabric_id']))
+            if not os.path.exists(model_path):
+                # Model klasörünü ve versiyon dosyasını oluştur
+                os.makedirs(os.path.dirname(model_path), exist_ok=True)
+                # Yeni model dosyası oluştur
+                model_data = {
+                    "current_version": "v1",
+                    "versions": {}
+                }
+                with open(model_path, "w", encoding="utf-8") as f:
+                    json.dump(model_data, f, indent=2, ensure_ascii=False)
+            else:
+                with open(model_path, "r", encoding="utf-8") as f:
+                    model_data = json.load(f)
             
-            # Eğer temsil eden görsel çıkarıldıysa
-            if cluster['representative_id'] in fabric_ids.values():
-                # Geriye kalan herhangi bir üye var mı?
-                cursor.execute("""
-                    SELECT fabric_id FROM fabric_clusters 
-                    WHERE cluster_id = ? LIMIT 1
-                """, (cluster['id'],))
+            # Versiyon kontrolü
+            if version not in model_data["versions"]:
+                model_data["versions"][version] = {
+                    "created_at": datetime.now().isoformat(),
+                    "comment": f"{model} modeli {version} versiyonu",
+                    "algorithm": "manual",
+                    "parameters": {},
+                    "clusters": {}
+                }
+            
+            version_data = model_data["versions"][version]
+            
+            # Mevcut kümelerde bu görseller varsa çıkar
+            for cluster_name, cluster_data in list(version_data["clusters"].items()):
+                cluster_data["images"] = [img for img in cluster_data["images"] if img not in filenames]
                 
-                remaining = cursor.fetchone()
+                if not cluster_data["images"] or cluster_data["representative"] in filenames:
+                    if cluster_data["images"]:
+                        cluster_data["representative"] = cluster_data["images"][0]
+                    else:
+                        del version_data["clusters"][cluster_name]
+            
+            # Yeni küme ismi
+            new_cluster_name = "cluster-" + str(len(version_data["clusters"]) + 1)
+            
+            # thumbnail klasörünü kontrol et
+            thumbnail_path = os.path.join("exported_clusters", model, version, "thumbnails")
+            os.makedirs(thumbnail_path, exist_ok=True)
+            
+            # Görsellerin thumbnail'larını kopyala
+            for fname in filenames:
+                src_thumb = os.path.join("thumbnails", fname)
+                dst_thumb = os.path.join(thumbnail_path, fname)
                 
-                if remaining:
-                    # Yeni temsil eden görsel seç
-                    cursor.execute("""
-                        UPDATE clusters SET representative_id = ? 
-                        WHERE id = ?
-                    """, (remaining['fabric_id'], cluster['id']))
-                else:
-                    # Küme tamamen boşaldı, sil
-                    cursor.execute("""
-                        DELETE FROM clusters 
-                        WHERE id = ?
-                    """, (cluster['id'],))
-        
-        # Yeni küme numarası için mevcut en yüksek numarayı bul
-        cursor.execute("""
-            SELECT MAX(cluster_number) as max_num FROM clusters 
-            WHERE version_id = ?
-        """, (version_id,))
-        
-        max_num = cursor.fetchone()
-        next_id = 1
-        if max_num and max_num['max_num'] is not None:
-            next_id = max_num['max_num'] + 1
-        
-        # Temsil eden görseli seç (ilk görsel)
-        representative = filenames[0]
-        if representative in fabric_ids:
-            # Yeni küme oluştur
-            cursor.execute("""
-                INSERT INTO clusters (version_id, cluster_number, representative_id)
-                VALUES (?, ?, ?)
-            """, (version_id, next_id, fabric_ids[representative]))
+                if os.path.exists(src_thumb):
+                    shutil.copy2(src_thumb, dst_thumb)
+                    
+                # Metadatada güncelle
+                update_metadata(fname, {"cluster": new_cluster_name})
             
-            cluster_id = cursor.lastrowid
+            # Temsil görselini seç (ilk görsel)
+            representative = filenames[0]
             
-            # Kümeye görselleri ekle
-            for filename in filenames:
-                if filename in fabric_ids:
-                    cursor.execute("""
-                        INSERT INTO fabric_clusters (fabric_id, cluster_id)
-                        VALUES (?, ?)
-                    """, (fabric_ids[filename], cluster_id))
+            # Yeni kümeyi oluştur
+            version_data["clusters"][new_cluster_name] = {
+                "representative": representative,
+                "images": filenames,
+                "comment": ""
+            }
+            
+            # Model verisini güncelle
+            model_data["current_version"] = version
             
             # Değişiklikleri kaydet
-            conn.commit()
-            
-            new_cluster_name = f"cluster-{next_id}"
-            
-            # ESKİ YÖNTEM (UYUMLULUK İÇİN): JSON dosyalarını da güncelle
-            try:
-                # Model verisini al
-                model_data = get_model_data(model)
-                
-                # Versiyon kontrolü
-                if version not in model_data["versions"]:
-                    model_data["versions"][version] = {
-                        "created_at": datetime.now().isoformat(),
-                        "comment": f"{model} modeli {version} versiyonu",
-                        "algorithm": "manual",
-                        "parameters": {},
-                        "clusters": {}
-                    }
-                
-                # Eski cluster'lardan seçili görselleri çıkar
-                version_data = model_data["versions"][version]
-                for cluster_name, cluster_data in list(version_data["clusters"].items()):
-                    cluster_data["images"] = [img for img in cluster_data["images"] if img not in filenames]
-                    
-                    if not cluster_data["images"] or cluster_data["representative"] in filenames:
-                        if cluster_data["images"]:
-                            cluster_data["representative"] = cluster_data["images"][0]
-                        else:
-                            del version_data["clusters"][cluster_name]
-                
-                # Thumbnail klasörünü oluştur (eğer yoksa)
-                thumbnail_path = os.path.join("exported_clusters", model, version, "thumbnails")
-                os.makedirs(thumbnail_path, exist_ok=True)
-                
-                # Görsellerin thumbnail'larını kopyala
-                for fname in filenames:
-                    src_thumb = os.path.join("thumbnails", fname)
-                    dst_thumb = os.path.join(thumbnail_path, fname)
-                    
-                    if os.path.exists(src_thumb):
-                        shutil.copy2(src_thumb, dst_thumb)
-                        
-                    # Metadatada güncelle (eski yöntem)
-                    update_metadata(fname, {"cluster": new_cluster_name})
-                
-                # Yeni cluster'a görselleri ekle
-                version_data["clusters"][new_cluster_name] = {
-                    "representative": representative,
-                    "images": filenames,
-                    "comment": ""
-                }
-                
-                # Model verisini kaydet
-                save_model_data(model, model_data)
-            except Exception as e:
-                print(f"⚠️ JSON dosya güncellemesi başarısız: {str(e)}")
+            with open(model_path, "w", encoding="utf-8") as f:
+                json.dump(model_data, f, indent=2, ensure_ascii=False)
             
             return jsonify({"status": "ok", "new_cluster": new_cluster_name})
-        else:
-            # Temsil eden görsel bulunamadı
-            conn.rollback()
-            return jsonify({"status": "error", "message": "Temsil eden görsel bulunamadı."})
-
+            
     except Exception as e:
         import traceback
         print(f"Cluster oluşturma hatası: {str(e)}")
         print(traceback.format_exc())
-        
-        # Hata durumunda işlemi geri al
-        if 'conn' in locals():
-            conn.rollback()
-        
         return jsonify({"status": "error", "message": str(e)})
-    finally:
-        # Bağlantıyı kapat
-        if 'conn' in locals() and conn:
-            conn.close()
+
 
 # --- Feedback kaydı alma endpointi (SQLite) ---
 @app.route("/submit-feedback", methods=["POST"])
@@ -1413,8 +1434,686 @@ def check_faiss_reset_flag():
         cached_metadata = None
         print("🔄 Faiss indeksleri sıfırlandı (reset flag algılandı)")
 
+
+
+
+@app.route("/color-spectrum")
+def get_color_spectrum():
+    """
+    Renk spektrumu yapısını oluşturur ve döndürür.
+    
+    URL parametreleri:
+    - model: Spektrum model tipi (default: 'color')
+    - divisions: Ton (hue) bölünme sayısı (default: 12)
+    - saturation_levels: Doygunluk seviye sayısı (default: 3)
+    - value_levels: Parlaklık seviye sayısı (default: 3)
+    - rebuild: Spektrumu yeniden oluşturur (default: False)
+    - save_version: Spektrumu versiyon olarak kaydeder (default: False)
+    - version_name: Versiyon adı (default: 'spectrum-v1')
+    - comment: Versiyon açıklaması (default: '')
+    
+    Returns:
+        Renk spektrumu yapısını içeren JSON
+    """
+    # URL parametrelerini al
+    model_type = request.args.get("model", "color")
+    divisions = int(request.args.get("divisions", 12))
+    saturation_levels = int(request.args.get("saturation_levels", 3))
+    value_levels = int(request.args.get("value_levels", 3))
+    rebuild = request.args.get("rebuild", "false").lower() == "true"
+    save_version = request.args.get("save_version", "false").lower() == "true"
+    version_name = request.args.get("version_name", "spectrum-v1")
+    comment = request.args.get("comment", "Renk spektrumu tabanlı organizasyon")
+    
+    # Spektrum dosya yolları
+    spectrum_path = f"exported_clusters/{model_type}/spectrum.json"
+    
+    # Eğer yeniden oluşturma istenmediyse ve spektrum zaten varsa, mevcut spektrumu kullan
+    if not rebuild and os.path.exists(spectrum_path):
+        try:
+            with open(spectrum_path, "r", encoding="utf-8") as f:
+                spectrum = json.load(f)
+                
+            print(f"📊 Mevcut renk spektrumu yüklendi: {spectrum_path}")
+            
+            # İstatistikleri hesapla
+            stats = color_spectrum.get_color_spectrum_statistics(spectrum)
+            
+            return jsonify({
+                "spectrum": spectrum,
+                "statistics": stats,
+                "message": "Mevcut renk spektrumu yüklendi."
+            })
+        except Exception as e:
+            print(f"❌ Spektrum yükleme hatası: {str(e)}")
+    
+    # Spektrumu yeniden oluştur
+    print(f"🔄 Renk spektrumu oluşturuluyor: {divisions} bölüm, {saturation_levels} doygunluk seviyesi, {value_levels} parlaklık seviyesi")
+    
+    try:
+        # Görseller klasörünü kontrol et
+        if os.path.exists("realImages"):
+            # Spektrumu oluştur
+            spectrum = color_spectrum.build_spectrum_from_directory(
+                "realImages", 
+                divisions=divisions,
+                saturation_levels=saturation_levels,
+                value_levels=value_levels
+            )
+            
+            # Spektrumu kaydet
+            os.makedirs(os.path.dirname(spectrum_path), exist_ok=True)
+            with open(spectrum_path, "w", encoding="utf-8") as f:
+                json.dump(spectrum, f, ensure_ascii=False, indent=2)
+            
+            # İstatistikleri hesapla
+            stats = color_spectrum.get_color_spectrum_statistics(spectrum)
+            
+            # Eğer istenirse, spektrumu versiyon olarak kaydet
+            if save_version:
+                version_info = color_spectrum.export_spectrum_version(
+                    spectrum, version_name=version_name, model_type=model_type, comment=comment
+                )
+                
+                return jsonify({
+                    "spectrum": spectrum,
+                    "statistics": stats,
+                    "version": version_info,
+                    "message": f"Renk spektrumu oluşturuldu ve '{version_name}' versiyonu olarak kaydedildi."
+                })
+            
+            return jsonify({
+                "spectrum": spectrum,
+                "statistics": stats,
+                "message": "Renk spektrumu oluşturuldu."
+            })
+        else:
+            return jsonify({
+                "error": "realImages klasörü bulunamadı."
+            }), 404
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({
+            "error": f"Spektrum oluşturma hatası: {str(e)}"
+        }), 500
+
+
+@app.route("/dominant-colors")
+def get_dominant_colors():
+    """
+    Bir görselin dominant renklerini analiz eder ve döndürür.
+    
+    URL parametreleri:
+    - filename: Analiz edilecek görselin dosya adı
+    - method: Dominant renk çıkarma yöntemi (default: 'histogram', options: 'histogram', 'kmeans', 'average', 'resize')
+    - count: Çıkarılacak renk sayısı (default: 5)
+    
+    Returns:
+        Dominant renk analiz sonuçlarını içeren JSON
+    """
+    # URL parametrelerini al
+    filename = request.args.get("filename")
+    method = request.args.get("method", "histogram")
+    count = int(request.args.get("count", 5))
+    
+    # Filename kontrolü
+    if not filename:
+        return jsonify({
+            "error": "filename parametresi gerekli."
+        }), 400
+    
+    # Görsel dosya yolu
+    image_path = f"realImages/{filename}"
+    
+    # Dosya varlığını kontrol et
+    if not os.path.exists(image_path):
+        return jsonify({
+            "error": f"Görsel bulunamadı: {filename}"
+        }), 404
+    
+    try:
+        # Dominant renkleri çıkar
+        if count > 1:
+            dominant_colors = color_utils.extract_dominant_colors(
+                image_path, method=method, k=count
+            )
+            
+            # Renk bilgilerini hazırla
+            colors_info = []
+            for i, rgb in enumerate(dominant_colors):
+                hsv = color_utils.rgb_to_hsv(rgb)
+                color_name = color_utils.identify_color_group(hsv)
+                
+                colors_info.append({
+                    "index": i,
+                    "rgb": rgb,
+                    "hex": f"#{rgb[0]:02x}{rgb[1]:02x}{rgb[2]:02x}",
+                    "hsv": [
+                        round(hsv[0] * 360, 1),  # 0-360 derece
+                        round(hsv[1] * 100, 1),  # 0-100%
+                        round(hsv[2] * 100, 1)   # 0-100%
+                    ],
+                    "color_name": color_name
+                })
+        else:
+            # Tek dominant renk
+            rgb = color_utils.extract_dominant_color_improved(image_path, method=method)
+            hsv = color_utils.rgb_to_hsv(rgb)
+            color_name = color_utils.identify_color_group(hsv)
+            
+            colors_info = [{
+                "index": 0,
+                "rgb": rgb,
+                "hex": f"#{rgb[0]:02x}{rgb[1]:02x}{rgb[2]:02x}",
+                "hsv": [
+                    round(hsv[0] * 360, 1),  # 0-360 derece
+                    round(hsv[1] * 100, 1),  # 0-100%
+                    round(hsv[2] * 100, 1)   # 0-100%
+                ],
+                "color_name": color_name
+            }]
+        
+        # Daha detaylı renk analizi
+        detailed_analysis = color_utils.analyze_image_colors(image_path)
+        
+        # Harmonious colors
+        harmonious_colors = []
+        for harmony_type in ["complementary", "analogous", "triadic", "split-complementary", "monochromatic"]:
+            # İlk dominant renk için uyumlu renkleri bul
+            rgb = dominant_colors[0] if count > 1 else rgb
+            harm_colors = color_utils.find_harmonious_colors(rgb, harmony_type)
+            
+            harm_info = []
+            for i, harm_rgb in enumerate(harm_colors):
+                harm_hsv = color_utils.rgb_to_hsv(harm_rgb)
+                harm_color_name = color_utils.identify_color_group(harm_hsv)
+                
+                harm_info.append({
+                    "index": i,
+                    "rgb": harm_rgb,
+                    "hex": f"#{harm_rgb[0]:02x}{harm_rgb[1]:02x}{harm_rgb[2]:02x}",
+                    "hsv": [
+                        round(harm_hsv[0] * 360, 1),
+                        round(harm_hsv[1] * 100, 1),
+                        round(harm_hsv[2] * 100, 1)
+                    ],
+                    "color_name": harm_color_name
+                })
+            
+            harmonious_colors.append({
+                "type": harmony_type,
+                "colors": harm_info
+            })
+        
+        # Spektrumda sınıflandırma
+        try:
+            # Spektrum dosyasını yükle
+            spectrum_path = "exported_clusters/color/spectrum.json"
+            if os.path.exists(spectrum_path):
+                with open(spectrum_path, "r", encoding="utf-8") as f:
+                    spectrum = json.load(f)
+                
+                # İlk dominant renk için spektrum sınıflandırması
+                hsv = color_utils.rgb_to_hsv(dominant_colors[0] if count > 1 else rgb)
+                indices = color_spectrum.classify_color_in_spectrum(hsv, spectrum)
+                group_name = color_spectrum.get_color_group_name(indices, spectrum)
+                
+                spectrum_info = {
+                    "indices": indices,
+                    "group_name": group_name
+                }
+            else:
+                spectrum_info = None
+        except Exception as e:
+            print(f"Spektrum sınıflandırma hatası: {str(e)}")
+            spectrum_info = None
+        
+        return jsonify({
+            "filename": filename,
+            "dominant_colors": colors_info,
+            "harmonious_colors": harmonious_colors,
+            "spectrum_classification": spectrum_info,
+            "detailed_analysis": {
+                "color_distribution": detailed_analysis["color_distribution"],
+                "dominant_color_name": detailed_analysis["color_name"]
+            },
+            "method": method
+        })
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({
+            "error": f"Renk analizi hatası: {str(e)}"
+        }), 500
+
+
+
+@app.route('/create-cluster-version', methods=['POST'])
+def create_cluster_version():
+    """
+    Yeni bir küme versiyonu oluşturma endpoint'i.
+    
+    Model türüne göre farklı kümeleme yaklaşımları kullanır:
+    - Model tipi "color" ise renk spektrumu tabanlı sınıflandırma kullanır
+    - Diğer modeller için standart auto_cluster.py'yi kullanır
+    """
+    try:
+        # İstek verilerini al
+        data = request.get_json()
+        model_type = data.get("model")
+        version = data.get("version")
+        algorithm = data.get("algorithm", "kmeans")  # Varsayılan k-means
+        
+        if not model_type or not version:
+            return jsonify({"status": "error", "message": "Model ve versiyon gerekli."})
+        
+        # Model ve versiyon bilgisini logla
+        print(f"💾 Versiyon oluşturuluyor: {model_type}/{version}, algoritma: {algorithm}")
+        
+        # Konfigürasyon parametrelerini hazırla
+        config = {
+            "model_type": model_type,
+            "version": version,
+            "algorithm": algorithm
+        }
+        
+        # Algoritma parametrelerini ekle
+        if "parameters" in data:
+            config.update(data.get("parameters", {}))
+        
+        # Renk modeli mi kontrol et
+        if model_type == "color":
+            # Renk tabanlı kümeleme için color_cluster modülünü kullan
+            print(f"🎨 Renk modeli için renk spektrumu tabanlı organizasyon kullanılıyor")
+            import color_cluster
+            version_data = color_cluster.cluster_images(config)
+            
+            return jsonify({
+                "status": "ok", 
+                "message": "Renk spektrumu tabanlı organizasyon tamamlandı.",
+                "version": version,
+                "cluster_count": len(version_data.get("clusters", {}))
+            })
+        else:
+            # Standart kümeleme için auto_cluster modülünü kullan
+            print(f"🔍 Standart kümeleme algoritması kullanılıyor")
+            import auto_cluster
+            result = auto_cluster.main(config)
+            
+            return jsonify({
+                "status": "ok",
+                "message": f"{algorithm} algoritması ile kümeleme tamamlandı.",
+                "version": version,
+                "outliers": result.get("outliers", [])
+            })
+            
+    except Exception as e:
+        import traceback
+        error_details = traceback.format_exc()
+        print(f"❌ Versiyon oluşturma hatası: {str(e)}")
+        print(error_details)
+        return jsonify({"status": "error", "message": str(e), "details": error_details})
+
+
+
+
+
+@app.route("/find-similar-colors")
+def find_similar_colors():
+    """
+    Faiss kullanarak benzer renklere sahip görselleri arar.
+    
+    URL parametreleri:
+    - rgb: RGB renk değeri (örn: 255,0,0)
+    - hex: HEX renk değeri (örn: #ff0000) - rgb parametresi önceliklidir
+    - hsv: HSV renk değeri (örn: 0,100,100) - rgb ve hex önceliklidir
+    - k: Döndürülecek sonuç sayısı (default: 50)
+    - use_hsv: HSV renk uzayı kullanma (default: true)
+    - model: Spektrum model tipi (default: 'color')
+    
+    Returns:
+        Benzer renklere sahip görsellerin listesi
+    """
+    import time
+    start_time = time.time()
+    
+    # URL parametrelerini al
+    rgb_param = request.args.get("rgb")
+    hex_param = request.args.get("hex", "")
+    hsv_param = request.args.get("hsv")
+    k = int(request.args.get("k", 50))
+    use_hsv = request.args.get("use_hsv", "true").lower() == "true"
+    model_type = request.args.get("model", "color")
+    
+    # Spektrum ve indeks dosya yolları
+    spectrum_path = f"exported_clusters/{model_type}/spectrum.json"
+    index_path = f"exported_clusters/{model_type}/faiss_index.bin"
+    mapping_path = f"exported_clusters/{model_type}/index_mapping.json"
+    
+    # Renk değeri kontrolü
+    if not rgb_param and not hex_param and not hsv_param:
+        return jsonify({
+            "error": "rgb, hex veya hsv parametrelerinden biri gerekli."
+        }), 400
+    
+    # Renk değerini HSV'ye dönüştür
+    try:
+        if rgb_param:
+            # RGB parametresi (örn: 255,0,0)
+            rgb = [int(x) for x in rgb_param.split(",")]
+            hsv = color_utils.rgb_to_hsv(rgb)
+        elif hex_param:
+            # HEX parametresi (örn: #ff0000)
+            hex_color = hex_param.lstrip("#")
+            rgb = tuple(int(hex_color[i:i+2], 16) for i in (0, 2, 4))
+            hsv = color_utils.rgb_to_hsv(rgb)
+        elif hsv_param:
+            # HSV parametresi (örn: 0,100,100) - 0-360, 0-100, 0-100 aralığından 0-1 aralığına dönüştür
+            hsv_values = [float(x) for x in hsv_param.split(",")]
+            hsv = (hsv_values[0] / 360.0, hsv_values[1] / 100.0, hsv_values[2] / 100.0)
+    except Exception as e:
+        return jsonify({
+            "error": f"Renk dönüşüm hatası: {str(e)}"
+        }), 400
+    
+    # Spektrumu kontrol et
+    if not os.path.exists(spectrum_path):
+        return jsonify({
+            "error": f"Spektrum bulunamadı. Önce /color-spectrum endpoint'ini çağırın."
+        }), 404
+    
+    # Spektrumu yükle
+    with open(spectrum_path, "r", encoding="utf-8") as f:
+        spectrum = json.load(f)
+    
+    # Faiss indeksini kontrol et ve gerekirse oluştur
+    if not os.path.exists(index_path) or not os.path.exists(mapping_path):
+        try:
+            # Faiss indeksi oluştur
+            import faiss
+            faiss_index, index_mapping = color_spectrum.create_faiss_index_for_colors(
+                spectrum, use_hsv=use_hsv
+            )
+            
+            # İndeksi kaydet
+            if faiss_index is not None:
+                os.makedirs(os.path.dirname(index_path), exist_ok=True)
+                faiss.write_index(faiss_index, index_path)
+                
+                # index_mapping'in id_to_filename ve filename_to_id anahtarlarını dict'e dönüştürelim
+                # (JSON'da int anahtarlar string'e dönüşür)
+                serialize_mapping = {
+                    "id_to_filename": {str(k): v for k, v in index_mapping["id_to_filename"].items()},
+                    "filename_to_id": {k: v for k, v in index_mapping["filename_to_id"].items()}
+                }
+                
+                with open(mapping_path, "w", encoding="utf-8") as f:
+                    json.dump(serialize_mapping, f, ensure_ascii=False, indent=2)
+        except Exception as e:
+            traceback.print_exc()
+            return jsonify({
+                "error": f"Faiss indeksi oluşturma hatası: {str(e)}"
+            }), 500
+    
+    try:
+        # Faiss indeksini yükle
+        import faiss
+        faiss_index = faiss.read_index(index_path)
+        
+        # Mapping'i yükle ve int anahtarları tekrar int'e dönüştür
+        with open(mapping_path, "r", encoding="utf-8") as f:
+            index_mapping_raw = json.load(f)
+        
+        # id_to_filename'de string anahtarları int'e çevir
+        index_mapping = {
+            "id_to_filename": {int(k): v for k, v in index_mapping_raw["id_to_filename"].items()},
+            "filename_to_id": index_mapping_raw["filename_to_id"]
+        }
+        
+        # Benzer renkleri bul
+        results = color_spectrum.find_similar_colors_with_faiss(
+            hsv, faiss_index, index_mapping, k=k, use_hsv=use_hsv
+        )
+        
+        # Renk bilgilerini ekle
+        for result in results:
+            filename = result["filename"]
+            try:
+                # Dominant renk bilgisini ekle
+                image_path = f"realImages/{filename}"
+                rgb = color_utils.extract_dominant_color_improved(image_path, method="histogram")
+                img_hsv = color_utils.rgb_to_hsv(rgb)
+                color_name = color_utils.identify_color_group(img_hsv)
+                
+                result["dominant_color"] = {
+                    "rgb": rgb,
+                    "hex": f"#{rgb[0]:02x}{rgb[1]:02x}{rgb[2]:02x}",
+                    "hsv": [
+                        round(img_hsv[0] * 360, 1),
+                        round(img_hsv[1] * 100, 1),
+                        round(img_hsv[2] * 100, 1)
+                    ],
+                    "color_name": color_name
+                }
+            except Exception as e:
+                # Hata durumunda sadece hata bilgisini ekle
+                result["dominant_color_error"] = str(e)
+        
+        # İstatistik bilgileri
+        rgb_value = color_utils.hsv_to_rgb(hsv)
+        stats = {
+            "query_color": {
+                "hsv": [
+                    round(hsv[0] * 360, 1),
+                    round(hsv[1] * 100, 1),
+                    round(hsv[2] * 100, 1)
+                ],
+                "rgb": rgb_value,
+                "hex": f"#{rgb_value[0]:02x}{rgb_value[1]:02x}{rgb_value[2]:02x}",
+                "color_name": color_utils.identify_color_group(hsv)
+            },
+            "results_count": len(results),
+            "search_time": round(time.time() - start_time, 3)
+        }
+        
+        return jsonify({
+            "results": results,
+            "stats": stats,
+            "message": f"Renk araması tamamlandı. {len(results)} sonuç bulundu."
+        })
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({
+            "error": f"Renk arama hatası: {str(e)}"
+        }), 500
+    """
+    Faiss kullanarak benzer renklere sahip görselleri arar.
+    
+    URL parametreleri:
+    - rgb: RGB renk değeri (örn: 255,0,0)
+    - hex: HEX renk değeri (örn: #ff0000) - rgb parametresi önceliklidir
+    - hsv: HSV renk değeri (örn: 0,100,100) - rgb ve hex önceliklidir
+    - k: Döndürülecek sonuç sayısı (default: 50)
+    - use_hsv: HSV renk uzayı kullanma (default: true)
+    - model: Spektrum model tipi (default: 'color')
+    
+    Returns:
+        Benzer renklere sahip görsellerin listesi
+    """
+    import time
+    start_time = time.time()
+    # URL parametrelerini al
+    rgb_param = request.args.get("rgb")
+    hex_param = request.args.get("hex")
+    hsv_param = request.args.get("hsv")
+    k = int(request.args.get("k", 50))
+    use_hsv = request.args.get("use_hsv", "true").lower() == "true"
+    model_type = request.args.get("model", "color")
+    
+    # Spektrum ve indeks dosya yolları
+    spectrum_path = f"exported_clusters/{model_type}/spectrum.json"
+    index_path = f"exported_clusters/{model_type}/faiss_index.bin"
+    mapping_path = f"exported_clusters/{model_type}/index_mapping.json"
+    
+    # Renk değeri kontrolü
+    if not rgb_param and not hex_param and not hsv_param:
+        return jsonify({
+            "error": "rgb, hex veya hsv parametrelerinden biri gerekli."
+        }), 400
+    
+    # Renk değerini HSV'ye dönüştür
+    try:
+        if rgb_param:
+            # RGB parametresi (örn: 255,0,0)
+            rgb = [int(x) for x in rgb_param.split(",")]
+            hsv = color_utils.rgb_to_hsv(rgb)
+        elif hex_param:
+            # HEX parametresi (örn: #ff0000)
+            hex_color = hex_param.lstrip("#")
+
+            # Geçerli hex değeri kontrolü
+            if len(hex_color) != 6:
+                return jsonify({
+                    "error": "Geçersiz HEX renk değeri. 6 karakter olmalı (örn: ff0000)."
+                }), 400
+            try:
+                rgb = tuple(int(hex_color[i:i+2], 16) for i in (0, 2, 4))
+                hsv = color_utils.rgb_to_hsv(rgb)
+            except ValueError:
+                return jsonify({
+                    "error": "Geçersiz HEX renk değeri. Lütfen geçerli bir HEX kodu girin (örn: ff0000)."
+                }), 400
+
+
+        elif hsv_param:
+            # HSV parametresi (örn: 0,100,100) - 0-360, 0-100, 0-100 aralığından 0-1 aralığına dönüştür
+            hsv_values = [float(x) for x in hsv_param.split(",")]
+            hsv = (hsv_values[0] / 360.0, hsv_values[1] / 100.0, hsv_values[2] / 100.0)
+    except Exception as e:
+        return jsonify({
+            "error": f"Renk dönüşüm hatası: {str(e)}"
+        }), 400
+    
+    # Spektrumu kontrol et
+    if not os.path.exists(spectrum_path):
+        return jsonify({
+            "error": f"Spektrum bulunamadı. Önce /color-spectrum endpoint'ini çağırın."
+        }), 404
+    
+    # Spektrumu yükle
+    with open(spectrum_path, "r", encoding="utf-8") as f:
+        spectrum = json.load(f)
+    
+    # Faiss indeksini kontrol et ve gerekirse oluştur
+    if not os.path.exists(index_path) or not os.path.exists(mapping_path):
+        try:
+            # Faiss indeksi oluştur
+            import faiss
+            faiss_index, index_mapping = color_spectrum.create_faiss_index_for_colors(
+                spectrum, use_hsv=use_hsv
+            )
+            
+            # İndeksi kaydet
+            if faiss_index is not None:
+                os.makedirs(os.path.dirname(index_path), exist_ok=True)
+                faiss.write_index(faiss_index, index_path)
+                
+                with open(mapping_path, "w", encoding="utf-8") as f:
+                    json.dump(index_mapping, f, ensure_ascii=False, indent=2)
+        except Exception as e:
+            traceback.print_exc()
+            return jsonify({
+                "error": f"Faiss indeksi oluşturma hatası: {str(e)}"
+            }), 500
+    
+    try:
+        # Faiss indeksini yükle
+        import faiss
+        faiss_index = faiss.read_index(index_path)
+        
+        with open(mapping_path, "r", encoding="utf-8") as f:
+            index_mapping = json.load(f)
+        
+        # Benzer renkleri bul
+        results = color_spectrum.find_similar_colors_with_faiss(
+            hsv, faiss_index, index_mapping, k=k, use_hsv=use_hsv
+        )
+        
+        # Renk bilgilerini ekle
+        for result in results:
+            filename = result["filename"]
+            try:
+                # Dominant renk bilgisini ekle
+                image_path = f"realImages/{filename}"
+                rgb = color_utils.extract_dominant_color_improved(image_path, method="histogram")
+                img_hsv = color_utils.rgb_to_hsv(rgb)
+                color_name = color_utils.identify_color_group(img_hsv)
+                
+                result["dominant_color"] = {
+                    "rgb": rgb,
+                    "hex": f"#{rgb[0]:02x}{rgb[1]:02x}{rgb[2]:02x}",
+                    "hsv": [
+                        round(img_hsv[0] * 360, 1),
+                        round(img_hsv[1] * 100, 1),
+                        round(img_hsv[2] * 100, 1)
+                    ],
+                    "color_name": color_name
+                }
+            except:
+                # Hata durumunda boş geç
+                pass
+        
+        # İstatistik bilgileri
+        stats = {
+            "query_color": {
+                "hsv": [
+                    round(hsv[0] * 360, 1),
+                    round(hsv[1] * 100, 1),
+                    round(hsv[2] * 100, 1)
+                ],
+                "rgb": color_utils.hsv_to_rgb(hsv),
+                "hex": f"#{color_utils.hsv_to_rgb(hsv)[0]:02x}{color_utils.hsv_to_rgb(hsv)[1]:02x}{color_utils.hsv_to_rgb(hsv)[2]:02x}",
+                "color_name": color_utils.identify_color_group(hsv)
+            },
+            "results_count": len(results),
+            "search_time": round(time.time() - start_time, 3)
+        }
+        
+        return jsonify({
+            "results": results,
+            "stats": stats,
+            "message": f"Renk araması tamamlandı. {len(results)} sonuç bulundu."
+        })
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({
+            "error": f"Renk arama hatası: {str(e)}"
+        }), 500
+
+
+
+
 # Uygulamayı başlatırken flag kontrolü
 check_faiss_reset_flag()
+
+
+
+
+# Renk önbelleği işlemleri
+@app.route("/reset-color-cache")
+def reset_color_cache():
+    """Renk önbelleğini temizler ve Faiss indeksini sıfırlar"""
+    try:
+        from color_spectrum import clear_color_cache
+        clear_color_cache()
+        return jsonify({
+            "status": "ok",
+            "message": "Renk önbelleği temizlendi"
+        })
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "message": f"Renk önbelleği temizlenirken hata: {str(e)}"
+        }), 500
 
 if __name__ == "__main__":
     # Uygulama başlarken bir temizlik zamanlaması başlat

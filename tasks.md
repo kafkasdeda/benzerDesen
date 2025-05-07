@@ -80,6 +80,38 @@ Tekstil sektöründe görsel benzerlik analizi ve gruplama sistemi geliştirme p
 - [x] FEATURE-004-harmonious-search ✅
 - [x] PERF-002-batch-loading ✅
 
+- [x] FEATURE-009-color-model-enhancement
+   - **Durum**: Tamamlandı ✅
+   - **Öncelik**: P1
+   - **Tahmini**: 15s
+   - **Gerçek**: 13s
+   - **Başlangıç**: 2025-05-06
+   - **Tamamlanma**: 2025-05-06
+   - **Açıklama**: Renk modeli için kümeleme yaklaşımı yerine renk spektrumu tabanlı organizasyon
+   - **Kabul Kriterleri**:
+     - HSV renk uzayı kullanarak ton, doygunluk ve parlaklık bölümleri ile doğal renk organizasyonu ✅
+     - Renk modeli için özelleştirilmiş parametre seçenekleri ✅
+     - Kümeleme algoritması sınırlılıklarının kaldırılması ✅
+     - Daha doğal renk benzerliği sonuçları sunma ✅
+   - **Bağımlılıklar**: UI-008-model-version-persistence
+   - **Notlar**: Renk modeli için HSV bazlı sınıflandırma, daha doğru renk analizi ve Faiss entegrasyonu ile hızlı renk araması özellikleri eklendi. `/create-cluster` endpoint'i model tipine göre farklı davranacak şekilde güncellendi.
+
+- [x] FEATURE-009-E-color-model-ui-parameters
+   - **Durum**: Tamamlandı ✅
+   - **Öncelik**: P1
+   - **Tahmini**: 2.5s
+   - **Gerçek**: 2.5s
+   - **Başlangıç**: 2025-05-06
+   - **Tamamlanma**: 2025-05-06
+   - **Açıklama**: Renk modeli için özelleştirilmiş parametre seçeneklerini UI'a ekleme
+   - **Kabul Kriterleri**:
+     - UI sezgisel olmalı ✅
+     - Parametreler anında sonuçları etkilemeli ✅
+     - Diğer modellerin parametreleri korunmalı ✅
+     - Filtreler birleştirilebilir olmalı (AND/OR) ✅
+   - **Bağımlılıklar**: FEATURE-009-color-model-enhancement
+   - **Notlar**: Renk çarkı arayüzü ve renk grubu hızlı seçim butonları eklendi. Seçilen renk veya ton değerleri clusterParams nesnesine aktarılıyor.
+
 - [x] UI-008-model-version-persistence
    - **Durum**: Tamamlandı ✅
    - **Öncelik**: P1

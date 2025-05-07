@@ -1,0 +1,27 @@
+### FEATURE-009-E: Renk Modeli için Özel UI Parametreleri
+- **Durum**: Tamamlandı ✅
+- **Öncelik**: P1
+- **Tahmini Süre**: 2.5 saat
+- **Gerçek Süre**: 2.5 saat
+- **Başlangıç Tarihi**: 2025-05-06
+- **Tamamlanma Tarihi**: 2025-05-06
+- **Açıklama**: Renk modeli için özelleştirilmiş parametre seçeneklerini UI'a ekleme
+- **Yapılanlar**:
+  - ✅ Renk modeli seçildiğinde özel parametre paneli gösterimi
+  - ✅ Ton (Hue) bölümleri seçimi için dropdown (6, 12, 18, 24, 36 bölüm)
+  - ✅ Doygunluk (Saturation) seviyeleri seçimi (2-5 seviye)
+  - ✅ Parlaklık (Value) seviyeleri seçimi (2-5 seviye)
+  - ✅ Dominant renk çıkarma yöntemi seçimi (Histogram, K-Means, Ortalama)
+  - ✅ Sezgisel tooltip açıklamaları
+  - ✅ Renk grubu hızlı seçim butonları (kırmızı, sarı, yeşil, vb.)
+  - ✅ Renk çarkı arayüzü
+- **Kabul Kriterleri**:
+  - ✅ UI sezgisel olmalı
+  - ✅ Parametreler anında sonuçları etkilemeli
+  - ✅ Diğer modellerin parametreleri korunmalı
+  - ✅ Filtreler birleştirilebilir olmalı (AND/OR)
+- **Notlar**:
+  - right_panel.js içinde "Yeni Versiyon Oluştur" modalına renk çarkı arayüzü eklendi
+  - Ton (Hue) seçimi için interaktif renk çarkı kullanıcılara daha sezgisel bir deneyim sunuyor
+  - Renk grubu hızlı seçim butonları ile tek tıkla ön tanımlı renkler seçilebiliyor
+  - Seçilen renk veya ton, clusterParams nesnesine otomatik olarak ekleniyor

@@ -563,6 +563,10 @@ function showNewVersionModal() {
   const oldModal = document.getElementById("new-version-modal");
   if (oldModal) document.body.removeChild(oldModal);
   
+  // Seçili model tipini al
+  const selectedModel = window.currentModel;
+  console.log("Seçili model:", selectedModel);
+  
   // Yeni modal oluştur
   const modal = document.createElement("div");
   modal.id = "new-version-modal";
@@ -585,100 +589,413 @@ function showNewVersionModal() {
   content.style.maxWidth = "500px";
   content.style.width = "90%";
   
-  content.innerHTML = `
-    <h2>Yeni ${window.currentModel} Versiyonu Oluştur</h2>
-    
-    <div style="margin-bottom: 15px;">
-      <label style="display: block; margin-bottom: 5px;"><strong>Algoritma:</strong></label>
-      <select id="algorithm-select" style="width: 100%; padding: 8px; border-radius: 4px;">
-        <option value="kmeans">K-Means</option>
-        <option value="dbscan">DBSCAN</option>
-        <option value="hierarchical">Hierarchical</option>
-      </select>
-    </div>
-    
-    <!-- Algoritma-özel parametreler -->
-    <div id="algorithm-params">
-      <!-- K-Means için -->
-      <div id="kmeans-params" class="algo-params">
-        <label style="display: block; margin-bottom: 5px;">
-          <strong>k - Cluster Sayısı:</strong> <span id="k-value">5</span>
-        </label>
-        <input type="range" id="k-slider" min="2" max="20" value="5" style="width: 100%;">
-      </div>
-      
-      <!-- DBSCAN için (başlangıçta gizli) -->
-      <div id="dbscan-params" class="algo-params" style="display: none;">
-        <label style="display: block; margin-bottom: 5px;">
-          <strong>eps - Threshold:</strong> <span id="eps-value">0.5</span>
-        </label>
-        <input type="range" id="eps-slider" min="0.1" max="2" step="0.1" value="0.5" style="width: 100%;">
+  // Başlık
+  const title = document.createElement("h2");
+  title.textContent = `Yeni ${selectedModel} Versiyonu Oluştur`;
+  content.appendChild(title);
+  
+  // Eğer seçilen model "color" ise farklı form göster
+  if (selectedModel === "color") {
+    console.log("Renk modeli için özel form gösteriliyor...");
+    // Renk modeli için özel form
+    content.innerHTML += `
+      <div class="color-model-params">
+        <p>Renk modeli için kümeleme yerine HSV renk uzayında spektrum organizasyonu kullanılacak.</p>
         
-        <label style="display: block; margin-top: 10px; margin-bottom: 5px;">
-          <strong>min_samples:</strong> <span id="min-samples-value">5</span>
-        </label>
-        <input type="range" id="min-samples-slider" min="2" max="15" value="5" style="width: 100%;">
+        <div class="form-group">
+          <label for="version-name">Versiyon Adı:</label>
+          <input type="text" id="version-name" value="v1" class="form-control" style="width: 100%; padding: 8px; margin-top: 5px; border-radius: 4px; border: 1px solid #ddd;">
+        </div>
+        
+        <div class="form-group">
+          <label for="divisions" title="Renk çemberindeki bölüm sayısı. Daha yüksek değer daha detaylı ton ayrımı sağlar.">
+            Ton (Hue) Bölümleri:
+          </label>
+          <select id="divisions" class="form-control" style="width: 100%; padding: 8px; margin-top: 5px; border-radius: 4px; border: 1px solid #ddd;">
+            <option value="6">6 bölüm (60° aralıklar)</option>
+            <option value="12" selected>12 bölüm (30° aralıklar)</option>
+            <option value="18">18 bölüm (20° aralıklar)</option>
+            <option value="24">24 bölüm (15° aralıklar)</option>
+            <option value="36">36 bölüm (10° aralıklar)</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="saturation-levels" title="Doygunluk seviyelerinin sayısı. Daha yüksek değer daha detaylı doygunluk ayrımı sağlar.">
+            Doygunluk (Saturation) Seviyeleri:
+          </label>
+          <select id="saturation-levels" class="form-control" style="width: 100%; padding: 8px; margin-top: 5px; border-radius: 4px; border: 1px solid #ddd;">
+            <option value="2">2 seviye (Düşük, Yüksek)</option>
+            <option value="3" selected>3 seviye (Düşük, Orta, Yüksek)</option>
+            <option value="4">4 seviye (Çok detaylı)</option>
+            <option value="5">5 seviye (En detaylı)</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="value-levels" title="Parlaklık seviyelerinin sayısı. Daha yüksek değer daha detaylı parlaklık ayrımı sağlar.">
+            Parlaklık (Value) Seviyeleri:
+          </label>
+          <select id="value-levels" class="form-control" style="width: 100%; padding: 8px; margin-top: 5px; border-radius: 4px; border: 1px solid #ddd;">
+            <option value="2">2 seviye (Koyu, Açık)</option>
+            <option value="3" selected>3 seviye (Koyu, Orta, Açık)</option>
+            <option value="4">4 seviye (Çok detaylı)</option>
+            <option value="5">5 seviye (En detaylı)</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="dominant-color-method" title="Görselden dominant renk çıkarma yöntemi. Histogram daha hızlı, K-means daha doğru sonuç verir.">
+            Dominant Renk Metodu:
+          </label>
+          <select id="dominant-color-method" class="form-control" style="width: 100%; padding: 8px; margin-top: 5px; border-radius: 4px; border: 1px solid #ddd;">
+            <option value="histogram" selected>Histogram (Hızlı)</option>
+            <option value="kmeans">K-Means (Doğru)</option>
+            <option value="average">Ortalama (En hızlı)</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="color-wheel-container" title="Renk çarkı üzerinden renk seçebilirsiniz.">Renk Çarkı:</label>
+          <div id="color-wheel-container" style="display: flex; justify-content: center; margin-top: 15px; margin-bottom: 15px;">
+            <div class="color-wheel" style="position: relative; width: 200px; height: 200px; border-radius: 50%; overflow: hidden; box-shadow: 0 0 8px rgba(0,0,0,0.2);">
+              <!-- Renk çarkı bölümleri -->
+              <div class="color-section" data-hue="0" style="position: absolute; width: 50%; height: 50%; background: #f00; left: 50%; top: 0; transform-origin: bottom left; transform: rotate(0deg) skewY(60deg);"></div>
+              <div class="color-section" data-hue="30" style="position: absolute; width: 50%; height: 50%; background: #ff8000; left: 50%; top: 0; transform-origin: bottom left; transform: rotate(30deg) skewY(60deg);"></div>
+              <div class="color-section" data-hue="60" style="position: absolute; width: 50%; height: 50%; background: #ff0; left: 50%; top: 0; transform-origin: bottom left; transform: rotate(60deg) skewY(60deg);"></div>
+              <div class="color-section" data-hue="90" style="position: absolute; width: 50%; height: 50%; background: #80ff00; left: 50%; top: 0; transform-origin: bottom left; transform: rotate(90deg) skewY(60deg);"></div>
+              <div class="color-section" data-hue="120" style="position: absolute; width: 50%; height: 50%; background: #0f0; left: 50%; top: 0; transform-origin: bottom left; transform: rotate(120deg) skewY(60deg);"></div>
+              <div class="color-section" data-hue="150" style="position: absolute; width: 50%; height: 50%; background: #00ff80; left: 50%; top: 0; transform-origin: bottom left; transform: rotate(150deg) skewY(60deg);"></div>
+              <div class="color-section" data-hue="180" style="position: absolute; width: 50%; height: 50%; background: #0ff; left: 50%; top: 0; transform-origin: bottom left; transform: rotate(180deg) skewY(60deg);"></div>
+              <div class="color-section" data-hue="210" style="position: absolute; width: 50%; height: 50%; background: #0080ff; left: 50%; top: 0; transform-origin: bottom left; transform: rotate(210deg) skewY(60deg);"></div>
+              <div class="color-section" data-hue="240" style="position: absolute; width: 50%; height: 50%; background: #00f; left: 50%; top: 0; transform-origin: bottom left; transform: rotate(240deg) skewY(60deg);"></div>
+              <div class="color-section" data-hue="270" style="position: absolute; width: 50%; height: 50%; background: #8000ff; left: 50%; top: 0; transform-origin: bottom left; transform: rotate(270deg) skewY(60deg);"></div>
+              <div class="color-section" data-hue="300" style="position: absolute; width: 50%; height: 50%; background: #f0f; left: 50%; top: 0; transform-origin: bottom left; transform: rotate(300deg) skewY(60deg);"></div>
+              <div class="color-section" data-hue="330" style="position: absolute; width: 50%; height: 50%; background: #ff0080; left: 50%; top: 0; transform-origin: bottom left; transform: rotate(330deg) skewY(60deg);"></div>
+              <!-- Orta beyaz daire -->
+              <div class="center-circle" style="position: absolute; width: 40px; height: 40px; background: white; border-radius: 50%; top: 50%; left: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 5px rgba(0,0,0,0.2); border: 1px solid #ddd;"></div>
+              <!-- Marker (seçilen rengi gösterecek) -->
+              <div id="color-marker" style="position: absolute; width: 12px; height: 12px; background: black; border-radius: 50%; top: 30px; left: 100px; transform: translate(-50%, -50%); box-shadow: 0 0 5px rgba(0,0,0,0.5); display: none;"></div>
+            </div>
+          </div>
+          <div id="selected-hue-info" style="text-align: center; margin-bottom: 10px;">Seçilen Ton (Hue): Yok</div>
+        </div>
+
+        <div class="form-group">
+          <label for="color-group-filter" title="Belirli renk gruplarını filtreleme veya vurgulama için kullanılır.">Renk Grubu Hızlı Seçim:</label>
+          <div id="color-group-buttons" style="display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px;">
+            <button type="button" class="color-group-btn" data-color="red" style="width: 30px; height: 30px; background-color: #e74c3c; border: 2px solid #ddd; border-radius: 4px;"></button>
+            <button type="button" class="color-group-btn" data-color="orange" style="width: 30px; height: 30px; background-color: #e67e22; border: 2px solid #ddd; border-radius: 4px;"></button>
+            <button type="button" class="color-group-btn" data-color="yellow" style="width: 30px; height: 30px; background-color: #f1c40f; border: 2px solid #ddd; border-radius: 4px;"></button>
+            <button type="button" class="color-group-btn" data-color="green" style="width: 30px; height: 30px; background-color: #2ecc71; border: 2px solid #ddd; border-radius: 4px;"></button>
+            <button type="button" class="color-group-btn" data-color="blue" style="width: 30px; height: 30px; background-color: #3498db; border: 2px solid #ddd; border-radius: 4px;"></button>
+            <button type="button" class="color-group-btn" data-color="purple" style="width: 30px; height: 30px; background-color: #9b59b6; border: 2px solid #ddd; border-radius: 4px;"></button>
+            <button type="button" class="color-group-btn" data-color="pink" style="width: 30px; height: 30px; background-color: #fd79a8; border: 2px solid #ddd; border-radius: 4px;"></button>
+            <button type="button" class="color-group-btn" data-color="brown" style="width: 30px; height: 30px; background-color: #795548; border: 2px solid #ddd; border-radius: 4px;"></button>
+            <button type="button" class="color-group-btn" data-color="gray" style="width: 30px; height: 30px; background-color: #95a5a6; border: 2px solid #ddd; border-radius: 4px;"></button>
+            <button type="button" class="color-group-btn" data-color="black" style="width: 30px; height: 30px; background-color: #34495e; border: 2px solid #ddd; border-radius: 4px;"></button>
+            <button type="button" class="color-group-btn" data-color="white" style="width: 30px; height: 30px; background-color: #ecf0f1; border: 2px solid #ddd; border-radius: 4px;"></button>
+          </div>
+          <div id="selected-color-info" style="margin-top: 8px; font-size: 14px;">Seçilen Renk: Yok</div>
+        </div>
+
+        <div class="form-group">
+          <label for="version-comment">Açıklama (opsiyonel):</label>
+          <input type="text" id="version-comment" class="form-control" placeholder="Bu versiyon hakkında bir açıklama..." style="width: 100%; padding: 8px; margin-top: 5px; border-radius: 4px; border: 1px solid #ddd;">
+        </div>
       </div>
-      
-      <!-- Hierarchical için (başlangıçta gizli) -->
-      <div id="hierarchical-params" class="algo-params" style="display: none;">
-        <label style="display: block; margin-bottom: 5px;">
-          <strong>Linkage Type:</strong>
-        </label>
-        <select id="linkage-select" style="width: 100%; padding: 8px; border-radius: 4px;">
-          <option value="ward">Ward (varsayılan)</option>
-          <option value="complete">Complete</option>
-          <option value="average">Average</option>
-          <option value="single">Single</option>
+    `;
+  } else {
+    // Diğer modeller için standart form
+    content.innerHTML += `
+      <div style="margin-bottom: 15px;">
+        <label style="display: block; margin-bottom: 5px;"><strong>Algoritma:</strong></label>
+        <select id="algorithm-select" style="width: 100%; padding: 8px; border-radius: 4px;">
+          <option value="kmeans">K-Means</option>
+          <option value="dbscan">DBSCAN</option>
+          <option value="hierarchical">Hierarchical</option>
         </select>
-        
-        <label style="display: block; margin-top: 10px; margin-bottom: 5px;">
-          <strong>Cluster Sayısı:</strong> <span id="h-k-value">5</span>
-        </label>
-        <input type="range" id="h-k-slider" min="2" max="20" value="5" style="width: 100%;">
       </div>
-    </div>
-    
-    <!-- Versiyon Açıklaması -->
-    <div style="margin-top: 15px;">
-      <label style="display: block; margin-bottom: 5px;"><strong>Versiyon Açıklaması:</strong></label>
-      <textarea id="version-comment" style="width: 100%; padding: 8px; border-radius: 4px; height: 80px;" 
-        placeholder="Bu versiyonun özelliklerini yazın..."></textarea>
-    </div>
-    
-    <!-- Butonlar -->
-    <div style="margin-top: 20px; display: flex; justify-content: space-between;">
-      <button id="cancel-version" style="padding: 10px 15px; background-color: #ccc; border: none; border-radius: 4px; cursor: pointer;">İptal</button>
-      <button id="create-version" style="padding: 10px 15px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;">Oluştur</button>
-    </div>
-  `;
+      
+      <!-- Algoritma-özel parametreler -->
+      <div id="algorithm-params">
+        <!-- K-Means için -->
+        <div id="kmeans-params" class="algo-params">
+          <label style="display: block; margin-bottom: 5px;">
+            <strong>k - Cluster Sayısı:</strong> <span id="k-value">5</span>
+          </label>
+          <input type="range" id="k-slider" min="2" max="20" value="5" style="width: 100%;">
+        </div>
+        
+        <!-- DBSCAN için (başlangıçta gizli) -->
+        <div id="dbscan-params" class="algo-params" style="display: none;">
+          <label style="display: block; margin-bottom: 5px;">
+            <strong>eps - Threshold:</strong> <span id="eps-value">0.5</span>
+          </label>
+          <input type="range" id="eps-slider" min="0.1" max="2" step="0.1" value="0.5" style="width: 100%;">
+          
+          <label style="display: block; margin-top: 10px; margin-bottom: 5px;">
+            <strong>min_samples:</strong> <span id="min-samples-value">5</span>
+          </label>
+          <input type="range" id="min-samples-slider" min="2" max="15" value="5" style="width: 100%;">
+        </div>
+        
+        <!-- Hierarchical için (başlangıçta gizli) -->
+        <div id="hierarchical-params" class="algo-params" style="display: none;">
+          <label style="display: block; margin-bottom: 5px;">
+            <strong>Linkage Type:</strong>
+          </label>
+          <select id="linkage-select" style="width: 100%; padding: 8px; border-radius: 4px;">
+            <option value="ward">Ward (varsayılan)</option>
+            <option value="complete">Complete</option>
+            <option value="average">Average</option>
+            <option value="single">Single</option>
+          </select>
+          
+          <label style="display: block; margin-top: 10px; margin-bottom: 5px;">
+            <strong>Cluster Sayısı:</strong> <span id="h-k-value">5</span>
+          </label>
+          <input type="range" id="h-k-slider" min="2" max="20" value="5" style="width: 100%;">
+        </div>
+      </div>
+      
+      <!-- Versiyon Açıklaması -->
+      <div style="margin-top: 15px;">
+        <label style="display: block; margin-bottom: 5px;"><strong>Versiyon Açıklaması:</strong></label>
+        <textarea id="version-comment" style="width: 100%; padding: 8px; border-radius: 4px; height: 80px;" 
+          placeholder="Bu versiyonun özelliklerini yazın..."></textarea>
+      </div>
+    `;
+  }
+  
+  // Butonlar
+  const buttonContainer = document.createElement("div");
+  buttonContainer.style.marginTop = "20px";
+  buttonContainer.style.display = "flex";
+  buttonContainer.style.justifyContent = "space-between";
+  
+  const cancelBtn = document.createElement("button");
+  cancelBtn.id = "cancel-version";
+  cancelBtn.textContent = "İptal";
+  cancelBtn.style.padding = "10px 15px";
+  cancelBtn.style.backgroundColor = "#ccc";
+  cancelBtn.style.border = "none";
+  cancelBtn.style.borderRadius = "4px";
+  cancelBtn.style.cursor = "pointer";
+  
+  const createBtn = document.createElement("button");
+  createBtn.id = "create-version";
+  createBtn.textContent = "Oluştur";
+  createBtn.style.padding = "10px 15px";
+  createBtn.style.backgroundColor = "#4CAF50";
+  createBtn.style.color = "white";
+  createBtn.style.border = "none";
+  createBtn.style.borderRadius = "4px";
+  createBtn.style.cursor = "pointer";
+  
+  buttonContainer.appendChild(cancelBtn);
+  buttonContainer.appendChild(createBtn);
+  content.appendChild(buttonContainer);
   
   modal.appendChild(content);
   document.body.appendChild(modal);
   
   // Event listeners
-  document.getElementById("algorithm-select").addEventListener("change", updateAlgorithmParams);
-  document.getElementById("k-slider").addEventListener("input", e => {
-    document.getElementById("k-value").textContent = e.target.value;
-  });
-  document.getElementById("eps-slider").addEventListener("input", e => {
-    document.getElementById("eps-value").textContent = e.target.value;
-  });
-  document.getElementById("min-samples-slider").addEventListener("input", e => {
-    document.getElementById("min-samples-value").textContent = e.target.value;
-  });
-  document.getElementById("h-k-slider").addEventListener("input", e => {
-    document.getElementById("h-k-value").textContent = e.target.value;
-  });
+  if (selectedModel !== "color") {
+    // Sadece diğer modeller için algoritma seçim olayları ekle
+    document.getElementById("algorithm-select").addEventListener("change", updateAlgorithmParams);
+    document.getElementById("k-slider").addEventListener("input", e => {
+      document.getElementById("k-value").textContent = e.target.value;
+    });
+    document.getElementById("eps-slider").addEventListener("input", e => {
+      document.getElementById("eps-value").textContent = e.target.value;
+    });
+    document.getElementById("min-samples-slider").addEventListener("input", e => {
+      document.getElementById("min-samples-value").textContent = e.target.value;
+    });
+    document.getElementById("h-k-slider").addEventListener("input", e => {
+      document.getElementById("h-k-value").textContent = e.target.value;
+    });
+    
+    // İlk görünümü ayarla
+    updateAlgorithmParams();
+  } else {
+    // Renk çarkı etkileşimini ekle
+    const colorWheel = document.querySelector('.color-wheel');
+    const colorMarker = document.getElementById('color-marker');
+    
+    if (colorWheel) {
+      // Renk çarkı bölümlerine tıklama olayı ekle
+      const colorSections = colorWheel.querySelectorAll('.color-section');
+      colorSections.forEach(section => {
+        section.addEventListener('click', function(e) {
+          // Tıklanan konumu al
+          const rect = colorWheel.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          
+          // Merkeze göre konumu hesapla
+          const centerX = rect.width / 2;
+          const centerY = rect.height / 2;
+          const dx = x - centerX;
+          const dy = y - centerY;
+          
+          // Merkeze olan uzaklık (radius içinde olup olmadığını kontrol etmek için)
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          
+          // Eğer orta dairede tıkladıysa işlem yapma
+          if (distance < 20) return;
+          
+          // Ton (Hue) değerini hesapla (0-360 derece)
+          const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+          const hue = (angle + 90) % 360; // +90 döndürüyor renk çemberi için
+          
+          // Marker'i göster ve konumlandır
+          colorMarker.style.display = 'block';
+          colorMarker.style.left = x + 'px';
+          colorMarker.style.top = y + 'px';
+          
+          // Seçilen Ton bilgisini güncelle
+          document.getElementById('selected-hue-info').textContent = `Seçilen Ton (Hue): ${Math.round(hue)}°`;
+          
+          // Seçilen tonu form parametrelerine ekle
+          let hueInput = document.getElementById('hue-filter-value');
+          if (!hueInput) {
+            hueInput = document.createElement('input');
+            hueInput.type = 'hidden';
+            hueInput.id = 'hue-filter-value';
+            document.querySelector('.color-model-params').appendChild(hueInput);
+          }
+          hueInput.value = Math.round(hue);
+          
+          // Seçilen ton ile uyumlu renk butonunu da vurgula
+          if (hue >= 330 || hue < 30) highlightColorButton('red');
+          else if (hue >= 30 && hue < 60) highlightColorButton('orange');
+          else if (hue >= 60 && hue < 90) highlightColorButton('yellow');
+          else if (hue >= 90 && hue < 150) highlightColorButton('green');
+          else if (hue >= 150 && hue < 210) highlightColorButton('blue');
+          else if (hue >= 210 && hue < 270) highlightColorButton('blue');
+          else if (hue >= 270 && hue < 330) highlightColorButton('purple');
+        });
+      });
+    }
+    
+    // Renk butonlarına tıklama olaylarını ekle
+    const colorButtons = document.querySelectorAll('.color-group-btn');
+    colorButtons.forEach(btn => {
+      btn.addEventListener('click', function() {
+        // Tüm butonların seçim durumunu temizle
+        colorButtons.forEach(b => {
+          b.style.borderColor = '#ddd';
+          b.style.borderWidth = '2px';
+        });
+        
+        // Bu butonu seçili olarak işaretle
+        this.style.borderColor = '#3498db';
+        this.style.borderWidth = '3px';
+        
+        // Seçilen renk bilgisini güncelle
+        const colorName = this.dataset.color;
+        document.getElementById('selected-color-info').textContent = `Seçilen Renk: ${colorName.charAt(0).toUpperCase() + colorName.slice(1)}`;
+        
+        // Renk grubunu form parametrelerine ekle için hidden input güncelle veya ekle
+        let colorFilterInput = document.getElementById('color-filter-value');
+        if (!colorFilterInput) {
+          colorFilterInput = document.createElement('input');
+          colorFilterInput.type = 'hidden';
+          colorFilterInput.id = 'color-filter-value';
+          document.querySelector('.color-model-params').appendChild(colorFilterInput);
+        }
+        colorFilterInput.value = colorName;
+      });
+    });
+  }
+  
+  // Renk butonunu vurgulama yardımcı fonksiyonu
+  function highlightColorButton(colorName) {
+    const colorButtons = document.querySelectorAll('.color-group-btn');
+    colorButtons.forEach(btn => {
+      if (btn.dataset.color === colorName) {
+        btn.style.borderColor = '#3498db';
+        btn.style.borderWidth = '3px';
+      } else {
+        btn.style.borderColor = '#ddd';
+        btn.style.borderWidth = '2px';
+      }
+    });
+  }
   
   document.getElementById("cancel-version").addEventListener("click", () => {
     document.body.removeChild(modal);
   });
   
-  document.getElementById("create-version").addEventListener("click", createNewVersion);
-  
-  // İlk görünümü ayarla
-  updateAlgorithmParams();
+  document.getElementById("create-version").addEventListener("click", () => {
+    const versionName = document.getElementById("version-name").value;
+    const versionComment = document.getElementById("version-comment").value;
+    
+    let clusterParams = {};
+    
+    if (selectedModel === "color") {
+      // Renk modeli için spektrum parametreleri
+      const divisions = parseInt(document.getElementById("divisions").value);
+      const saturationLevels = parseInt(document.getElementById("saturation-levels").value);
+      const valueLevels = parseInt(document.getElementById("value-levels").value);
+      const dominantColorMethod = document.getElementById("dominant-color-method").value;
+      
+      // Seçilen renk grubu filtresi (varsa)
+      const colorFilter = document.getElementById('color-filter-value')?.value;
+      
+      clusterParams = {
+        model_type: selectedModel,
+        version: versionName,
+        algorithm: "color_spectrum",
+        divisions: divisions,
+        saturation_levels: saturationLevels,
+        value_levels: valueLevels,
+        dominant_color_method: dominantColorMethod
+      };
+      
+      // Renk filtresi varsa ekle
+      if (colorFilter) {
+        clusterParams.color_filter = colorFilter;
+      }
+      
+      // Ton (Hue) değeri seçilmişse ekle
+      const hueValue = document.getElementById('hue-filter-value')?.value;
+      if (hueValue) {
+        clusterParams.hue_filter = parseInt(hueValue);
+      }
+    } else {
+      // Diğer modeller için kümeleme parametreleri
+      const algorithm = document.getElementById("algorithm-select").value;
+      
+      clusterParams = {
+        model_type: selectedModel,
+        version: versionName,
+        algorithm: algorithm
+      };
+      
+      if (algorithm === "kmeans") {
+        clusterParams.k = parseInt(document.getElementById("k-slider").value);
+      } else if (algorithm === "dbscan") {
+        clusterParams.eps = parseFloat(document.getElementById("eps-slider").value);
+        clusterParams.min_samples = parseInt(document.getElementById("min-samples-slider").value);
+      } else if (algorithm === "hierarchical") {
+        clusterParams.distance_threshold = parseFloat(document.getElementById("linkage-select").value);
+        clusterParams.linkage = document.getElementById("linkage-select").value;
+      }
+    }
+    
+    if (versionComment) {
+      clusterParams.comment = versionComment;
+    }
+    
+    // API'ye istek gönder
+    createClusterVersion(clusterParams);
+    
+    // Modal kapat
+    document.body.removeChild(modal);
+  });
 }
 
 // Seçilen algoritmaya göre parametre alanını güncelle
@@ -694,115 +1011,526 @@ function updateAlgorithmParams() {
 
 // Yeni versiyon oluştur
 function createNewVersion() {
-  const algorithm = document.getElementById("algorithm-select").value;
-  const comment = document.getElementById("version-comment").value;
+  // Mevcut seçili model ve algoritma bilgilerini al
+  const selectedModel = window.currentModel;
+  const selectedAlgorithm = document.getElementById("algorithm-select").value;
   
-  // Parametre değerlerini al
-  let parameters = {};
+  // Modal içeriğini oluştur
+  const modalContent = document.createElement("div");
+  modalContent.className = "modal-content";
   
-  if (algorithm === "kmeans") {
-    parameters.k = parseInt(document.getElementById("k-slider").value);
-  }
-  else if (algorithm === "dbscan") {
-    parameters.eps = parseFloat(document.getElementById("eps-slider").value);
-    parameters.min_samples = parseInt(document.getElementById("min-samples-slider").value);
-  }
-  else if (algorithm === "hierarchical") {
-    parameters.k = parseInt(document.getElementById("h-k-slider").value);
-    parameters.linkage = document.getElementById("linkage-select").value;
-  }
-  
-  // Modal'ı bekliyor durumuna getir
-  const modal = document.getElementById("new-version-modal");
-  const content = modal.querySelector("div");
-  content.innerHTML = `
-    <h2>Yeni Versiyon Oluşturuluyor...</h2>
-    <p style="text-align: center; margin: 20px 0;">
-      <span style="display: inline-block; width: 40px; height: 40px; border: 4px solid #f3f3f3; 
-            border-top: 4px solid #3498db; border-radius: 50%; animation: spin 2s linear infinite;"></span>
-    </p>
-    <p style="text-align: center;">Bu işlem biraz zaman alabilir, lütfen bekleyin.</p>
-    
-    <style>
-      @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-      }
-    </style>
+  // Başlık ve açıklama
+  const header = document.createElement("div");
+  header.className = "modal-header";
+  header.innerHTML = `
+      <h2>Yeni Versiyon Oluştur</h2>
+      <p>Seçilen model tipi: <strong>${selectedModel}</strong></p>
   `;
+  modalContent.appendChild(header);
   
-  // API çağrısı yap
-  fetch("/create-new-version", {
+  // Form alanları
+  const form = document.createElement("div");
+  form.className = "modal-form";
+  
+  // Farklı model tipleri için farklı içerik göster
+  if (selectedModel === "color") {
+      // Renk modeli için özel form
+      form.innerHTML = `
+          <div class="color-model-params">
+              <h3>Renk Spektrumu Parametreleri</h3>
+              <p>Renk modeli için kümeleme yerine HSV renk uzayında spektrum organizasyonu kullanılacak.</p>
+              
+              <div class="form-group">
+                  <label for="version-name">Versiyon Adı:</label>
+                  <input type="text" id="version-name" value="v1" class="form-control">
+              </div>
+              
+              <div class="form-group">
+                  <label for="divisions" title="Renk çemberindeki bölüm sayısı. Daha yüksek değer daha detaylı ton ayrımı sağlar.">
+                      Ton (Hue) Bölümleri:
+                      <i class="fas fa-info-circle"></i>
+                  </label>
+                  <select id="divisions" class="form-control">
+                      <option value="6">6 bölüm (60° aralıklar)</option>
+                      <option value="12" selected>12 bölüm (30° aralıklar)</option>
+                      <option value="18">18 bölüm (20° aralıklar)</option>
+                      <option value="24">24 bölüm (15° aralıklar)</option>
+                      <option value="36">36 bölüm (10° aralıklar)</option>
+                  </select>
+              </div>
+              
+              <div class="form-group">
+                  <label for="saturation-levels" title="Doygunluk seviyelerinin sayısı. Daha yüksek değer daha detaylı doygunluk ayrımı sağlar.">
+                      Doygunluk (Saturation) Seviyeleri:
+                      <i class="fas fa-info-circle"></i>
+                  </label>
+                  <select id="saturation-levels" class="form-control">
+                      <option value="2">2 seviye (Düşük, Yüksek)</option>
+                      <option value="3" selected>3 seviye (Düşük, Orta, Yüksek)</option>
+                      <option value="4">4 seviye (Çok detaylı)</option>
+                      <option value="5">5 seviye (En detaylı)</option>
+                  </select>
+              </div>
+              
+              <div class="form-group">
+                  <label for="value-levels" title="Parlaklık seviyelerinin sayısı. Daha yüksek değer daha detaylı parlaklık ayrımı sağlar.">
+                      Parlaklık (Value) Seviyeleri:
+                      <i class="fas fa-info-circle"></i>
+                  </label>
+                  <select id="value-levels" class="form-control">
+                      <option value="2">2 seviye (Koyu, Açık)</option>
+                      <option value="3" selected>3 seviye (Koyu, Orta, Açık)</option>
+                      <option value="4">4 seviye (Çok detaylı)</option>
+                      <option value="5">5 seviye (En detaylı)</option>
+                  </select>
+              </div>
+              
+              <div class="form-group">
+                  <label for="dominant-color-method" title="Görselden dominant renk çıkarma yöntemi. Histogram daha hızlı, K-means daha doğru sonuç verir.">
+                      Dominant Renk Metodu:
+                      <i class="fas fa-info-circle"></i>
+                  </label>
+                  <select id="dominant-color-method" class="form-control">
+                      <option value="histogram" selected>Histogram (Hızlı)</option>
+                      <option value="kmeans">K-Means (Doğru)</option>
+                      <option value="average">Ortalama (En hızlı)</option>
+                  </select>
+              </div>
+              
+              <div class="form-group">
+                  <label for="color-wheel-container" title="Renk çarkı üzerinden renk seçebilirsiniz.">Renk Çarkı:</label>
+                  <div id="color-wheel-container" style="display: flex; justify-content: center; margin-top: 15px; margin-bottom: 15px;">
+                      <div class="color-wheel" style="position: relative; width: 200px; height: 200px; border-radius: 50%; overflow: hidden; box-shadow: 0 0 8px rgba(0,0,0,0.2);">
+                          <!-- Renk çarkı bölümleri -->
+                          <div class="color-section" data-hue="0" style="position: absolute; width: 50%; height: 50%; background: #f00; left: 50%; top: 0; transform-origin: bottom left; transform: rotate(0deg) skewY(60deg);"></div>
+                          <div class="color-section" data-hue="30" style="position: absolute; width: 50%; height: 50%; background: #ff8000; left: 50%; top: 0; transform-origin: bottom left; transform: rotate(30deg) skewY(60deg);"></div>
+                          <div class="color-section" data-hue="60" style="position: absolute; width: 50%; height: 50%; background: #ff0; left: 50%; top: 0; transform-origin: bottom left; transform: rotate(60deg) skewY(60deg);"></div>
+                          <div class="color-section" data-hue="90" style="position: absolute; width: 50%; height: 50%; background: #80ff00; left: 50%; top: 0; transform-origin: bottom left; transform: rotate(90deg) skewY(60deg);"></div>
+                          <div class="color-section" data-hue="120" style="position: absolute; width: 50%; height: 50%; background: #0f0; left: 50%; top: 0; transform-origin: bottom left; transform: rotate(120deg) skewY(60deg);"></div>
+                          <div class="color-section" data-hue="150" style="position: absolute; width: 50%; height: 50%; background: #00ff80; left: 50%; top: 0; transform-origin: bottom left; transform: rotate(150deg) skewY(60deg);"></div>
+                          <div class="color-section" data-hue="180" style="position: absolute; width: 50%; height: 50%; background: #0ff; left: 50%; top: 0; transform-origin: bottom left; transform: rotate(180deg) skewY(60deg);"></div>
+                          <div class="color-section" data-hue="210" style="position: absolute; width: 50%; height: 50%; background: #0080ff; left: 50%; top: 0; transform-origin: bottom left; transform: rotate(210deg) skewY(60deg);"></div>
+                          <div class="color-section" data-hue="240" style="position: absolute; width: 50%; height: 50%; background: #00f; left: 50%; top: 0; transform-origin: bottom left; transform: rotate(240deg) skewY(60deg);"></div>
+                          <div class="color-section" data-hue="270" style="position: absolute; width: 50%; height: 50%; background: #8000ff; left: 50%; top: 0; transform-origin: bottom left; transform: rotate(270deg) skewY(60deg);"></div>
+                          <div class="color-section" data-hue="300" style="position: absolute; width: 50%; height: 50%; background: #f0f; left: 50%; top: 0; transform-origin: bottom left; transform: rotate(300deg) skewY(60deg);"></div>
+                          <div class="color-section" data-hue="330" style="position: absolute; width: 50%; height: 50%; background: #ff0080; left: 50%; top: 0; transform-origin: bottom left; transform: rotate(330deg) skewY(60deg);"></div>
+                          <!-- Orta beyaz daire -->
+                          <div class="center-circle" style="position: absolute; width: 40px; height: 40px; background: white; border-radius: 50%; top: 50%; left: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 5px rgba(0,0,0,0.2); border: 1px solid #ddd;"></div>
+                          <!-- Marker (seçilen rengi gösterecek) -->
+                          <div id="color-marker" style="position: absolute; width: 12px; height: 12px; background: black; border-radius: 50%; top: 30px; left: 100px; transform: translate(-50%, -50%); box-shadow: 0 0 5px rgba(0,0,0,0.5); display: none;"></div>
+                      </div>
+                  </div>
+                  <div id="selected-hue-info" style="text-align: center; margin-bottom: 10px;">Seçilen Ton (Hue): Yok</div>
+              </div>
+
+              <div class="form-group">
+                  <label for="color-group-filter" title="Belirli renk gruplarını filtreleme veya vurgulama için kullanılır.">Renk Grubu Hızlı Seçim:</label>
+                  <div id="color-group-buttons" style="display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px;">
+                      <button type="button" class="color-group-btn" data-color="red" style="width: 30px; height: 30px; background-color: #e74c3c; border: 2px solid #ddd; border-radius: 4px;"></button>
+                      <button type="button" class="color-group-btn" data-color="orange" style="width: 30px; height: 30px; background-color: #e67e22; border: 2px solid #ddd; border-radius: 4px;"></button>
+                      <button type="button" class="color-group-btn" data-color="yellow" style="width: 30px; height: 30px; background-color: #f1c40f; border: 2px solid #ddd; border-radius: 4px;"></button>
+                      <button type="button" class="color-group-btn" data-color="green" style="width: 30px; height: 30px; background-color: #2ecc71; border: 2px solid #ddd; border-radius: 4px;"></button>
+                      <button type="button" class="color-group-btn" data-color="blue" style="width: 30px; height: 30px; background-color: #3498db; border: 2px solid #ddd; border-radius: 4px;"></button>
+                      <button type="button" class="color-group-btn" data-color="purple" style="width: 30px; height: 30px; background-color: #9b59b6; border: 2px solid #ddd; border-radius: 4px;"></button>
+                      <button type="button" class="color-group-btn" data-color="pink" style="width: 30px; height: 30px; background-color: #fd79a8; border: 2px solid #ddd; border-radius: 4px;"></button>
+                      <button type="button" class="color-group-btn" data-color="brown" style="width: 30px; height: 30px; background-color: #795548; border: 2px solid #ddd; border-radius: 4px;"></button>
+                      <button type="button" class="color-group-btn" data-color="gray" style="width: 30px; height: 30px; background-color: #95a5a6; border: 2px solid #ddd; border-radius: 4px;"></button>
+                      <button type="button" class="color-group-btn" data-color="black" style="width: 30px; height: 30px; background-color: #34495e; border: 2px solid #ddd; border-radius: 4px;"></button>
+                      <button type="button" class="color-group-btn" data-color="white" style="width: 30px; height: 30px; background-color: #ecf0f1; border: 2px solid #ddd; border-radius: 4px;"></button>
+                  </div>
+                  <div id="selected-color-info" style="margin-top: 8px; font-size: 14px;">Seçilen Renk: Yok</div>
+              </div>
+
+              <div class="form-group">
+                  <label for="version-comment">Açıklama (opsiyonel):</label>
+                  <input type="text" id="version-comment" class="form-control" placeholder="Bu versiyon hakkında bir açıklama...">
+              </div>
+          </div>
+      `;
+  } else {
+      // Diğer modeller için standart kümeleme form
+      form.innerHTML = `
+          <div class="form-group">
+              <label for="version-name">Versiyon Adı:</label>
+              <input type="text" id="version-name" value="v1" class="form-control">
+          </div>
+          
+          <div class="form-group">
+              <label for="algorithm">Algoritma:</label>
+              <select id="algorithm" class="form-control">
+                  <option value="kmeans" ${selectedAlgorithm === "kmeans" ? "selected" : ""}>K-Means</option>
+                  <option value="dbscan" ${selectedAlgorithm === "dbscan" ? "selected" : ""}>DBSCAN</option>
+                  <option value="hierarchical" ${selectedAlgorithm === "hierarchical" ? "selected" : ""}>Hierarchical</option>
+              </select>
+          </div>
+          
+          <div class="form-group" id="kmeans-params" style="display: ${selectedAlgorithm === 'kmeans' ? 'block' : 'none'}">
+              <label for="k">Küme Sayısı (k):</label>
+              <input type="number" id="k" min="2" max="100" value="20" class="form-control">
+          </div>
+          
+          <div class="form-group" id="dbscan-params" style="display: ${selectedAlgorithm === 'dbscan' ? 'block' : 'none'}">
+              <label for="eps">Epsilon (komşuluk mesafesi):</label>
+              <input type="number" id="eps" min="0.01" max="10" step="0.01" value="0.5" class="form-control">
+              <label for="min-samples">Min Samples:</label>
+              <input type="number" id="min-samples" min="2" max="100" value="5" class="form-control">
+          </div>
+          
+          <div class="form-group" id="hierarchical-params" style="display: ${selectedAlgorithm === 'hierarchical' ? 'block' : 'none'}">
+              <label for="distance-threshold">Mesafe Eşiği:</label>
+              <input type="number" id="distance-threshold" min="0.1" max="10" step="0.1" value="1.5" class="form-control">
+              <label for="linkage">Bağlantı Tipi:</label>
+              <select id="linkage" class="form-control">
+                  <option value="ward">Ward</option>
+                  <option value="complete">Complete</option>
+                  <option value="average">Average</option>
+                  <option value="single">Single</option>
+              </select>
+          </div>
+          
+          <div class="form-group">
+              <label for="version-comment">Açıklama (opsiyonel):</label>
+              <input type="text" id="version-comment" class="form-control" placeholder="Bu versiyon hakkında bir açıklama...">
+          </div>
+      `;
+  }
+  
+  modalContent.appendChild(form);
+  
+  // Butonlar
+  const buttons = document.createElement("div");
+  buttons.className = "modal-buttons";
+  buttons.innerHTML = `
+      <button id="cancel-version" class="btn btn-secondary">İptal</button>
+      <button id="create-version" class="btn btn-primary">Oluştur</button>
+  `;
+  modalContent.appendChild(buttons);
+  
+  // Modal göster
+  showModal(modalContent);
+  
+  // Algoritma değiştiğinde parametre panellerini güncelle
+  if (selectedModel !== "color") {
+      document.getElementById("algorithm").addEventListener("change", function() {
+          const algorithm = this.value;
+          document.getElementById("kmeans-params").style.display = algorithm === "kmeans" ? "block" : "none";
+          document.getElementById("dbscan-params").style.display = algorithm === "dbscan" ? "block" : "none";
+          document.getElementById("hierarchical-params").style.display = algorithm === "hierarchical" ? "block" : "none";
+      });
+  }
+  
+  // İptal butonu
+  document.getElementById("cancel-version").addEventListener("click", function() {
+      closeModal();
+  });
+  
+  // Renk çarkı etkileşimini ekle
+  const colorWheel = document.querySelector('.color-wheel');
+  const colorMarker = document.getElementById('color-marker');
+  
+  if (colorWheel) {
+      // Renk çarkı bölümlerine tıklama olayı ekle
+      const colorSections = colorWheel.querySelectorAll('.color-section');
+      colorSections.forEach(section => {
+          section.addEventListener('click', function(e) {
+              // Tıklanan konumu al
+              const rect = colorWheel.getBoundingClientRect();
+              const x = e.clientX - rect.left;
+              const y = e.clientY - rect.top;
+              
+              // Merkeze göre konumu hesapla
+              const centerX = rect.width / 2;
+              const centerY = rect.height / 2;
+              const dx = x - centerX;
+              const dy = y - centerY;
+              
+              // Merkeze olan uzaklık (radius içinde olup olmadığını kontrol etmek için)
+              const distance = Math.sqrt(dx * dx + dy * dy);
+              
+              // Eğer orta dairede tıkladıysa işlem yapma
+              if (distance < 20) return;
+              
+              // Ton (Hue) değerini hesapla (0-360 derece)
+              const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+              const hue = (angle + 90) % 360; // +90 döndürüyor renk çemberi için
+              
+              // Marker'i göster ve konumlandır
+              colorMarker.style.display = 'block';
+              colorMarker.style.left = x + 'px';
+              colorMarker.style.top = y + 'px';
+              
+              // Seçilen Ton bilgisini güncelle
+              document.getElementById('selected-hue-info').textContent = `Seçilen Ton (Hue): ${Math.round(hue)}°`;
+              
+              // Seçilen tonu form parametrelerine ekle
+              let hueInput = document.getElementById('hue-filter-value');
+              if (!hueInput) {
+                  hueInput = document.createElement('input');
+                  hueInput.type = 'hidden';
+                  hueInput.id = 'hue-filter-value';
+                  document.querySelector('.color-model-params').appendChild(hueInput);
+              }
+              hueInput.value = Math.round(hue);
+              
+              // Seçilen ton ile uyumlu renk butonunu da vurgula
+              if (hue >= 330 || hue < 30) highlightColorButton('red');
+              else if (hue >= 30 && hue < 60) highlightColorButton('orange');
+              else if (hue >= 60 && hue < 90) highlightColorButton('yellow');
+              else if (hue >= 90 && hue < 150) highlightColorButton('green');
+              else if (hue >= 150 && hue < 210) highlightColorButton('blue');
+              else if (hue >= 210 && hue < 270) highlightColorButton('blue');
+              else if (hue >= 270 && hue < 330) highlightColorButton('purple');
+          });
+      });
+  }
+  
+  // Renk butonunu vurgulama yardımcı fonksiyonu
+  function highlightColorButton(colorName) {
+      const colorButtons = document.querySelectorAll('.color-group-btn');
+      colorButtons.forEach(btn => {
+          if (btn.dataset.color === colorName) {
+              btn.style.borderColor = '#3498db';
+              btn.style.borderWidth = '3px';
+          } else {
+              btn.style.borderColor = '#ddd';
+              btn.style.borderWidth = '2px';
+          }
+      });
+  }
+  
+  // Renk butonlarına tıklama olaylarını ekle
+  const colorButtons = document.querySelectorAll('.color-group-btn');
+  colorButtons.forEach(btn => {
+      btn.addEventListener('click', function() {
+          // Tüm butonların seçim durumunu temizle
+          colorButtons.forEach(b => b.style.borderColor = '#ddd');
+          
+          // Bu butonu seçili olarak işaretle
+          this.style.borderColor = '#3498db';
+          this.style.borderWidth = '3px';
+          
+          // Seçilen renk bilgisini güncelle
+          const colorName = this.dataset.color;
+          document.getElementById('selected-color-info').textContent = `Seçilen Renk: ${colorName.charAt(0).toUpperCase() + colorName.slice(1)}`;
+          
+          // Renk grubunu form parametrelerine ekle için hidden input güncelle veya ekle
+          let colorFilterInput = document.getElementById('color-filter-value');
+          if (!colorFilterInput) {
+              colorFilterInput = document.createElement('input');
+              colorFilterInput.type = 'hidden';
+              colorFilterInput.id = 'color-filter-value';
+              document.querySelector('.color-model-params').appendChild(colorFilterInput);
+          }
+          colorFilterInput.value = colorName;
+      });
+  });
+
+  // Oluştur butonu
+  document.getElementById("create-version").addEventListener("click", function() {
+      const versionName = document.getElementById("version-name").value;
+      const versionComment = document.getElementById("version-comment").value;
+      
+      let clusterParams = {};
+      
+      if (selectedModel === "color") {
+          // Renk modeli için spektrum parametreleri
+          const divisions = parseInt(document.getElementById("divisions").value);
+          const saturationLevels = parseInt(document.getElementById("saturation-levels").value);
+          const valueLevels = parseInt(document.getElementById("value-levels").value);
+          const dominantColorMethod = document.getElementById("dominant-color-method").value;
+          
+          // Seçilen renk grubu filtresi (varsa)
+          const colorFilter = document.getElementById('color-filter-value')?.value;
+          
+          clusterParams = {
+              model_type: selectedModel,
+              version: versionName,
+              algorithm: "color_spectrum",
+              divisions: divisions,
+              saturation_levels: saturationLevels,
+              value_levels: valueLevels,
+              dominant_color_method: dominantColorMethod
+          };
+          
+          // Renk filtresi varsa ekle
+          if (colorFilter) {
+              clusterParams.color_filter = colorFilter;
+          }
+          
+          // Ton (Hue) değeri seçilmişse ekle
+          const hueValue = document.getElementById('hue-filter-value')?.value;
+          if (hueValue) {
+              clusterParams.hue_filter = parseInt(hueValue);
+          }
+      } else {
+          // Diğer modeller için kümeleme parametreleri
+          const algorithm = document.getElementById("algorithm").value;
+          
+          clusterParams = {
+              model_type: selectedModel,
+              version: versionName,
+              algorithm: algorithm
+          };
+          
+          if (algorithm === "kmeans") {
+              clusterParams.k = parseInt(document.getElementById("k").value);
+          } else if (algorithm === "dbscan") {
+              clusterParams.eps = parseFloat(document.getElementById("eps").value);
+              clusterParams.min_samples = parseInt(document.getElementById("min-samples").value);
+          } else if (algorithm === "hierarchical") {
+              clusterParams.distance_threshold = parseFloat(document.getElementById("distance-threshold").value);
+              clusterParams.linkage = document.getElementById("linkage").value;
+          }
+      }
+      
+      if (versionComment) {
+          clusterParams.comment = versionComment;
+      }
+      
+      // API'ye istek gönder
+      createClusterVersion(clusterParams);
+      
+      // Modal kapat
+      closeModal();
+  });
+}
+
+// right_panel.js'de değiştirilecek fonksiyon - muhtemelen satır 1421 civarında
+function createClusterVersion(params) {
+  // Gönderilen parametreleri debug etmek için konsola yazdır
+  console.log("Gönderilen versiyon parametreleri:", JSON.stringify(params, null, 2));
+  
+  // model ve version parametrelerini garanti edelim
+  if (!params.model) {
+    // model_type kullanılmışsa, model alanına kopyalayalım
+    if (params.model_type) {
+      params.model = params.model_type;
+    } else {
+      // Yoksa mevcut modeli kullan
+      params.model = window.currentModel;
+    }
+  }
+  
+  if (!params.version) {
+    params.version = params.version_name || "v1";
+  }
+  
+  console.log("Düzeltilmiş parametreler:", JSON.stringify(params, null, 2));
+  
+  // Yükleniyor göster
+  const loadingMsg = document.createElement("div");
+  loadingMsg.id = "loading-message";
+  loadingMsg.style.position = "fixed";
+  loadingMsg.style.top = "50%";
+  loadingMsg.style.left = "50%";
+  loadingMsg.style.transform = "translate(-50%, -50%)";
+  loadingMsg.style.backgroundColor = "rgba(0,0,0,0.8)";
+  loadingMsg.style.color = "white";
+  loadingMsg.style.padding = "20px";
+  loadingMsg.style.borderRadius = "5px";
+  loadingMsg.style.zIndex = "1001";
+  loadingMsg.innerHTML = `
+    <div style="text-align: center;">
+      <div style="font-size: 24px; margin-bottom: 10px;">⏳</div>
+      <div>Versiyon oluşturuluyor...</div>
+    </div>
+  `;
+  document.body.appendChild(loadingMsg);
+  
+  // API'ye istek gönder
+  fetch("/create-cluster-version", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      model: window.currentModel,
-      algorithm,
-      parameters,
-      comment
-    })
+    body: JSON.stringify(params)
   })
   .then(res => res.json())
   .then(result => {
-    if (result.status === "ok") {
-      // Modal'ı başarılı durumuna getir
-      content.innerHTML = `
-        <h2>✅ Yeni Versiyon Oluşturuldu</h2>
-        <p style="margin: 15px 0;">
-          <strong>${window.currentModel}</strong> modeli için <strong>${result.version}</strong> versiyonu başarıyla oluşturuldu.
-        </p>
-        <p>Toplam <strong>${result.cluster_count}</strong> cluster oluşturuldu.</p>
-        
-        <div style="margin-top: 20px; text-align: center;">
-          <button id="close-success" style="padding: 10px 15px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;">Tamam</button>
-        </div>
-      `;
-      
-      document.getElementById("close-success").addEventListener("click", () => {
-        document.body.removeChild(modal);
-        
-        // Mevcut versiyonu güncelle ve yeniden yükle
-        window.currentVersion = result.version;
-        loadAvailableVersions(window.currentModel);
-        loadClusterRepresentatives(window.currentModel, window.currentVersion);
-      });
+    // Yükleniyor mesajını kaldır
+    if (document.getElementById("loading-message")) {
+      document.body.removeChild(document.getElementById("loading-message"));
     }
-    else {
-      // Modal'ı hata durumuna getir
-      content.innerHTML = `
-        <h2>❌ Hata Oluştu</h2>
-        <p style="margin: 15px 0; color: #e74c3c;">
-          ${result.message}
-        </p>
-        
-        <div style="margin-top: 20px; text-align: center;">
-          <button id="close-error" style="padding: 10px 15px; background-color: #e74c3c; color: white; border: none; border-radius: 4px; cursor: pointer;">Kapat</button>
-        </div>
-      `;
+    
+    if (result.status === "ok") {
+      // Başarılı mesajı göster
+      alert(`✅ Yeni versiyon oluşturuldu: ${params.version}`);
       
-      document.getElementById("close-error").addEventListener("click", () => {
-        document.body.removeChild(modal);
+      // Versiyonları güncelle
+      window.currentVersion = params.version;
+      loadAvailableVersions(params.model);
+      
+      // Kullanıcı tercihlerini güncelle
+      saveUserPreferences();
+      
+      // Sağ paneli güncelle
+      loadClusterRepresentatives(params.model, params.version);
+      
+      // Orta panele versiyon değişimini bildir (özel event)
+      const event = new CustomEvent('versionChanged', {
+        detail: {
+          model: params.model,
+          version: params.version,
+          source: 'rightPanel'
+        }
       });
+      document.dispatchEvent(event);
+    } else {
+      // Hata mesajı göster
+      alert(`❌ Versiyon oluşturulamadı: ${result.message || 'Bilinmeyen hata'}`);
     }
   })
   .catch(err => {
-    // Modal'ı hata durumuna getir
-    content.innerHTML = `
-      <h2>❌ Bağlantı Hatası</h2>
-      <p style="margin: 15px 0; color: #e74c3c;">
-        Sunucu ile iletişim kurulurken bir hata oluştu:<br>
-        ${err.message}
-      </p>
-      
-      <div style="margin-top: 20px; text-align: center;">
-        <button id="close-error" style="padding: 10px 15px; background-color: #e74c3c; color: white; border: none; border-radius: 4px; cursor: pointer;">Kapat</button>
-      </div>
-    `;
+    // Yükleniyor mesajını kaldır
+    if (document.getElementById("loading-message")) {
+      document.body.removeChild(document.getElementById("loading-message"));
+    }
     
-    document.getElementById("close-error").addEventListener("click", () => {
-      document.body.removeChild(modal);
-    });
+    console.error("Versiyon oluşturma hatası:", err);
+    alert("❌ Versiyon oluşturulurken bir hata oluştu.");
   });
+}
+
+// Kullanıcı tercihlerini localStorage'a kaydet
+function saveUserPreferences() {
+  try {
+    localStorage.setItem('preferredModel', window.currentModel);
+    localStorage.setItem('preferredVersion', window.currentVersion);
+    console.log("Kullanıcı tercihleri kaydedildi:", {
+      model: window.currentModel,
+      version: window.currentVersion
+    });
+  } catch (e) {
+    console.warn("Kullanıcı tercihleri kaydedilemedi:", e);
+  }
+}
+
+// localStorage'dan kullanıcı tercihlerini yükle
+function loadUserPreferences() {
+  try {
+    const savedModel = localStorage.getItem('preferredModel');
+    const savedVersion = localStorage.getItem('preferredVersion');
+    
+    console.log("Kaydedilmiş tercihler:", {
+      model: savedModel,
+      version: savedVersion
+    });
+    
+    // Eğer kaydedilmiş değerler varsa, bunları kullan
+    if (savedModel) {
+      window.currentModel = savedModel;
+      highlightCurrentModel();
+      
+      // Model değiştiği için versiyonları güncelle
+      loadAvailableVersions(window.currentModel).then(() => {
+        if (savedVersion) {
+          window.currentVersion = savedVersion;
+          setCurrentVersion();
+          loadClusterRepresentatives(window.currentModel, window.currentVersion);
+        }
+      });
+    }
+  } catch (e) {
+    console.warn("Kullanıcı tercihleri yüklenemedi:", e);
+  }
 }
 
 // Yeni model versiyon kombinasyonu oluşturma
@@ -865,9 +1593,61 @@ function createNewCluster(model, version) {
   });
 }
 
+// Modal gösterme fonksiyonu
+function showModal(content) {
+  // Eski modalı kaldır
+  const oldModal = document.querySelector(".modal-container");
+  if (oldModal) document.body.removeChild(oldModal);
+  
+  // Yeni modal oluştur
+  const modalContainer = document.createElement("div");
+  modalContainer.className = "modal-container";
+  modalContainer.style.position = "fixed";
+  modalContainer.style.top = "0";
+  modalContainer.style.left = "0";
+  modalContainer.style.width = "100%";
+  modalContainer.style.height = "100%";
+  modalContainer.style.backgroundColor = "rgba(0,0,0,0.5)";
+  modalContainer.style.display = "flex";
+  modalContainer.style.justifyContent = "center";
+  modalContainer.style.alignItems = "center";
+  modalContainer.style.zIndex = "1000";
+  
+  // Modal içeriği
+  const modalBox = document.createElement("div");
+  modalBox.className = "modal-box";
+  modalBox.style.backgroundColor = "white";
+  modalBox.style.padding = "20px";
+  modalBox.style.borderRadius = "5px";
+  modalBox.style.maxWidth = "500px";
+  modalBox.style.width = "90%";
+  modalBox.style.maxHeight = "80vh";
+  modalBox.style.overflowY = "auto";
+  
+  modalBox.appendChild(content);
+  modalContainer.appendChild(modalBox);
+  document.body.appendChild(modalContainer);
+  
+  // Modal dışına tıklama ile kapatma
+  modalContainer.addEventListener("click", (e) => {
+    if (e.target === modalContainer) {
+      closeModal();
+    }
+  });
+}
+
+// Modal kapatma fonksiyonu
+function closeModal() {
+  const modal = document.querySelector(".modal-container");
+  if (modal) document.body.removeChild(modal);
+}
+
 // Sayfa yüklenirken bu komut çalıştırılır
 window.addEventListener("DOMContentLoaded", () => {
   initRightPanel();
+  
+  // Kullanıcı tercihlerini yükle
+  loadUserPreferences();
   
   // Orta panelden gelen model/versiyon değişikliklerini dinle
   document.addEventListener('modelChanged', handleModelChangeEvent);
@@ -889,6 +1669,9 @@ function handleModelChangeEvent(e) {
     
     // Cluster'ları güncelle
     loadClusterRepresentatives(window.currentModel, window.currentVersion);
+    
+    // Kullanıcı tercihlerini kaydet
+    saveUserPreferences();
   }
 }
 
@@ -910,6 +1693,9 @@ function handleVersionChangeEvent(e) {
           window.currentVersion = e.detail.version;
           setCurrentVersion();
           loadClusterRepresentatives(window.currentModel, window.currentVersion);
+          
+          // Kullanıcı tercihlerini kaydet
+          saveUserPreferences();
         }
       });
     }
@@ -919,6 +1705,9 @@ function handleVersionChangeEvent(e) {
       window.currentVersion = e.detail.version;
       setCurrentVersion();
       loadClusterRepresentatives(window.currentModel, window.currentVersion);
+      
+      // Kullanıcı tercihlerini kaydet
+      saveUserPreferences();
     }
   }
 }
