@@ -126,5 +126,12 @@
     "model": "pattern",
     "version": "v1",
     "feedback": 2
+  },
+  {
+    "anchor": "AW23-OLYMPIA PRESTIGE-KM13491-2.jpg",
+    "output": "AW25-WOOL JACKET BI STRETCH-KP62344-14.jpg",
+    "model": "pattern",
+    "version": "v7",
+    "feedback": 1
   }
 ]

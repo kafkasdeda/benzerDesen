@@ -195,6 +195,12 @@ Benzer Desen projesi, tekstil sektöründe görsel benzerlik analizi ve grupland
   - [ ] Gelişmiş filtreleme özellikleri
   - [ ] Kullanıcı tercihlerini saklama
 
+- [ ] **3D Kumaş Görselleştirme** (MVP sonrası)
+  - [ ] Kumaş desenlerinin 3D giysi modelleri üzerinde görüntülenmesi
+  - [ ] Three.js entegrasyonu ile gerçek zamanlı 3D model görüntüleme
+  - [ ] Dokunma ve fare ile model kontrolleri (döndürme, yakınlaştırma)
+  - [ ] Kumaş tekstil özelliklerinin gerçekçi görüntülenmesi
+
 ### 3. Düşük Öncelikli Görevler (P2)
 - [ ] **Dağıtım İyileştirmeleri**
   - [ ] Docker containerization
@@ -257,19 +263,26 @@ Güncel: 3 saniye (4x iyileştirme)
 Güncel: 0.3 saniye (6.3x iyileştirme)
 ```
 
-## 📋 Bir Sonraki Oturumda Yapılacaklar
+## 💽 Bir Sonraki Oturumda Yapılacaklar
 
-1. **FEATURE-009-D Kümeleme Alternatifi**
-   - `auto_cluster.py` içinde renk için özel sınıflandırma ekleme
-   - Renk modeli versiyonları için özel şema yapısı geliştirme
-   - "/create-cluster" endpoint'ini renk-duyarlı hale getirme
+1. **PERF-005-B Versiyon-Benzerlik Entegrasyonu**
+   - Versiyon oluşturma sırasında parametreleri kaydetme mekanizması oluşturma
+   - Benzerlik hesaplama fonksiyonunu versiyon parametrelerini okuyacak şekilde güncelleme
+   - Versiyon değişikliği sırasında benzerlik parametrelerini otomatik güncelleme
+   - Versiyon bilgisi paneliyle entegre etme
 
-2. **PERF-004-memory-optimization Planlaması**
+2. **FEATURE-010-3d-fabric-visualization Detaylandırma**
+   - Three.js entegrasyonu için temel prototip oluşturma
+   - GLTF model yükleme ve görselleştirme için test yapmak
+   - Kumaş uygulanabilir 3D giysi modellerinin teknik gereksinimlerini belirleme
+   - Farklı kumaş türleri için materyal ayarları ve ışık yönetimini planlama
+
+3. **PERF-004-memory-optimization Planlaması**
    - Bellek kullanımı optimizasyonları için yeni görev oluşturma
    - Safari uyumluluğu sorunlarını çözme
    - Büyük veri setleri için iyileştirmeler geliştirme
 
-3. **INFRA-003-documentation-standardization Başlama**
+4. **INFRA-003-documentation-standardization Başlama**
    - Docstring formatı belirleme (Google formatı temelli)
    - README.md ve kullanım kılavuzu taslağı oluşturma
    - Kod stil rehberi hazırlama
@@ -288,6 +301,7 @@ Güncel: 0.3 saniye (6.3x iyileştirme)
 - ⏳ Dokümantasyon standardizasyonu (devam ediyor - ekip iş birliği için önemli)
 - 🔜 Feedback-tabanlı öğrenme (MVP sonrası planlanan)
 - 🔜 Modern UI ve dağıtım iyileştirmeleri (MVP sonrası planlanan)
+- 🔜 3D kumaş görselleştirme (MVP sonrası planlanan - yeni fikir)
 - ⏸️ SQLite veritabanına geçiş (ertelendi)
 
 ## 📊 Zaman Çizelgesi
@@ -306,6 +320,7 @@ Güncel: 0.3 saniye (6.3x iyileştirme)
 ### Temmuz 2025 (Planlanan - MVP sonrası)
 - Hafta 1-2: Docker containerization ve dağıtım
 - Hafta 3-4: İleri analiz özellikleri ve tavsiye sistemi
+- Hafta 3-4: 3D kumaş görselleştirme özelliği
 
 ## 🚀 MVP Kriterleri
 
@@ -343,4 +358,4 @@ MVP (Minimum Viable Product) aşağıdaki kritik kriterleri tamamlamayı hedefli
 
 ---
 
-*Son güncelleme: 6 Mayıs 2025 (FEATURE-009-E-color-model-ui-parameters görevi tamamlandı, bir sonraki oturumda FEATURE-009-G testlerine odaklanılacak)*
+*Son güncelleme: 10 Mayıs 2025 (FEATURE-010-3d-fabric-visualization görevi oluşturuldu, Three.js ile kumaş desenlerinin 3D giysi modelleri üzerinde görselleştirme özelliği planlama aşamasında)*

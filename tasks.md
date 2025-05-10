@@ -128,17 +128,17 @@ Tekstil sektöründe görsel benzerlik analizi ve gruplama sistemi geliştirme p
    - **Bağımlılıklar**: UI-001
    - **Notlar**: Session 18'de tamamlandı, kullanıcı tercihleri artık sayfalar arasında ve yeniden yüklemeler sırasında korunuyor. Sağ panelde yeterli versiyon bilgisi mevcut olduğu için ek versiyon bilgi paneli eklemeye gerek duyulmadı.
 
-- [ ] PERF-004-memory-optimization (Beklemede)
-   - **Öncelik**: P1
-   - **Tahmini**: 5s
-   - **Açıklama**: Bellek yönetimi iyileştirmeleri
+- [ ] PERF-005-color-model-optimization (Üzerinde Çalışılıyor 🔄)
+   - **Öncelik**: P0
+   - **Tahmini**: 6.5s
+   - **Başlangıç**: 2025-05-07
+   - **Açıklama**: Renk modeli performans ve entegrasyon iyileştirmeleri
    - **Kabul Kriterleri**:
-     - Bellek kaçaklarının tespit edilmesi ve giderilmesi
-     - Safari tarayıcısı için uyumluluk sorunlarının çözülmesi
-     - Büyük veri setleri için önbellek stratejilerinin geliştirilmesi
-     - Bellek kullanımını %30 azaltma
-   - **Bağımlılıklar**: PERF-003
-   - **Notlar**: Safari'deki "Uyumluyu Ara" özelliğinde yaşanan sorunları çözmek için önemli
+     - Versiyon-Benzerlik entegrasyonu sağlanması
+     - Faiss entegrasyonu iyileştirilmesi
+     - UI/UX görselleştirmeleri eklenmesi
+   - **Bağımlılıklar**: FEATURE-009-color-model-enhancement
+   - **Notlar**: İlk arama gecikme sorunu çözümü (PERF-005-A) HSV uzayının dairesel yapısı ile Faiss'in doğrusal indeksleme mekanizması arasındaki uyumsuzluk nedeniyle ertelendi. Session 19'da PERF-005-B ile devam edilecek.
 
 ### Ertelenen Görevler
 - [ ] FEATURE-007-database-integration ⏸️ (Ertelendi)
@@ -154,6 +154,22 @@ Tekstil sektöründe görsel benzerlik analizi ve gruplama sistemi geliştirme p
    - **Notlar**: Projenin karmaşıklığı nedeniyle ertelendi. Mevcut JSON yapısıyla devam edilecek.
 
 ## 📋 Detaylı Görev Listesi
+
+### Yeni Özellik Önerisi
+
+#### FEATURE-010-3d-fabric-visualization
+- **Durum**: Planlama Aşamasında 📝
+- **Öncelik**: P2
+- **Tahmini**: 8s
+- **Açıklama**: Kumaş desenlerini 3D giysi modelleri üzerinde görselleştirme
+- **Kabul Kriterleri**:
+  - Three.js ile 3D giysi modellerinin görüntülenmesi
+  - Kumaş desenlerini 3D model üzerine texture/material olarak uygulama
+  - Kullanıcıya 3D modeli döndürme, yakınlaştırma ve farklı açılardan görüntüleme imkanı
+  - Desen tekrarlama kontrolü ve seamless olmayan görüntüler için çözüm
+  - Responsive ve mobil uyumlu kontrol arayüzü
+- **Bağımlılıklar**: UI-001, FEATURE-003
+- **Notlar**: Prototip olarak başlayacak, MVP sonrası geliştirilecek. GLTF formatında ceket modeli kullanılarak yapılacak ilk implementasyon.
 
 ### Özellik Geliştirme (FEATURE)
 
@@ -612,12 +628,17 @@ Tekstil sektöründe görsel benzerlik analizi ve gruplama sistemi geliştirme p
 - [ ] UI-007-modal-improvements
 - [ ] TEST-004-sqlite-integration-tests (Ertelendi ⏸️)
 - [ ] PERF-005-json-cache-optimization (Yeni)
+- [ ] FEATURE-010-3d-fabric-visualization (Yeni)
 
 ## 🚧 Bilinen Engelleyiciler
 
 Şu anda yok.
 
 ## 📝 Notlar
+
+- 3D kumaş görselleştirme özelliği fikri, kumaş desenlerinin gerçek giysilerde nasıl görüneceğini göstermek amacıyla tasarlanıyor
+- Bu özellik için Three.js kütüphanesi ve GLTF formatındaki ceket modeli kullanılacak
+- Web tarayıcısında gerçek zamanlı olarak kumaşları 3D model üzerinde görselleştirmek, karar verme sürecini hızlandırabilir
 
 - Proje yönetim sistemi geçişi tamamlandı
 - SQLite entegrasyonu karmaşıklığı nedeniyle ertelendi, mevcut JSON yapısına optimizasyonlar yapılacak

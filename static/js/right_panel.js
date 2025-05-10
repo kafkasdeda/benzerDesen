@@ -724,7 +724,7 @@ function showNewVersionModal() {
           <label style="display: block; margin-bottom: 5px;">
             <strong>k - Cluster Sayısı:</strong> <span id="k-value">5</span>
           </label>
-          <input type="range" id="k-slider" min="2" max="20" value="5" style="width: 100%;">
+          <input type="range" id="k-slider" min="2" max="100" value="5" style="width: 100%;">
         </div>
         
         <!-- DBSCAN için (başlangıçta gizli) -->
