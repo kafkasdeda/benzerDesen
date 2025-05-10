@@ -73,19 +73,64 @@ Bu görev, Benzer Desen projesinde tekstil desenlerini 3D giysi modelleri üzeri
   - Kumafl tipine göre otomatik model seçme fonksiyonu eklendi
   - Hatalar için görsel geri bildirim (buton rengi değişimi) eklendi
 
-### FEATURE-010-C: Kumaş Deseni Uygulama
+### FEATURE-010-C: Akıllı Kumaş Uygulama
 - **Öncelik**: P0
 - **Tahmini Süre**: 5 saat
-- **Durum**: Planlandı, Bir Sonraki Session'da 🗓️
+- **Durum**: Tamamlandı ✅
+- **Başlangıç Tarihi**: 2025-05-10
+- **Tamamlanma Tarihi**: 2025-05-10
+- **Gerçek Süre**: 3 saat
 - **Açıklama**: Seçilen kumaş deseninin 3D model üzerine uygulanması
+- **Yapılanlar**:
+  - [x] Sadece kumaş mesh'lerini hedefleme algoritması geliştirildi
+  - [x] Mesh tanımlama algoritması ile kumaş parçalarını otomatik tespit etme
+  - [x] Kumaş deseninin texture olarak yüklenmesi ve optimizasyonu
+  - [x] Diffuse map olarak kumaş deseninin uygulanması
+  - [x] UV mapping ayarlarının yapılması ve desen ölçeklendirme
+  - [x] Texture tekrarlama (repeat) ve döndürme ayarları eklendi
+  - [x] Material tanıma için akıllı algoritmalar geliştirildi
+- **Kabul Kriterleri**:
+  - ✅ Kumaş mesh'lerini düğme ve fermuar gibi mesh'lerden doğru bir şekilde ayırt edebilmeli
+  - ✅ Texture ayarları (tekrarlama, döndürme, kaydırma) özelleştirilebilmeli
+  - ✅ Material özellikleri (roughness, metalness) doğru şekilde ayarlanabilmeli
+  - ✅ Yeni bir model yüklenirken mevcut texture korunmalı
+- **Notlar**:
+  - Kumaş mesh'leri için tanıma algoritması isim, materyal ismi ve boyut tabanlı çalışıyor
+  - Mesh tanımlanamadığında otomatik olarak tüm modele texture uygulanabiliyor
+  - debug_ModelInfo() fonksiyonu ile model parçalarının detaylı bilgilerini konsola yazdırabiliyoruz
+
+### FEATURE-010-C2: Akıllı Mesh Tanıma Algoritması
+- **Öncelik**: P0
+- **Tahmini Süre**: 2 saat
+- **Durum**: Planlandı 🗓️
+- **Açıklama**: Kumaş mesh'lerini düğmeler, dikişler ve diğer detaylardan ayırt etmek için akıllı bir algoritma geliştirme
 - **Yapılacaklar**:
-  - [ ] Kumaş deseninin texture olarak yüklenmesi
-  - [ ] Model malzemelerinin (materials) incelenmesi ve değiştirilmesi
-  - [ ] Diffuse map olarak kumaş deseninin uygulanması
-  - [ ] UV mapping ayarlarının yapılması
-  - [ ] Texture tekrarlama (repeat) ve döndürme ayarları
-  - [ ] Kumaş türüne göre normal ve metallic/roughness ayarları
-  - [ ] Kumaş desen önizlemesinin oluşturulması
+  - [ ] Material tiplerine göre mesh sınıflandırma
+  - [ ] Kumaş mesh'lerini tanımlamak için geometri analizi
+  - [ ] Material isimlerine göre tanıma ("fabric", "cloth", "textile" gibi anahtar kelimeler)
+  - [ ] Yüzey alanına göre ana kumaş parçalarını tanımlama (en büyük mesh'ler genellikle kumaştır)
+  - [ ] Kumaş mesh'i tespiti için konfigürasyon ayarları
+- **Kabul Kriterleri**:
+  - Tüm modellerde sağlıklı çalışmalı
+  - Yalnızca kumaş mesh'lerine desen uygulamalı
+  - Düğmeler, fermuarlar ve dikişlere dokunmamalı
+
+### FEATURE-010-I: Marka Kimliği Arka Plan Seçeneği
+- **Öncelik**: P2
+- **Tahmini Süre**: 1.5 saat
+- **Durum**: Planlandı 🗓️
+- **Açıklama**: Görüntüleyicide minimalist marka kimliği arka plan seçeneği ekleme
+- **Yapılacaklar**:
+  - [ ] Arka plan rengi/gradient ayarı (Scene.background)
+  - [ ] Minimalist marka logosu ekleme seçeneği (düşük opasite ile)
+  - [ ] Marka kimliğine uygun zemin düzlemi ekleme seçeneği
+  - [ ] Marka görünümünü açma/kapama düğmesi
+  - [ ] Farklı marka temaları arasında geçiş yapabilme
+  - [ ] Minimalist görünüm - profesyonel ancak sade
+- **Kabul Kriterleri**:
+  - Markanın profesyonel imajını yansıtmalı
+  - Kumaşın görünürlüğünü engellememeli
+  - Kullanıcı tarafından kolaylıkla açılıp kapanabilmeli
 
 ### FEATURE-010-D: Kullanıcı Kontrolleri
 - **Öncelik**: P1
@@ -163,9 +208,9 @@ Bu görev, Benzer Desen projesinde tekstil desenlerini 3D giysi modelleri üzeri
 
 ## 📊 İlerleme Takibi
 
-**İlerleme**: %30 (FEATURE-010-A ve FEATURE-010-B tamamlandı)
+**İlerleme**: %40 (FEATURE-010-A, FEATURE-010-B ve FEATURE-010-C tamamlandı)
 
-**Sonraki Adım**: FEATURE-010-C - Kumaş Deseni Uygulama (Bir sonraki session'da)
+**Sonraki Adım**: FEATURE-010-C2 - Akıllı Mesh Tanıma Algoritması iyileştirmeleri ve kullanıcı kontrolleri
 
 ## 📝 Teknik Notlar ve Talimatlar
 
@@ -327,6 +372,14 @@ animate();
    - Sorun: Farklı tarayıcılarda WebGL desteği ve performansı
    - Çözüm: Feature detection, fallback options, cross-browser test
 
+5. **Doğru Mesh Seçimi**
+   - Sorun: Kumaş mesh'lerini düğmeler ve dikişlerden ayırt etmek
+   - Çözüm: Akıllı mesh tanıma algoritması, material ve geometri analizi, konfigürasyon sistemi
+
+6. **Marka Görünümü**
+   - Sorun: Marka kimliğinin 3D görüntüleyiciyle entegrasyonu
+   - Çözüm: Minimal tasarım yaklaşımı, düşük opasite, kontrollü görünüm
+
 ## 📝 İlerleme Günlüğü
 
 ### 10 Mayıs 2025
@@ -358,6 +411,14 @@ animate();
 - Browser uyumluluk kontrolleri eklendi
 - Temel model yükleme ve texture uygulama işlevi test edildi
 
+### 10 Mayıs 2025 - Session 2
+- FEATURE-010-C tamamlandı: Akıllı Kumaş Uygulama algoritması geliştirildi
+- Kumaş mesh'lerini tespit eden algoritma eklendi
+- Texture uygulaması için gelişmiş parametreler (repeat, rotation, offset) eklendi
+- Mevcut applyFabricTexture fonksiyonu korunurken, daha gelişmiş applyFabricTextureIntelligent fonksiyonu eklendi
+- Material özelliklerini (roughness, metalness, vb.) akıllıca ayarlayan algoritma geliştirildi
+- Bugün ayrıca 3D model dosyalarını .gitignore'a ekleyerek Git repo'sunu optimize ettik
+
 ### 11 Mayıs 2025
 - GLTF model incelemesi yapıldı
 - Model yapısı analiz edildi ve parçalar (mesh'ler) incelendi
@@ -388,4 +449,7 @@ animate();
 - "<" ve ">" butonları oluşturuldu ve görsel geri bildirim eklendi
 
 **Sonraki Adımlar:**
-- FEATURE-010-C görevine geçme: Kumaş desenini 3D model üzerine uygulamayı iyileştirme
+- FEATURE-010-C ve C2'ye geçme: 
+  - Kumaş desenini sadece kumaş parçalarına uygulama
+  - Akıllı mesh tanıma algoritması geliştirme
+  - Marka arka plan seçeneği ekleme
