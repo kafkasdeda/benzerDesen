@@ -473,9 +473,9 @@ class Fabric3DVisualizer {
                     
                     this._debug('Model başarıyla yüklendi.');
                     
-                    // Önceki texture varsa, uygula
+                    // Önceki texture varsa, akıllı texture uygulama kullan
                     if (this.currentFabricTexture) {
-                        this.applyFabricTexture(this.currentFabricTexture);
+                        this.applyFabricTextureIntelligent(this.currentFabricTexture);
                     }
                     
                     resolve(this.model);

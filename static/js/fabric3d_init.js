@@ -85,8 +85,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.log('Fabric3D: Varsayılan model yüklendi', result);
                 updateStatus('Varsayılan model yüklendi: ' + result.info.name, statusDiv);
                 
-                // Örnek olarak bir kumaş deseni de uygula
-                return fabric3d.applyFabricTexture('/thumbnails/fabric001.jpg');
+                // Örnek olarak bir kumaş deseni akıllı şekilde uygula
+                return fabric3d.applyFabricTextureIntelligent('/thumbnails/fabric001.jpg');
             })
             .then(() => {
                 console.log('Fabric3D: Örnek kumaş uygulandı');
@@ -496,10 +496,16 @@ function createControlPanel(container, fabric3d) {
         // Durum mesajını güncelle
         updateStatus('Kumaş uygulanıyor...');
         
-        // Kumaşı uygula
-        fabric3d.applyFabricTexture(texturePath)
-            .then(() => {
-                updateStatus('Kumaş başarıyla uygulandı!');
+        // Kumaşı akıllı şekilde uygula
+        fabric3d.applyFabricTextureIntelligent(texturePath, {
+            repeat: [2, 2],      // Varsayılan tekrar sayısı
+            rotation: 0,         // Varsayılan döndürme (derece)
+            offset: [0, 0],      // Varsayılan kaydırma
+            colorCorrection: true // Renk düzeltme aktif
+        })
+            .then((result) => {
+                const meshCount = result.meshCount || 0;
+                updateStatus(`Kumaş başarıyla uygulandı! (${meshCount} mesh)`);
             })
             .catch(error => {
                 updateStatus(`Hata: ${error.message}`);
