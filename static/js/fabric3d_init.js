@@ -31,18 +31,253 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log('Fabric3D: Three.js ortamı başarıyla başlatıldı.');
     
+    // Model listesini yükle
+    fabric3d.loadModelList()
+    .then(modelList => {
+    console.log('Fabric3D: Model listesi başarıyla yüklendi.');
+        
+        // Model listesi hakkında bilgi göster
+    if (modelList && modelList.models && modelList.models.length > 0) {
+            console.log(`Fabric3D: ${modelList.models.length} model bulundu.`);
+                
+                // Navigasyon butonlarını göster/gizle
+                const prevButton = document.querySelector('.fabric3d-nav-button.prev');
+                const nextButton = document.querySelector('.fabric3d-nav-button.next');
+                
+                if (prevButton && nextButton) {
+                    prevButton.style.display = 'flex';
+                    nextButton.style.display = 'flex';
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Fabric3D: Model listesi yüklenemedi:', error);
+            updateStatus(`Hata: Model listesi yüklenemedi: ${error.message}`, statusDiv);
+            
+            // 3 saniye sonra tekrar deneme mesajı göster
+            setTimeout(() => {
+                updateStatus('Model listesi yüklenemedi. Sayfayı yenileyip tekrar deneyin.', statusDiv);
+            }, 3000);
+        });
+    
     // Ortam hazır mesajı
     const statusDiv = document.createElement('div');
     statusDiv.className = 'fabric3d-status';
     statusDiv.innerHTML = 'Three.js ortamı hazır!<br>Model ve kumaş bekleniyor...';
     container.appendChild(statusDiv);
     
+    // Gezinme butonları oluştur
+    createNavigationButtons(container, fabric3d, statusDiv);
+    
     // Kontrol panel oluştur
     createControlPanel(container, fabric3d);
     
     // Global erişim (test için)
     window.fabric3d = fabric3d;
+    
+    // Varsayılan modelini test etmek için
+    setTimeout(() => {
+        // Yükleme durumunu göster
+        updateStatus('Varsayılan model yükleniyor...', statusDiv);
+        
+        fabric3d.loadDefaultModel('men')
+            .then(result => {
+                console.log('Fabric3D: Varsayılan model yüklendi', result);
+                updateStatus('Varsayılan model yüklendi: ' + result.info.name, statusDiv);
+                
+                // Örnek olarak bir kumaş deseni de uygula
+                return fabric3d.applyFabricTexture('/thumbnails/fabric001.jpg');
+            })
+            .then(() => {
+                console.log('Fabric3D: Örnek kumaş uygulandı');
+            })
+            .catch(error => {
+                console.error('Fabric3D: Varsayılan model yüklenemedi:', error);
+                updateStatus('Hata: Varsayılan model yüklenemedi: ' + error.message, statusDiv);
+            });
+    }, 2000); // 2 saniye sonra
 });
+
+/**
+ * Kontrol paneli oluştur
+ * @param {HTMLElement} container Panel konteyneri
+ * @param {Fabric3DVisualizer} fabric3d Fabric3D nesnesi
+ */
+/**
+ * Durum mesajını güncelle
+ * @param {string} message Durum mesajı
+ * @param {HTMLElement} statusDiv Durum mesajı div'i
+ */
+function updateStatus(message, statusDiv) {
+    if (!statusDiv) return;
+    statusDiv.innerHTML = message;
+}
+
+/**
+ * Model gezinme butonlarını oluştur
+ * @param {HTMLElement} container Panel konteyneri
+ * @param {Fabric3DVisualizer} fabric3d Fabric3D nesnesi
+ * @param {HTMLElement} statusDiv Durum mesajı div'i
+ */
+function createNavigationButtons(container, fabric3d, statusDiv) {
+    // Sol gezinme butonu (önceki model)
+    const prevButton = document.createElement('button');
+    prevButton.className = 'fabric3d-nav-button prev';
+    prevButton.innerHTML = '&lt;'; // HTML sayfasında "<" olarak görünecek
+    prevButton.style.cssText = `
+        position: absolute;
+        top: 50%;
+        left: 10px;
+        width: 40px;
+        height: 40px;
+        background-color: rgba(0, 0, 0, 0.5);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        font-size: 20px;
+        display: none; /* Başlangıçta gizli, model listesi yüklendiğinde gösterilecek */
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 100;
+        transform: translateY(-50%);
+        opacity: 0.7;
+        transition: opacity 0.2s, background-color 0.2s;
+    `;
+    
+    prevButton.addEventListener('mouseover', function() {
+        this.style.opacity = '1';
+    });
+    
+    prevButton.addEventListener('mouseout', function() {
+        this.style.opacity = '0.7';
+    });
+    
+    prevButton.addEventListener('click', function() {
+        // Buton devre dışı görünümü
+        this.style.backgroundColor = 'rgba(0, 0, 0, 0.3)';
+        this.style.cursor = 'wait';
+        
+        if (!fabric3d.isModelLoaded || !fabric3d.currentModelId) {
+            updateStatus('Henüz bir model yüklenmedi.', statusDiv);
+            // Butonu normal hale getir
+            setTimeout(() => {
+                this.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+                this.style.cursor = 'pointer';
+            }, 500);
+            return;
+        }
+        
+        updateStatus('Önceki model yükleniyor...', statusDiv);
+        
+        fabric3d.prevModel()
+            .then(result => {
+                updateStatus(`Model yüklendi: ${result.info.name}`, statusDiv);
+                // Butonu normal hale getir
+                this.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+                this.style.cursor = 'pointer';
+                
+                // Güncel kumaş deseni varsa, yeni modele uygula
+                if (fabric3d.currentFabricTexture) {
+                    fabric3d.applyFabricTexture(fabric3d.currentFabricTexture);
+                }
+            })
+            .catch(error => {
+                updateStatus(`Hata: ${error.message}`, statusDiv);
+                console.error('Önceki model yükleme hatası:', error);
+                
+                // Butonu normal hale getir, ama hata rengi ile
+                this.style.backgroundColor = 'rgba(255, 0, 0, 0.3)';
+                this.style.cursor = 'pointer';
+                
+                // 2 saniye sonra normal renge dön
+                setTimeout(() => {
+                    this.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+                }, 2000);
+            });
+    });
+    
+    // Sağ gezinme butonu (sonraki model)
+    const nextButton = document.createElement('button');
+    nextButton.className = 'fabric3d-nav-button next';
+    nextButton.innerHTML = '&gt;'; // HTML sayfasında ">" olarak görünecek
+    nextButton.style.cssText = `
+        position: absolute;
+        top: 50%;
+        right: 10px;
+        width: 40px;
+        height: 40px;
+        background-color: rgba(0, 0, 0, 0.5);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        font-size: 20px;
+        display: none; /* Başlangıçta gizli, model listesi yüklendiğinde gösterilecek */
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 100;
+        transform: translateY(-50%);
+        opacity: 0.7;
+        transition: opacity 0.2s, background-color 0.2s;
+    `;
+    
+    nextButton.addEventListener('mouseover', function() {
+        this.style.opacity = '1';
+    });
+    
+    nextButton.addEventListener('mouseout', function() {
+        this.style.opacity = '0.7';
+    });
+    
+    nextButton.addEventListener('click', function() {
+        // Buton devre dışı görünümü
+        this.style.backgroundColor = 'rgba(0, 0, 0, 0.3)';
+        this.style.cursor = 'wait';
+        
+        if (!fabric3d.isModelLoaded || !fabric3d.currentModelId) {
+            updateStatus('Henüz bir model yüklenmedi.', statusDiv);
+            // Butonu normal hale getir
+            setTimeout(() => {
+                this.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+                this.style.cursor = 'pointer';
+            }, 500);
+            return;
+        }
+        
+        updateStatus('Sonraki model yükleniyor...', statusDiv);
+        
+        fabric3d.nextModel()
+            .then(result => {
+                updateStatus(`Model yüklendi: ${result.info.name}`, statusDiv);
+                // Butonu normal hale getir
+                this.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+                this.style.cursor = 'pointer';
+                
+                // Güncel kumaş deseni varsa, yeni modele uygula
+                if (fabric3d.currentFabricTexture) {
+                    fabric3d.applyFabricTexture(fabric3d.currentFabricTexture);
+                }
+            })
+            .catch(error => {
+                updateStatus(`Hata: ${error.message}`, statusDiv);
+                console.error('Sonraki model yükleme hatası:', error);
+                
+                // Butonu normal hale getir, ama hata rengi ile
+                this.style.backgroundColor = 'rgba(255, 0, 0, 0.3)';
+                this.style.cursor = 'pointer';
+                
+                // 2 saniye sonra normal renge dön
+                setTimeout(() => {
+                    this.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+                }, 2000);
+            });
+    });
+    
+    // Butonları konteynere ekle
+    container.appendChild(prevButton);
+    container.appendChild(nextButton);
+}
 
 /**
  * Kontrol paneli oluştur
@@ -280,6 +515,27 @@ function createControlPanel(container, fabric3d) {
         if (!statusDiv) return;
         statusDiv.innerHTML = message;
     }
+    
+    // Model yükleme butonu işlevini güncelle - artık ID ile yükleme yapacak
+    loadModelBtn.addEventListener('click', function() {
+        const modelPath = modelSelect.value;
+        if (!modelPath) return;
+        
+        // Durum mesajını güncelle
+        updateStatus('Model yükleniyor...');
+        
+        // Model ID'si ile yükleme yap
+        // Not: Bu örnekte path yerine ID kullanmalısınız
+        // Şimdilik basit tutmak için modelPath ile devam ediyoruz
+        fabric3d.loadModel(modelPath)
+            .then(() => {
+                updateStatus('Model başarıyla yüklendi!');
+            })
+            .catch(error => {
+                updateStatus(`Hata: ${error.message}`);
+                console.error('Model yükleme hatası:', error);
+            });
+    });
     
     // Kontrol panelini konteynere ekle
     container.appendChild(controlPanel);

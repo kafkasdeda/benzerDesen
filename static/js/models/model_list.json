@@ -1,0 +1,94 @@
+{
+  "models": [
+    {
+      "id": "men-jacket-default",
+      "name": "Erkek Ceket - Klasik",
+      "category": "men",
+      "type": "jacket",
+      "variant": "default",
+      "path": "3d-models/men/jacket/default/men-jacket_gltf_thin.gltf",
+      "thumbnail": "static/img/thumbnails/men-jacket-default.jpg",
+      "materialIndex": 0,
+      "defaultScale": 1.0,
+      "defaultPosition": [0, 0, 0],
+      "defaultRotation": [0, 0, 0],
+      "cameraDistance": 5,
+      "supportedFabricTypes": ["KM", "KP"]
+    },
+    {
+      "id": "men-jacket-business",
+      "name": "Erkek Ceket - İş",
+      "category": "men",
+      "type": "jacket",
+      "variant": "jacket2",
+      "path": "3d-models/men/jacket/jacket2/business suit_gltf_thin.gltf",
+      "thumbnail": "static/img/thumbnails/men-jacket-business.jpg",
+      "materialIndex": 0,
+      "defaultScale": 1.0,
+      "defaultPosition": [0, 0, 0],
+      "defaultRotation": [0, 0, 0],
+      "cameraDistance": 5,
+      "supportedFabricTypes": ["KM", "KP"]
+    },
+    {
+      "id": "women-dress-casual",
+      "name": "Kadın Elbise - Günlük",
+      "category": "women",
+      "type": "dress",
+      "variant": "default",
+      "path": "3d-models/women/dress/1930s casual_gltf_thin.gltf",
+      "thumbnail": "static/img/thumbnails/women-dress-casual.jpg",
+      "materialIndex": 0,
+      "defaultScale": 1.0,
+      "defaultPosition": [0, 0, 0],
+      "defaultRotation": [0, 0, 0],
+      "cameraDistance": 5,
+      "supportedFabricTypes": ["KW", "KP"]
+    },
+    {
+      "id": "women-jacket",
+      "name": "Kadın Ceket",
+      "category": "women",
+      "type": "jacket",
+      "variant": "default",
+      "path": "3d-models/women/jacket/women-jacket_gltf_thin.gltf",
+      "thumbnail": "static/img/thumbnails/women-jacket.jpg",
+      "materialIndex": 0, 
+      "defaultScale": 1.0,
+      "defaultPosition": [0, 0, 0],
+      "defaultRotation": [0, 0, 0],
+      "cameraDistance": 5,
+      "supportedFabricTypes": ["KW", "KP"]
+    }
+  ],
+  "mappings": {
+    "fabric-type": {
+      "KM": ["men-jacket-default", "men-jacket-business"],
+      "KW": ["women-dress-casual", "women-jacket"],
+      "KP": ["men-jacket-default", "women-jacket"]
+    },
+    "defaults": {
+      "men": "men-jacket-default",
+      "women": "women-dress-casual",
+      "unknown": "men-jacket-default"
+    }
+  },
+  "navigation": {
+    "men-jacket-default": {
+      "next": "men-jacket-business",
+      "prev": "women-jacket"
+    },
+    "men-jacket-business": {
+      "next": "women-dress-casual",
+      "prev": "men-jacket-default"
+    },
+    "women-dress-casual": {
+      "next": "women-jacket",
+      "prev": "men-jacket-business"
+    },
+    "women-jacket": {
+      "next": "men-jacket-default",
+      "prev": "women-dress-casual"
+    }
+  }
+}

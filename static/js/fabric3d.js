@@ -30,15 +30,24 @@ class Fabric3DVisualizer {
         // Model ve texture bilgileri
         this.loadedModelPath = null;
         this.currentFabricTexture = null;
+        this.currentModelId = null;
+        
+        // Model listesi
+        this.modelList = null;
+        this.modelListPath = 'static/js/models/model_list.json';
         
         // Durum takibi
         this.isInitialized = false;
         this.isModelLoaded = false;
+        this.isModelListLoaded = false;
         
         // Yükleme yönetimi
         this.loadingManager = null;
         this.gltfLoader = null;
         this.textureLoader = null;
+        this.jsonLoader = null;
+        this.isLoading = false;
+        this.loadingElement = null;
         
         // Animasyon
         this.animationFrameId = null;
@@ -105,6 +114,11 @@ class Fabric3DVisualizer {
             // Yükleyiciler
             this.gltfLoader = new THREE.GLTFLoader(this.loadingManager);
             this.textureLoader = new THREE.TextureLoader(this.loadingManager);
+            this.jsonLoader = new THREE.FileLoader(this.loadingManager);
+            this.jsonLoader.setResponseType('json');
+            
+            // Yükleme göstergesi oluştur
+            this._createLoadingIndicator();
             
             // Kontroller
             this._setupControls();
@@ -224,6 +238,99 @@ class Fabric3DVisualizer {
     }
     
     /**
+     * Yükleme göstergesi oluştur
+     * @private
+     */
+    _createLoadingIndicator() {
+        // Eğer zaten varsa, tekrar oluşturma
+        if (this.loadingElement) return;
+        
+        // Loading div
+        this.loadingElement = document.createElement('div');
+        this.loadingElement.className = 'fabric3d-loading';
+        this.loadingElement.style.position = 'absolute';
+        this.loadingElement.style.top = '0';
+        this.loadingElement.style.left = '0';
+        this.loadingElement.style.width = '100%';
+        this.loadingElement.style.height = '100%';
+        this.loadingElement.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+        this.loadingElement.style.display = 'flex';
+        this.loadingElement.style.alignItems = 'center';
+        this.loadingElement.style.justifyContent = 'center';
+        this.loadingElement.style.zIndex = '1000';
+        this.loadingElement.style.color = 'white';
+        this.loadingElement.style.display = 'none';
+        
+        // Progress container
+        const progressContainer = document.createElement('div');
+        progressContainer.className = 'fabric3d-progress-container';
+        progressContainer.style.width = '80%';
+        progressContainer.style.maxWidth = '300px';
+        progressContainer.style.textAlign = 'center';
+        
+        // Progress text
+        const progressText = document.createElement('div');
+        progressText.className = 'fabric3d-progress-text';
+        progressText.textContent = 'Yükleniyor...';
+        progressText.style.marginBottom = '10px';
+        progressText.style.fontWeight = 'bold';
+        
+        // Progress bar container
+        const progressBarContainer = document.createElement('div');
+        progressBarContainer.className = 'fabric3d-progress-bar-container';
+        progressBarContainer.style.width = '100%';
+        progressBarContainer.style.height = '10px';
+        progressBarContainer.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
+        progressBarContainer.style.borderRadius = '5px';
+        progressBarContainer.style.overflow = 'hidden';
+        
+        // Progress bar
+        const progressBar = document.createElement('div');
+        progressBar.className = 'fabric3d-progress-bar';
+        progressBar.style.width = '0%';
+        progressBar.style.height = '100%';
+        progressBar.style.backgroundColor = '#4CAF50';
+        progressBar.style.transition = 'width 0.3s ease';
+        
+        // Progress percentage
+        const progressPercentage = document.createElement('div');
+        progressPercentage.className = 'fabric3d-progress-percentage';
+        progressPercentage.textContent = '0%';
+        progressPercentage.style.marginTop = '5px';
+        
+        // Yapıyı oluştur
+        progressBarContainer.appendChild(progressBar);
+        progressContainer.appendChild(progressText);
+        progressContainer.appendChild(progressBarContainer);
+        progressContainer.appendChild(progressPercentage);
+        this.loadingElement.appendChild(progressContainer);
+        
+        // Container'a ekle
+        this.container.appendChild(this.loadingElement);
+    }
+    
+    /**
+     * Yükleme göstergesini göster/gizle
+     * @param {boolean} show Gösterme durumu
+     * @private
+     */
+    _toggleLoadingIndicator(show) {
+        if (!this.loadingElement) return;
+        
+        this.isLoading = show;
+        this.loadingElement.style.display = show ? 'flex' : 'none';
+        
+        // Gösterge sıfırla
+        if (show) {
+            const progressBar = this.loadingElement.querySelector('.fabric3d-progress-bar');
+            const progressPercentage = this.loadingElement.querySelector('.fabric3d-progress-percentage');
+            
+            if (progressBar) progressBar.style.width = '0%';
+            if (progressPercentage) progressPercentage.textContent = '0%';
+        }
+    }
+
+    /**
      * Yükleme ilerlemesi geri çağrısı
      * @param {number} progress İlerleme yüzdesi
      * @private
@@ -232,6 +339,15 @@ class Fabric3DVisualizer {
         // İlerleme göstergesi için hook
         if (typeof this.onProgress === 'function') {
             this.onProgress(progress);
+        }
+        
+        // Görsel ilerleme göstergesini güncelle
+        if (this.loadingElement) {
+            const progressBar = this.loadingElement.querySelector('.fabric3d-progress-bar');
+            const progressPercentage = this.loadingElement.querySelector('.fabric3d-progress-percentage');
+            
+            if (progressBar) progressBar.style.width = `${progress}%`;
+            if (progressPercentage) progressPercentage.textContent = `${progress}%`;
         }
         
         this._debug(`Yükleme ilerlemesi: %${progress}`);
@@ -247,6 +363,29 @@ class Fabric3DVisualizer {
         if (typeof this.onError === 'function') {
             this.onError(url);
         }
+        
+        // Yükleme göstergesini gizle
+        this._toggleLoadingIndicator(false);
+        
+        // Hata mesajı göster
+        if (this.loadingElement) {
+            const progressText = this.loadingElement.querySelector('.fabric3d-progress-text');
+            if (progressText) {
+                progressText.textContent = `Yükleme Hatası: ${url}`;
+                progressText.style.color = '#ff0000';
+            }
+            
+            // 3 saniye sonra gizle
+            setTimeout(() => {
+                this._toggleLoadingIndicator(false);
+                if (progressText) {
+                    progressText.textContent = 'Yükleniyor...';
+                    progressText.style.color = 'white';
+                }
+            }, 3000);
+        }
+        
+        console.error(`Yükleme hatası: ${url}`);
     }
     
     /**
@@ -258,6 +397,39 @@ class Fabric3DVisualizer {
         if (this.debugMode) {
             console.log(`[Fabric3D] ${message}`);
         }
+    }
+    
+    /**
+     * Model listesini yükle
+     * @param {string} [modelListPath=null] Model listesi JSON dosyasının yolu
+     * @returns {Promise} Yükleme tamamlandığında çözümlenen Promise
+     */
+    loadModelList(modelListPath = null) {
+        return new Promise((resolve, reject) => {
+            const path = modelListPath || this.modelListPath;
+            
+            this._debug(`Model listesi yükleniyor: ${path}`);
+            this._toggleLoadingIndicator(true);
+            
+            this.jsonLoader.load(
+                path,
+                (data) => {
+                    this.modelList = data;
+                    this.isModelListLoaded = true;
+                    this._toggleLoadingIndicator(false);
+                    this._debug('Model listesi başarıyla yüklendi.');
+                    resolve(this.modelList);
+                },
+                (xhr) => {
+                    // İlerleme LoadingManager tarafından ele alınıyor
+                },
+                (error) => {
+                    this._toggleLoadingIndicator(false);
+                    console.error('Model listesi yüklenirken hata oluştu:', error);
+                    reject(error);
+                }
+            );
+        });
     }
     
     /**
@@ -279,6 +451,7 @@ class Fabric3DVisualizer {
             }
             
             this._debug(`Model yükleniyor: ${modelPath}`);
+            this._toggleLoadingIndicator(true);
             
             this.gltfLoader.load(
                 modelPath,
@@ -296,6 +469,7 @@ class Fabric3DVisualizer {
                     
                     this.isModelLoaded = true;
                     this.loadedModelPath = modelPath;
+                    this._toggleLoadingIndicator(false);
                     
                     this._debug('Model başarıyla yüklendi.');
                     
@@ -310,10 +484,86 @@ class Fabric3DVisualizer {
                     // İlerleme LoadingManager tarafından ele alınıyor
                 },
                 (error) => {
+                    this._toggleLoadingIndicator(false);
                     console.error('Model yüklenirken hata oluştu:', error);
                     reject(error);
                 }
             );
+        });
+    }
+    
+    /**
+     * ID ile modeli yükle
+     * @param {string} modelId Model ID'si
+     * @returns {Promise} Yükleme tamamlandığında çözümlenen Promise
+     */
+    loadModelById(modelId) {
+        return new Promise(async (resolve, reject) => {
+            if (!this.isInitialized) {
+                reject(new Error('Three.js ortamı başlatılmamış. Önce init() çağırın.'));
+                return;
+            }
+            
+            // Model listesi yüklü değilse, yükle
+            if (!this.isModelListLoaded) {
+                try {
+                    await this.loadModelList();
+                } catch (error) {
+                    reject(new Error('Model listesi yüklenemedi: ' + error.message));
+                    return;
+                }
+            }
+            
+            // Model ID'yi kontrol et
+            if (!this.modelList || !this.modelList.models) {
+                reject(new Error('Model listesi bulunamadı veya geçersiz.'));
+                return;
+            }
+            
+            // Model bilgilerini bul
+            const modelInfo = this.modelList.models.find(model => model.id === modelId);
+            if (!modelInfo) {
+                reject(new Error(`"${modelId}" ID'li model bulunamadı.`));
+                return;
+            }
+            
+            try {
+                // Modeli yükle
+                const model = await this.loadModel(modelInfo.path);
+                this.currentModelId = modelId;
+                
+                // Modele özel ayarları uygula
+                if (modelInfo.defaultScale && modelInfo.defaultScale !== 1.0) {
+                    this.model.scale.set(
+                        modelInfo.defaultScale,
+                        modelInfo.defaultScale,
+                        modelInfo.defaultScale
+                    );
+                }
+                
+                if (modelInfo.defaultPosition) {
+                    this.model.position.set(
+                        modelInfo.defaultPosition[0],
+                        modelInfo.defaultPosition[1],
+                        modelInfo.defaultPosition[2]
+                    );
+                }
+                
+                if (modelInfo.defaultRotation) {
+                    this.model.rotation.set(
+                        modelInfo.defaultRotation[0] * (Math.PI / 180),
+                        modelInfo.defaultRotation[1] * (Math.PI / 180),
+                        modelInfo.defaultRotation[2] * (Math.PI / 180)
+                    );
+                }
+                
+                resolve({
+                    model: model,
+                    info: modelInfo
+                });
+            } catch (error) {
+                reject(error);
+            }
         });
     }
     
@@ -464,6 +714,150 @@ class Fabric3DVisualizer {
         });
     }
     
+    /**
+     * Sonraki modele geç
+     * @returns {Promise} İşlem tamamlandığında çözümlenen Promise
+     */
+    nextModel() {
+        return new Promise(async (resolve, reject) => {
+            if (!this.isModelListLoaded || !this.currentModelId) {
+                reject(new Error('Geçerli model yok veya model listesi yüklenmedi.'));
+                return;
+            }
+            
+            // Gezinme bilgisini bul
+            const navigation = this.modelList.navigation[this.currentModelId];
+            if (!navigation || !navigation.next) {
+                reject(new Error('Sonraki model bulunamadı.'));
+                return;
+            }
+            
+            try {
+                // Sonraki modeli yükle
+                const result = await this.loadModelById(navigation.next);
+                resolve(result);
+            } catch (error) {
+                reject(error);
+            }
+        });
+    }
+    
+    /**
+     * Önceki modele geç
+     * @returns {Promise} İşlem tamamlandığında çözümlenen Promise
+     */
+    prevModel() {
+        return new Promise(async (resolve, reject) => {
+            if (!this.isModelListLoaded || !this.currentModelId) {
+                reject(new Error('Geçerli model yok veya model listesi yüklenmedi.'));
+                return;
+            }
+            
+            // Gezinme bilgisini bul
+            const navigation = this.modelList.navigation[this.currentModelId];
+            if (!navigation || !navigation.prev) {
+                reject(new Error('Önceki model bulunamadı.'));
+                return;
+            }
+            
+            try {
+                // Önceki modeli yükle
+                const result = await this.loadModelById(navigation.prev);
+                resolve(result);
+            } catch (error) {
+                reject(error);
+            }
+        });
+    }
+    
+    /**
+     * Varsayılan modeli yükle
+     * @param {string} [category='unknown'] Model kategorisi (men, women, unknown)
+     * @returns {Promise} İşlem tamamlandığında çözümlenen Promise
+     */
+    loadDefaultModel(category = 'unknown') {
+        return new Promise(async (resolve, reject) => {
+            if (!this.isModelListLoaded) {
+                try {
+                    await this.loadModelList();
+                } catch (error) {
+                    reject(new Error('Model listesi yüklenemedi: ' + error.message));
+                    return;
+                }
+            }
+            
+            // Varsayılan model ID'sini bul
+            if (!this.modelList.mappings || !this.modelList.mappings.defaults) {
+                reject(new Error('Varsayılan model eşleştirmeleri bulunamadı.'));
+                return;
+            }
+            
+            const defaultModelId = this.modelList.mappings.defaults[category] || 
+                                 this.modelList.mappings.defaults.unknown;
+            
+            if (!defaultModelId) {
+                reject(new Error('Varsayılan model bulunamadı.'));
+                return;
+            }
+            
+            try {
+                // Varsayılan modeli yükle
+                const result = await this.loadModelById(defaultModelId);
+                resolve(result);
+            } catch (error) {
+                reject(error);
+            }
+        });
+    }
+    
+    /**
+     * Kumaş tipine göre uygun model yükle
+     * @param {string} fabricType Kumaş tipi (KM, KW, KP vb.)
+     * @returns {Promise} İşlem tamamlandığında çözümlenen Promise
+     */
+    loadModelByFabricType(fabricType) {
+        return new Promise(async (resolve, reject) => {
+            if (!this.isModelListLoaded) {
+                try {
+                    await this.loadModelList();
+                } catch (error) {
+                    reject(new Error('Model listesi yüklenemedi: ' + error.message));
+                    return;
+                }
+            }
+            
+            // Kumaş tipi eşleştirmelerini kontrol et
+            if (!this.modelList.mappings || 
+                !this.modelList.mappings['fabric-type'] || 
+                !this.modelList.mappings['fabric-type'][fabricType]) {
+                // Varsayılan modeli yükle
+                try {
+                    const result = await this.loadDefaultModel();
+                    resolve(result);
+                } catch (error) {
+                    reject(error);
+                }
+                return;
+            }
+            
+            // Kumaş tipine uygun ilk modeli al
+            const modelId = this.modelList.mappings['fabric-type'][fabricType][0];
+            
+            if (!modelId) {
+                reject(new Error(`"${fabricType}" kumaş tipi için uygun model bulunamadı.`));
+                return;
+            }
+            
+            try {
+                // Modeli yükle
+                const result = await this.loadModelById(modelId);
+                resolve(result);
+            } catch (error) {
+                reject(error);
+            }
+        });
+    }
+
     /**
      * Kaynakları temizle
      */
