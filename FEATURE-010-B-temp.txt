@@ -1,0 +1,17 @@
+### FEATURE-010-B: 3D Model Yükleme ve Klasör Yapısı
+- **Öncelik**: P0
+- **Tahmini Süre**: 4 saat
+- **Durum**: Devam Ediyor 🔄
+- **Başlangıç Tarihi**: 2025-05-10
+- **Gerçek Süre (şu ana kadar)**: -
+- **Açıklama**: 3D model klasör yapısının oluşturulması ve GLTF modellerinin yüklenmesi
+- **Yapılanlar**:
+  - [x] `3d-models/` klasör yapısının oluşturulması
+  - [x] Erkek ve kadın model klasörlerinin oluşturulması
+- **Yapılacaklar**:
+  - [ ] Mevcut GLTF model dizinleri için metadata bilgisi oluşturma
+  - [ ] GLTF modellerin yüklenmesi ve hazırlanması
+  - [ ] Model yükleme sırasında progress bar eklemek
+  - [ ] Hata durumlarını yönetme mekanizması geliştirmek
+  - [ ] Model metadata'larını kumaş türü ile eşleştirmek için JSON oluşturmak
+  - [ ] Model önbellek mekanizmasını iyileştirmek

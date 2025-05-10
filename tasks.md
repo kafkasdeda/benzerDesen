@@ -158,10 +158,20 @@ Tekstil sektöründe görsel benzerlik analizi ve gruplama sistemi geliştirme p
 ### Yeni Özellik Önerisi
 
 #### FEATURE-010-3d-fabric-visualization
-- **Durum**: Planlama Aşamasında 📝
+- **Durum**: Devam Ediyor 🔄
 - **Öncelik**: P2
-- **Tahmini**: 8s
+- **Tahmini**: 24s
+- **Başlangıç**: 2025-05-10
 - **Açıklama**: Kumaş desenlerini 3D giysi modelleri üzerinde görselleştirme
+- **Alt Görevler**:
+  - [x] FEATURE-010-A: Proje Altyapısı ve Three.js Entegrasyonu (Tamamlandı ✅, 2025-05-10)
+  - [ ] FEATURE-010-B: 3D Model Yükleme ve Klasör Yapısı (Devam Ediyor 🔄)
+  - [ ] FEATURE-010-C: Kumaş Deseni Uygulama
+  - [ ] FEATURE-010-D: Kullanıcı Kontrolleri
+  - [ ] FEATURE-010-E: Kumaş Kodu Analizi ve Otomatik Model Seçimi
+  - [ ] FEATURE-010-F: UI Entegrasyonu
+  - [ ] FEATURE-010-G: Performans İyileştirmeleri
+  - [ ] FEATURE-010-H: Test ve Dokümantasyon
 - **Kabul Kriterleri**:
   - Three.js ile 3D giysi modellerinin görüntülenmesi
   - Kumaş desenlerini 3D model üzerine texture/material olarak uygulama
@@ -169,7 +179,7 @@ Tekstil sektöründe görsel benzerlik analizi ve gruplama sistemi geliştirme p
   - Desen tekrarlama kontrolü ve seamless olmayan görüntüler için çözüm
   - Responsive ve mobil uyumlu kontrol arayüzü
 - **Bağımlılıklar**: UI-001, FEATURE-003
-- **Notlar**: Prototip olarak başlayacak, MVP sonrası geliştirilecek. GLTF formatında ceket modeli kullanılarak yapılacak ilk implementasyon.
+- **Notlar**: Three.js entegrasyonu ve temel klasör yapısı oluşturuldu, sağ panele 3D görselleştirici butonu eklendi. Fabric3DVisualizer sınıfı geliştirildi ve temel model yükleme/texture uygulama yetenekleri eklendi.
 
 ### Özellik Geliştirme (FEATURE)
 
@@ -616,6 +626,8 @@ Tekstil sektöründe görsel benzerlik analizi ve gruplama sistemi geliştirme p
 - [x] UI-009-feedback-stars-fix ✅
 - [x] INFRA-004-sqlite-project-management ✅
 - [x] UI-008-model-version-persistence ✅
+- [x] FEATURE-010-A: 3D Kumaş Görselleştirici - Three.js Entegrasyonu ✅
+- [ ] FEATURE-010-B: 3D Kumaş Görselleştirici - Model Yükleme 🔄
 - [ ] INFRA-001-project-management-transition 🔄
 - [ ] INFRA-002-git-workflow-standardization 🔄
 - [ ] INFRA-003-documentation-standardization

@@ -5,7 +5,7 @@
 C:\projeler\benzerDesen
 ```
 
-**Toplam İlerleme**: 75% (Temel benzerlik analizi, kümeleme, arayüz, performans iyileştirmeleri ve renk modeli iyileştirmeleri tamamlandı; feedback entegrasyonu ve gelişmiş UI özellikleri sonraki iterasyonlarda tamamlanacak)
+**Toplam İlerleme**: 76% (Temel benzerlik analizi, kümeleme, arayüz, performans iyileştirmeleri, renk modeli iyileştirmeleri ve 3D kumaş görselleştirici temelleri tamamlandı; feedback entegrasyonu ve gelişmiş UI özellikleri sonraki iterasyonlarda tamamlanacak)
 
 ## 🚀 Mevcut Durum
 
